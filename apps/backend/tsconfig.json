@@ -1,0 +1,7 @@
+{
+  "extends": "@cover-letter-ai/ts-config/nest.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist"
+  }
+}
