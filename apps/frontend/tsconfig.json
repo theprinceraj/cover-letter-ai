@@ -1,0 +1,8 @@
+{
+  "extends": "@cover-letter-ai/ts-config/vite/app.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist"
+  },
+  "include": ["src"]
+}

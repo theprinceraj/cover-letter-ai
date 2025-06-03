@@ -1,0 +1,3 @@
+{
+  "extends": "@cover-letter-ai/ts-config/vite/app.json"
+}
