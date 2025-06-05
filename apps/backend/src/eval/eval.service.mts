@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { GeminiService } from 'src/gemini.service';
+import { GeminiService } from '../gemini.service.js';
 import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai';
-import { SYSTEM_INSTRUCTION } from './constants';
+import { SYSTEM_INSTRUCTION } from './constants.js';
+import { writeFileSync } from 'fs';
+import { GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
+import type { APIResponse } from '@cover-letter-ai/constants';
 
 @Injectable()
 export class EvalService {
   private readonly ai: GoogleGenAI;
   constructor(private readonly gemini: GeminiService) {
-    this.ai = gemini.ai;
+    this.ai = this.gemini.ai;
   }
 
   async eval(jobDescription: string, studentInfo: string, resume: Express.Multer.File) {
@@ -21,6 +24,7 @@ export class EvalService {
     const contentParts: any = [textualPrompt];
 
     if (resume) {
+      writeFileSync('resume.pdf', resume.buffer);
       const resumeFile = await this.ai.files.upload({
         file: new Blob([resume.buffer], { type: resume.mimetype }),
       });
@@ -34,6 +38,13 @@ export class EvalService {
         systemInstruction: SYSTEM_INSTRUCTION,
       },
     });
-    return response.text;
+
+    const splitResponse = response.text?.split(GEMINI_RESPONSE_DELIMITER);
+    const coverLetter = splitResponse?.[0]?.trim().replace(/`/g, '');
+    const suggestions = splitResponse?.[1]
+      ?.trim()
+      .split('\n')
+      .map((s) => s.trim());
+    return { coverLetter, suggestions } as APIResponse;
   }
 }

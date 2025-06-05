@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { EvalService } from './eval.service';
+import { EvalService } from './eval.service.mjs';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('eval')

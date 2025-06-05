@@ -3,18 +3,13 @@ import { configDotenv } from 'dotenv';
 configDotenv();
 
 // --- Configuration ---
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''; // Get API key from environment variable
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
-const BASE_MODEL = 'models/gemini-1.5-flash-001-tuning'; // Base model for tuning
+const BASE_MODEL = 'models/gemini-1.5-flash-001-tuning';
 const MAX_OUTPUT_LENGTH = 4096; // Maximum character count for the output as per API error
 
 const coverLetterDataset = DATASET;
 
-/**
- * Formats resume information into a readable string for the model input.
- * @param resumeInfo The resume_info object from the dataset.
- * @returns A formatted string representation of the resume.
- */
 function formatResumeInfo(resumeInfo: any): string {
   let formatted = '--- RESUME INFO ---\n';
 
@@ -75,7 +70,6 @@ const tuningExamples = coverLetterDataset.map((entry) => {
   const textInput = `--- JOB DESCRIPTION ---\n${entry.job_description}\n\n${formatResumeInfo(entry.resume_info)}`;
   let output = entry.expected_cover_letter;
 
-  // Truncate output if it exceeds the maximum allowed length
   if (output.length > MAX_OUTPUT_LENGTH) {
     console.warn(`Warning: Output for an example was truncated from ${output.length} to ${MAX_OUTPUT_LENGTH} characters.`);
     output = output.substring(0, MAX_OUTPUT_LENGTH);
@@ -87,19 +81,18 @@ const tuningExamples = coverLetterDataset.map((entry) => {
   };
 });
 
-// Define the tuning request payload
 const tuningPayload = {
-  display_name: 'cover_letter_generator_model', // Changed model name to reflect new task
+  display_name: 'cover_letter_generator_model',
   base_model: BASE_MODEL,
   tuning_task: {
     hyperparameters: {
-      batch_size: 4, // Changed batch_size to 4 (minimum allowed)
+      batch_size: 4,
       learning_rate: 0.001,
       epoch_count: 5,
     },
     training_data: {
       examples: {
-        examples: tuningExamples, // Use the transformed examples here
+        examples: tuningExamples,
       },
     },
   },
@@ -107,18 +100,8 @@ const tuningPayload = {
 
 // --- Helper Functions ---
 
-/**
- * Delays execution for a specified number of milliseconds.
- * @param ms The number of milliseconds to wait.
- */
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Makes an HTTP request and handles potential errors.
- * @param url The URL to fetch.
- * @param options Fetch options (method, headers, body).
- * @returns The JSON response.
- */
 async function makeRequest(url: string, options: RequestInit): Promise<any> {
   try {
     const response = await fetch(url, options);
@@ -129,7 +112,7 @@ async function makeRequest(url: string, options: RequestInit): Promise<any> {
     return await response.json();
   } catch (error) {
     console.error(`Request to ${url} failed:`, error);
-    throw error; // Re-throw to propagate the error
+    throw error;
   }
 }
 
@@ -140,8 +123,6 @@ async function tuneModel() {
     console.error('Error: GEMINI_API_KEY is not set. Please set it as an environment variable or replace it in the script.');
     return;
   }
-
-  // Add a check for DATASET availability
   if (typeof DATASET === 'undefined' || !Array.isArray(DATASET) || DATASET.length === 0) {
     console.error(
       "Error: 'DATASET' is not defined or is empty. Please ensure your cover letter dataset is loaded into the 'DATASET' variable.",
@@ -152,7 +133,7 @@ async function tuneModel() {
   console.log('Initiating model tuning...');
 
   // 1. Initiate the tuning job (POST request)
-  let tunemodelResponse;
+  let tunemodelResponse: any;
   try {
     tunemodelResponse = await makeRequest(`${BASE_URL}/tunedModels?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -176,9 +157,9 @@ async function tuneModel() {
   let tunedModelName: string | undefined;
 
   while (!tuningDone) {
-    await sleep(5000); // Wait for 5 seconds before polling again
+    await sleep(5000);
 
-    let tuningOperationResponse;
+    let tuningOperationResponse: any;
     try {
       tuningOperationResponse = await makeRequest(
         `${BASE_URL.replace('/v1beta', '/v1')}/${operationName}?key=${GEMINI_API_KEY}`, // Note: operation polling uses v1
@@ -189,14 +170,13 @@ async function tuneModel() {
       );
     } catch (error) {
       console.error('Failed to fetch tuning operation status. Retrying...');
-      continue; // Continue polling even if one request fails
+      continue;
     }
 
     const completedPercent = tuningOperationResponse.metadata?.completedPercent || 0;
     tuningDone = tuningOperationResponse.done || false;
 
     // Clear previous line and print current progress (simple version for Node.js console)
-    // In a full application, you might use a more sophisticated terminal library or UI update.
     process.stdout.write(`\rTuning...${completedPercent}%`);
 
     if (tuningDone) {
@@ -210,9 +190,8 @@ async function tuneModel() {
   }
 
   // 3. Get the TunedModel and check its state.
-  // The model is ready to use if the state is active.
   console.log(`Fetching final state of tuned model: ${tunedModelName}`);
-  let tunedModelResponse;
+  let tunedModelResponse: any;
   try {
     tunedModelResponse = await makeRequest(`${BASE_URL}/${tunedModelName}?key=${GEMINI_API_KEY}`, {
       method: 'GET',
@@ -230,5 +209,4 @@ async function tuneModel() {
   return tunedModelResponse;
 }
 
-// Execute the main function
 tuneModel().catch(console.error);
