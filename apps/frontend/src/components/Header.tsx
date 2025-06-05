@@ -32,26 +32,7 @@ export const Header: React.FC = () => {
           </span>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-6">
-          <a
-            href="#features"
-            className="text-sm text-slate-300 hover:text-white transition-colors"
-          >
-            Features
-          </a>
-          <a
-            href="#examples"
-            className="text-sm text-slate-300 hover:text-white transition-colors"
-          >
-            Examples
-          </a>
-          <a
-            href="#pricing"
-            className="text-sm text-slate-300 hover:text-white transition-colors"
-          >
-            Pricing
-          </a>
-        </nav>
+        <nav className="hidden md:flex items-center space-x-6"></nav>
 
         <div className="flex items-center">
           <a

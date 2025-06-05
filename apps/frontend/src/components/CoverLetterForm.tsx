@@ -84,13 +84,13 @@ export const CoverLetterForm: React.FC = () => {
       axios
         .request(config)
         .then((response) => {
-          setApiResponse(response.data);
+          setApiResponse(response.data as APIResponse);
           setStatus("complete");
           setCurrentStep(2);
         })
         .catch((error) => {
           console.error(error);
-          setStatus("idle"); // Reset status on error
+          setStatus("idle");
         });
     }
   };

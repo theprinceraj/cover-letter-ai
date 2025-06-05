@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GEMINI_RESPONSE_DELIMITER = exports.FRONTEND_URL = exports.BACKEND_URL = exports.MAX_OTHER_RELEVANT_INFORMATION_LENGTH = exports.MAX_JOB_DESCRIPTION_LENGTH = void 0;
+exports.MAX_JOB_DESCRIPTION_LENGTH = 4499;
+exports.MAX_OTHER_RELEVANT_INFORMATION_LENGTH = 500;
+exports.BACKEND_URL = "http://localhost:3000";
+exports.FRONTEND_URL = "http://localhost:5173";
+exports.GEMINI_RESPONSE_DELIMITER = "Suggestions for Enhancement:";
+exports.default = {
+    MAX_JOB_DESCRIPTION_LENGTH: exports.MAX_JOB_DESCRIPTION_LENGTH,
+    MAX_OTHER_RELEVANT_INFORMATION_LENGTH: exports.MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
+    BACKEND_URL: exports.BACKEND_URL,
+    FRONTEND_URL: exports.FRONTEND_URL,
+    GEMINI_RESPONSE_DELIMITER: exports.GEMINI_RESPONSE_DELIMITER,
+};

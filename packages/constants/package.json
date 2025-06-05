@@ -1,13 +1,22 @@
 {
   "name": "@cover-letter-ai/constants",
-  "module": "index.ts",
-  "type": "module",
+  "module": "index.js",
+  "type": "commonjs",
   "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "types": "./index.ts",
+      "import": "./index.js",
+      "require": "./index.js",
+      "default": "./index.ts"
+    }
   },
   "peerDependencies": {
     "typescript": "^5"
