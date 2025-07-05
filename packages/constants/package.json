@@ -1,7 +1,7 @@
 {
   "name": "@cover-letter-ai/constants",
   "module": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "private": true,
   "scripts": {
     "build": "tsc",
@@ -12,7 +12,7 @@
   },
   "exports": {
     ".": {
-      "types": "./index.ts",
+      "types": "./index.d.ts",
       "import": "./index.js",
       "require": "./index.js",
       "default": "./index.ts"

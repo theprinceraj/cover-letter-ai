@@ -2,6 +2,9 @@
   "extends": "@cover-letter-ai/ts-config/nest.json",
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "src/*": ["./src/*"]
+    }
   }
 }
