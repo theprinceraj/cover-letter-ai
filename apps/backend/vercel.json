@@ -3,14 +3,21 @@
   "builds": [
     {
       "src": "src/main.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**"]
+      }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/main.ts",
-      "methods": ["GET", "POST", "PUT", "PATCH", "OPTIONS", "DELETE", "HEAD", "CONNECT", "TRACE"]
+      "dest": "src/main.ts"
     }
-  ]
+  ],
+  "functions": {
+    "src/main.ts": {
+      "maxDuration": 30
+    }
+  }
 }
