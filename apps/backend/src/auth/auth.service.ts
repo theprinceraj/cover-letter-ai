@@ -30,10 +30,56 @@ export class AuthService {
     return this.genJwtToken(user);
   }
 
+  async loginGuest(ip: string): Promise<{ access_token: string; guest: any }> {
+    // Check if guest already exists for this IP
+    let guest = await this.db.guest.findOne({ ipAddress: ip });
+
+    if (!guest) {
+      // Create new guest user
+      guest = await this.db.guest.create({
+        ipAddress: ip,
+      });
+    }
+
+    // Generate JWT token for guest
+    const token = await this.genGuestJwtToken(guest);
+
+    return {
+      access_token: token.access_token,
+      guest: {
+        id: guest.id,
+        ipAddress: guest.ipAddress,
+        exhaustedUses: guest.exhaustedUses,
+        useLimit: guest.useLimit,
+      },
+    };
+  }
+
   async genJwtToken(user: any): Promise<{ access_token: string }> {
     const payload = { email: user.email, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async genGuestJwtToken(guest: any): Promise<{ access_token: string }> {
+    const payload = { guestId: guest.id, sub: guest._id, type: 'guest' };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async getMe(user: any): Promise<any> {
+    if (user.ipAddress && !user.email) {
+      return {
+        id: user.id,
+        ipAddress: user.ipAddress,
+        exhaustedUses: user.exhaustedUses,
+        useLimit: user.useLimit,
+        type: 'guest',
+      };
+    }
+
+    return this.db.deleteConfidentialData(user);
   }
 }

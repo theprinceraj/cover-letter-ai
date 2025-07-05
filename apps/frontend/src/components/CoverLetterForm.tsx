@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { TextArea } from "./ui/TextArea";
 import { FileUpload } from "./ui/FileUpload";
 import { Button } from "./ui/Button";
 import { ProgressIndicator } from "./ui/ProgressIndicator";
 import type { FormValues, FormErrors, GenerationStatus } from "../types";
 import { validateForm, getCharacterCount } from "../utils/validation";
-import { FileText, Save, Download, Eye } from "lucide-react";
+import { FileText, Save, Download, Eye, AlertCircle } from "lucide-react";
 import axios from "axios";
 import {
   BACKEND_URL,
@@ -13,8 +13,11 @@ import {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
 } from "@cover-letter-ai/constants";
+import { useAuth } from "../hooks/useAuth";
+import { ModalContext } from "../Contexts";
 
 export const CoverLetterForm: React.FC = () => {
+  const { isAuthenticated, isLoading: authLoading, user, guest } = useAuth();
   const [formValues, setFormValues] = useState<FormValues>({
     jobDescription: "",
     resume: null,
@@ -28,6 +31,8 @@ export const CoverLetterForm: React.FC = () => {
     coverLetter: "",
     suggestions: [],
   });
+  const [error, setError] = useState<string | null>(null);
+  const { openSignInModal } = useContext(ModalContext)!;
 
   const steps = ["Enter Details", "Generate", "Preview"];
 
@@ -48,9 +53,25 @@ export const CoverLetterForm: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
+    if (!isAuthenticated) {
+      setError("Please sign in to generate a cover letter");
+      return;
+    }
+
+    // Check usage limits
+    const currentUser = user || guest;
+    if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit) {
+      setError(
+        "You have reached your usage limit. Please sign up with an email or contact me on X for more uses."
+      );
+      return;
+    }
+
+    // Validate form
     const errors = validateForm(formValues);
     setFormErrors(errors);
 
@@ -58,40 +79,46 @@ export const CoverLetterForm: React.FC = () => {
       setStatus("generating");
       setCurrentStep(1);
 
-      // Simulate API call
-      let data = new FormData();
-      data.append(
-        "jobDescription",
-        formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH)
-      );
-      data.append(
-        "additionalInfo",
-        formValues.additionalInfo.substring(
-          0,
-          MAX_OTHER_RELEVANT_INFORMATION_LENGTH
-        )
-      );
-      data.append("resume", formValues.resume as Blob);
+      try {
+        const formData = new FormData();
+        formData.append(
+          "jobDescription",
+          formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH)
+        );
+        formData.append(
+          "additionalInfo",
+          formValues.additionalInfo.substring(
+            0,
+            MAX_OTHER_RELEVANT_INFORMATION_LENGTH
+          )
+        );
+        formData.append("resume", formValues.resume as Blob);
 
-      let config = {
-        method: "post",
-        maxBodyLength: Infinity,
-        url: `${BACKEND_URL}/eval/cl`,
-        headers: { "Content-Type": "multipart/form-data" },
-        data: data,
-      };
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+          throw new Error("No authentication token found");
+        }
 
-      axios
-        .request(config)
-        .then((response) => {
-          setApiResponse(response.data as APIResponse);
-          setStatus("complete");
-          setCurrentStep(2);
-        })
-        .catch((error) => {
-          console.error(error);
-          setStatus("idle");
+        const response = await axios.post(`${BACKEND_URL}/eval/cl`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         });
+
+        setApiResponse(response.data as APIResponse);
+        setStatus("complete");
+        setCurrentStep(2);
+      } catch (error) {
+        console.error("Error generating cover letter:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to generate cover letter"
+        );
+        setStatus("error");
+        setCurrentStep(0);
+      }
     }
   };
 
@@ -113,10 +140,107 @@ export const CoverLetterForm: React.FC = () => {
   };
 
   const handlePreview = () => {
-    // Implementation for previewing the cover letter would go here
-
-    alert("Cover letter previewed successfully!");
+    // Create a new window for previewing the cover letter
+    const previewWindow = window.open("", "_blank");
+    if (previewWindow) {
+      previewWindow.document.writeln(`
+        <html>
+          <head>
+            <title>Cover Letter Preview</title>
+            <style>
+              body { 
+                font-family: Arial, sans-serif; 
+                line-height: 1.6; 
+                max-width: 800px; 
+                margin: 40px auto; 
+                padding: 20px;
+                background: #f5f5f5;
+              }
+              .cover-letter {
+                background: white;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                white-space: pre-wrap;
+              }
+              .suggestions {
+                margin-top: 30px;
+                padding: 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+              }
+              .suggestions h3 {
+                color: #333;
+                margin-bottom: 15px;
+              }
+              .suggestions ul {
+                margin: 0;
+                padding-left: 20px;
+              }
+              .suggestions li {
+                margin-bottom: 8px;
+                color: #555;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="cover-letter">${apiResponse.coverLetter}</div>
+            ${
+              apiResponse.suggestions && apiResponse.suggestions.length > 0
+                ? `
+              <div class="suggestions">
+                <h3>Suggestions for Improvement:</h3>
+                <ul>
+                  ${apiResponse.suggestions.map((suggestion) => `<li>${suggestion}</li>`).join("")}
+                </ul>
+              </div>
+            `
+                : ""
+            }
+          </body>
+        </html>
+      `);
+      previewWindow.document.close();
+    }
   };
+
+  if (!isAuthenticated && !authLoading) {
+    return (
+      <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+          <div className="p-6 sm:p-10 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
+              <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
+              <span className="text-2xl font-bold text-white mb-4">
+                Authentication Required
+              </span>
+              <p className="text-slate-300 mb-6">
+                Please sign in to generate your cover letter. You can use a
+                guest account for one free use.
+              </p>
+              <Button variant="primary" size="lg" onClick={openSignInModal}>
+                Sign In to Continue
+              </Button>
+            </h2>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+          <div className="p-6 sm:p-10 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+            <p className="text-slate-300">Loading...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
@@ -127,6 +251,15 @@ export const CoverLetterForm: React.FC = () => {
           </h2>
 
           <ProgressIndicator steps={steps} currentStep={currentStep} />
+
+          {error && (
+            <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-md">
+              <div className="flex items-center gap-2 text-red-300">
+                <AlertCircle size={16} />
+                <span>{error}</span>
+              </div>
+            </div>
+          )}
 
           {status === "complete" ? (
             <div className="mt-8 text-center">

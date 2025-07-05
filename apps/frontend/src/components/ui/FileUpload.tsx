@@ -12,7 +12,7 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = ({
   onFileChange,
   error,
-  acceptedTypes = ".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  acceptedTypes = ".pdf,application/pdf",
   label = "Upload Resume",
   currentFile,
 }) => {
@@ -107,7 +107,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               Drag and drop your resume here
             </p>
             <p className="text-xs text-slate-500">
-              Supported formats: PDF, DOCX
+              Supported formats: PDF
             </p>
           </>
         )}

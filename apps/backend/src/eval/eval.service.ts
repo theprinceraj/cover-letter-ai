@@ -10,6 +10,7 @@ import { UserDocument } from 'src/db/schema/user.schema.js';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary, type ConfigOptions } from 'cloudinary';
 import { unlinkSync, writeFileSync } from 'fs';
+import { GuestDocument } from 'src/db/schema/guest.schema.js';
 
 @Injectable()
 export class EvalService {
@@ -31,7 +32,7 @@ export class EvalService {
     cloudinary.config(options);
   }
 
-  async eval({ jobDescription, additionalInfo }: EvalClDto, resume: Express.Multer.File, user: UserDocument) {
+  async eval({ jobDescription, additionalInfo }: EvalClDto, resume: Express.Multer.File, user: UserDocument | GuestDocument) {
     if (user.exhaustedUses >= user.useLimit) throw new BadRequestException('You have exhausted your use limit');
 
     let textualPrompt: string;
@@ -42,7 +43,7 @@ export class EvalService {
     let resumeFileUri: string | null = null;
     if (resume) {
       // resumeFileUri = await this.uploadSingleFile(resume, 'resumes', `${user.email.substring(0, 5)}-${resume.originalname}`);
-      const resumeFileLocalTempName = `${user.email.substring(0, 5)}-${resume.originalname}.pdf`;
+      const resumeFileLocalTempName = `${user.id.substring(0, 5)}-${resume.originalname}.pdf`;
       writeFileSync(resumeFileLocalTempName, resume.buffer);
       const resumeFile = await this.ai.files.upload({
         file: new Blob([resume.buffer], { type: resume.mimetype }),
@@ -68,7 +69,11 @@ export class EvalService {
       .split('\n')
       .map((s) => s.trim());
 
-    await this.db.user.updateOne({ id: user.id }, { $inc: { exhaustedUses: 1 } });
+    if (user.hasOwnProperty('email')) {
+      await this.db.user.updateOne({ id: user.id }, { $inc: { exhaustedUses: 1 } });
+    } else {
+      await this.db.guest.updateOne({ id: user.id }, { $inc: { exhaustedUses: 1 } });
+    }
     await this.db.use.create({
       userId: user.id,
       useCount: 1,
@@ -79,7 +84,7 @@ export class EvalService {
       documentName: resume.originalname,
       suggestions,
       coverLetter,
-      type: 'USER',
+      type: user.hasOwnProperty('email') ? 'USER' : 'GUEST',
     });
 
     return { coverLetter, suggestions } as APIResponse;

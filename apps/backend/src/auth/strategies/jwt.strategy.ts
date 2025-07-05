@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { DbService } from 'src/db/db.service';
-import { UserDocument } from 'src/db/schema';
+import { UserDocument, GuestDocument } from 'src/db/schema';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -18,8 +18,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: any): Promise<UserDocument> {
-    console.log('payload', payload);
+  async validate(payload: any): Promise<UserDocument | GuestDocument> {
+    // console.log('payload', payload);
+    
+    // Check if this is a guest token
+    if (payload.type === 'guest') {
+      const guest = await this.db.guest.findById(payload.sub);
+      if (!guest) throw new UnauthorizedException('Invalid guest token.');
+      return guest;
+    }
+    
+    // Regular user token
     const user = await this.db.user.findById(payload.sub);
     if (!user) throw new UnauthorizedException('Invalid token.');
     return user;

@@ -3,7 +3,7 @@ import { EvalService } from './eval.service.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { EvalClDto } from './eval-cl.dto';
-import { UserDocument } from 'src/db/schema';
+import { GuestDocument, UserDocument } from 'src/db/schema';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { memoryStorage } from 'multer';
 
@@ -24,7 +24,7 @@ export class EvalController {
       },
     }),
   )
-  async eval(@Body() body: EvalClDto, @UploadedFile() resume: Express.Multer.File, @GetUser() user: UserDocument) {
+  async eval(@Body() body: EvalClDto, @UploadedFile() resume: Express.Multer.File, @GetUser() user: UserDocument | GuestDocument) {
     if (!resume) throw new BadRequestException('Resume is required');
     return this.evalService.eval(body, resume, user);
   }
