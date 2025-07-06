@@ -3,7 +3,8 @@ export const MAX_OTHER_RELEVANT_INFORMATION_LENGTH = 500;
 export const BACKEND_URL = "http://localhost:3000";
 export const FRONTEND_URL = "http://localhost:5173";
 export const GEMINI_RESPONSE_DELIMITER = "Suggestions for Enhancement:";
-export const DEFAULT_USE_LIMIT = 3;
+export const DEFAULT_USE_LIMIT_FOR_GUEST = 3;
+export const DEFAULT_USE_LIMIT_FOR_REGISTERED_USER = 10;
 
 export interface APIResponse {
   coverLetter: string;
@@ -20,7 +21,8 @@ export default {
   BACKEND_URL,
   FRONTEND_URL,
 
-  DEFAULT_USE_LIMIT,
+  DEFAULT_USE_LIMIT_FOR_GUEST,
+  DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
   GEMINI_RESPONSE_DELIMITER,
   MAX_JOB_DESCRIPTION_LENGTH,
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,

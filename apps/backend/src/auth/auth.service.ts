@@ -1,7 +1,7 @@
 import { ConflictException, Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { LocalDto } from './dto';
-import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
+import { AUTH_PROVIDERS, DEFAULT_USE_LIMIT_FOR_GUEST, DEFAULT_USE_LIMIT_FOR_REGISTERED_USER } from '@cover-letter-ai/constants';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -21,6 +21,7 @@ export class AuthService {
       hash: await bcrypt.hash(dto.password, 10),
       provider: AUTH_PROVIDERS.EMAIL,
       ipAddress: ip,
+      useLimit: DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
     });
     return this.db.deleteConfidentialData(user); // interceptor implement to replace this
   }
@@ -38,6 +39,7 @@ export class AuthService {
       // Create new guest user
       guest = await this.db.guest.create({
         ipAddress: ip,
+        useLimit: DEFAULT_USE_LIMIT_FOR_GUEST,
       });
     }
 

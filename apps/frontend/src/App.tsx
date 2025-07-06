@@ -1,12 +1,12 @@
-import { useState } from "react";
 import "./App.css";
-import { CoverLetterForm } from "./components/CoverLetterForm";
-import { Footer } from "./components/Footer";
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
 import { ModalContext } from "./Contexts";
+import { useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { TermsOfService } from "./pages/TermsOfService";
+import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 
-function App() {
+export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const openSignInModal = () => setIsSignInModalOpen(true);
   const closeSignInModal = () => setIsSignInModalOpen(false);
@@ -17,16 +17,15 @@ function App() {
         <ModalContext
           value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
         >
-          <Header />
-          <main>
-            <Hero />
-            <CoverLetterForm />
-          </main>
-          <Footer />
+          <Router>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            </Routes>
+          </Router>
         </ModalContext>
       </div>
     </>
   );
 }
-
-export default App;

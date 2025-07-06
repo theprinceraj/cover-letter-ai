@@ -10,14 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cover-letter-ai/constants": "*",
     "@cover-letter-ai/eslint-config": "*",
     "@cover-letter-ai/ts-config": "*",
-    "@cover-letter-ai/constants": "*",
     "@tailwindcss/vite": "^4.1.8",
     "axios": "^1.9.0",
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.3",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {
