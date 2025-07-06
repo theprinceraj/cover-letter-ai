@@ -5,17 +5,18 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./index.js",
-      "default": "./index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.ts"
     }
   },
   "peerDependencies": {
