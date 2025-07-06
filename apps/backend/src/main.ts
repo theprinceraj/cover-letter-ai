@@ -13,12 +13,14 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [FRONTEND_URL],
+    origin: [FRONTEND_URL, 'https://cl-writer.vercel.app', process.env.FRONTEND_URL],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
   });
 
   app.enableShutdownHooks();
 
   await app.listen(process.env.PORT ?? 3000);
+  console.log(`Server is running on port ${process.env.PORT ?? 3000}`);
 }
 bootstrap();

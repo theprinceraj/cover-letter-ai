@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: cover-letter-ai-backend
+    env: node
+    plan: starter
+    region: oregon
+    buildCommand: cd apps/backend && bun install && bun run build
+    startCommand: cd apps/backend && bun run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
