@@ -1,4 +1,5 @@
-import { LogOut, Sparkles, User, UserCheck2Icon } from "lucide-react";
+import { LogOut, User, UserCheck2Icon } from "lucide-react";
+import FullLogo from "../assets/full-logo.webp";
 import { useState, useEffect, useContext } from "react";
 import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
@@ -94,12 +95,13 @@ export const Header: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
-            <div className="flex items-center text-purple-500 mr-2">
+            {/* <div className="flex items-center text-purple-500 mr-2">
               <Sparkles size={24} />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               CoverGenius
-            </span>
+            </span> */}
+            <img src={FullLogo} alt="CoverGenius" className="h-10" />
           </div>
 
           <nav className="hidden md:flex items-center space-x-6"></nav>

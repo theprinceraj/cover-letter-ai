@@ -8,6 +8,7 @@ interface FileUploadProps {
   label?: string;
   currentFile: File | null;
   disabled?: boolean;
+  required?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -17,6 +18,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   label = "Upload Resume",
   currentFile,
   disabled = false,
+  required = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +65,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   return (
     <div className="w-full mb-4">
       <label className="block text-sm font-medium text-slate-200 mb-1.5">
-        {label} <span className="text-slate-400 text-xs">(Optional)</span>
+        {label} {required && <span className="text-purple-400 ml-1">*</span>}
       </label>
 
       <div
