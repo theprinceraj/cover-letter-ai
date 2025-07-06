@@ -1,4 +1,5 @@
 import { Sparkles, Shield, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer: React.FC = () => {
   return (
@@ -44,8 +45,10 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/terms-of-service"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors group"
                 >
                   Terms of Service
@@ -53,11 +56,11 @@ export const Footer: React.FC = () => {
                     size={14}
                     className="inline-block ml-1 text-slate-500 group-hover:text-white"
                   />
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/privacy-policy"
                   className="text-slate-400 hover:text-white transition-colors group"
                 >
                   Privacy Policy
@@ -65,7 +68,7 @@ export const Footer: React.FC = () => {
                     size={14}
                     className="inline-block ml-1 text-slate-500 group-hover:text-white"
                   />
-                </a>
+                </Link>
               </li>
               <li>
                 <a
