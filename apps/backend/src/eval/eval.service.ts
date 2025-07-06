@@ -69,11 +69,14 @@ export class EvalService {
       .split('\n')
       .map((s) => s.trim());
 
+    console.log('AUTH_PROVIDERS:::::', AUTH_PROVIDERS);
+
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
       await this.db.user.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     } else {
       await this.db.guest.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     }
+    console.log('currentUser.provider:::::', currentUser.provider);
     await this.db.use.create({
       userId: currentUser.id,
       useCount: currentUser.exhaustedUses + 1,
