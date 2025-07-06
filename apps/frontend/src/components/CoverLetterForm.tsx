@@ -250,20 +250,6 @@ export const CoverLetterForm: React.FC = () => {
                 onDownload={handleDownload}
               />
 
-              {/* <div className="bg-slate-800 rounded-lg p-6 mb-8">
-                <div className="flex items-start">
-                  <FileText className="text-purple-400 mt-1 mr-3" size={24} />
-                  <div className="text-left">
-                    <h4 className="text-lg font-medium text-white">
-                      Job-Winning Cover Letter
-                    </h4>
-                    <p className="text-slate-400 text-sm">
-                      Generated on {new Date().toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div> */}
-
               {/* Action Buttons */}
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="primary" size="lg" onClick={handleDownload}>
