@@ -99,12 +99,16 @@ export const CoverLetterForm: React.FC = () => {
           throw new Error("No authentication token found");
         }
 
-        const response = await axios.post(`${BACKEND_URL}/eval/cl`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/eval/cl`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setApiResponse(response.data as APIResponse);
         setStatus("complete");
