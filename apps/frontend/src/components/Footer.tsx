@@ -47,8 +47,6 @@ export const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/terms-of-service"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-slate-400 hover:text-white transition-colors group"
                 >
                   Terms of Service
