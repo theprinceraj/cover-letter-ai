@@ -18,6 +18,9 @@ export class Guest {
 
   @Prop({ type: SchemaTypes.Number, required: true, default: 1 })
   useLimit!: number;
+
+  @Prop({ type: SchemaTypes.String, required: true, default: 'GUEST' })
+  provider!: 'GUEST';
 }
 
 export const GuestSchema = SchemaFactory.createForClass(Guest);

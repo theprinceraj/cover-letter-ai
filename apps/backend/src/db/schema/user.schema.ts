@@ -1,4 +1,4 @@
-import { AuthProviders, DEFAULT_USE_LIMIT } from '@cover-letter-ai/constants';
+import { AUTH_PROVIDERS, DEFAULT_USE_LIMIT } from '@cover-letter-ai/constants';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { generateSnowflake } from '../snowflake.util';
@@ -23,7 +23,7 @@ export class User {
   @Prop({ type: SchemaTypes.Number, required: true, default: DEFAULT_USE_LIMIT })
   useLimit!: number;
 
-  @Prop({ type: SchemaTypes.String, required: true, default: AuthProviders.EMAIL })
+  @Prop({ type: SchemaTypes.String, required: true, default: AUTH_PROVIDERS.EMAIL })
   provider!: string;
 
   @Prop({ type: SchemaTypes.Boolean, required: true, default: false, select: false })

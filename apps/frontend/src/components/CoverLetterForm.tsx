@@ -331,6 +331,7 @@ export const CoverLetterForm: React.FC = () => {
                 error={formErrors.jobDescription}
                 showCount={true}
                 currentCount={getCharacterCount(formValues.jobDescription)}
+                disabled={currentStep !== 0}
                 required
               />
 
@@ -340,6 +341,7 @@ export const CoverLetterForm: React.FC = () => {
                   onFileChange={handleFileChange}
                   error={formErrors.resume}
                   currentFile={formValues.resume}
+                  disabled={currentStep !== 0}
                 />
 
                 <TextArea
@@ -353,6 +355,7 @@ export const CoverLetterForm: React.FC = () => {
                   optional={true}
                   showCount={true}
                   currentCount={getCharacterCount(formValues.additionalInfo)}
+                  disabled={currentStep !== 0}
                 />
               </div>
 

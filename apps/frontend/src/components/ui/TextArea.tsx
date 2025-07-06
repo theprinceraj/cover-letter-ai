@@ -8,6 +8,7 @@ interface TextAreaProps
   showCount?: boolean;
   currentCount?: number;
   maxCount?: number;
+  disabled?: boolean;
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
@@ -18,6 +19,7 @@ export const TextArea: React.FC<TextAreaProps> = ({
   currentCount = 0,
   maxCount,
   className = "",
+  disabled = false,
   id,
   ...props
 }) => {
@@ -51,7 +53,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
                     rounded-lg shadow-sm text-slate-200 placeholder-slate-500 
                     focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
                     transition-colors duration-200 resize-y
+                    ${disabled ? "cursor-not-allowed" : "cursor-text"}
                     ${className}`}
+        disabled={disabled}
         {...props}
       />
 

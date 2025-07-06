@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { GeminiService } from '../gemini.service.js';
 import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai';
 import { SYSTEM_INSTRUCTION } from './constants.js';
-import { GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
+import { AUTH_PROVIDERS, GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
 import type { APIResponse } from '@cover-letter-ai/constants';
 import { DbService } from 'src/db/db.service';
 import { EvalClDto } from './eval-cl.dto.js';
@@ -32,8 +32,8 @@ export class EvalService {
     cloudinary.config(options);
   }
 
-  async eval({ jobDescription, additionalInfo }: EvalClDto, resume: Express.Multer.File, user: UserDocument | GuestDocument) {
-    if (user.exhaustedUses >= user.useLimit) throw new BadRequestException('You have exhausted your use limit');
+  async eval({ jobDescription, additionalInfo }: EvalClDto, resume: Express.Multer.File, currentUser: UserDocument | GuestDocument) {
+    if (currentUser.exhaustedUses >= currentUser.useLimit) throw new BadRequestException('You have exhausted your use limit');
 
     let textualPrompt: string;
     if (!additionalInfo) textualPrompt = `Job Description: ${jobDescription}`;
@@ -42,8 +42,8 @@ export class EvalService {
     const contentParts: any = [textualPrompt];
     let resumeFileUri: string | null = null;
     if (resume) {
-      // resumeFileUri = await this.uploadSingleFile(resume, 'resumes', `${user.email.substring(0, 5)}-${resume.originalname}`);
-      const resumeFileLocalTempName = `${user.id.substring(0, 5)}-${resume.originalname}.pdf`;
+      // resumeFileUri = await this.uploadSingleFile(resume, 'resumes', `${currentUser.email.substring(0, 5)}-${resume.originalname}`);
+      const resumeFileLocalTempName = `${currentUser.id.substring(0, 5)}-${resume.originalname}.pdf`;
       writeFileSync(resumeFileLocalTempName, resume.buffer);
       const resumeFile = await this.ai.files.upload({
         file: new Blob([resume.buffer], { type: resume.mimetype }),
@@ -69,14 +69,14 @@ export class EvalService {
       .split('\n')
       .map((s) => s.trim());
 
-    if (user.hasOwnProperty('email')) {
-      await this.db.user.updateOne({ id: user.id }, { $inc: { exhaustedUses: 1 } });
+    if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
+      await this.db.user.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     } else {
-      await this.db.guest.updateOne({ id: user.id }, { $inc: { exhaustedUses: 1 } });
+      await this.db.guest.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     }
     await this.db.use.create({
-      userId: user.id,
-      useCount: 1,
+      userId: currentUser.id,
+      useCount: currentUser.exhaustedUses + 1,
       jobDescription,
       additionalInfo,
       documentUrl: resumeFileUri || '',
@@ -84,7 +84,7 @@ export class EvalService {
       documentName: resume.originalname,
       suggestions,
       coverLetter,
-      type: user.hasOwnProperty('email') ? 'USER' : 'GUEST',
+      type: currentUser.provider === AUTH_PROVIDERS.GUEST ? 'GUEST' : 'USER',
     });
 
     return { coverLetter, suggestions } as APIResponse;
