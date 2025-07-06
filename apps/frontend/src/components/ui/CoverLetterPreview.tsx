@@ -31,36 +31,39 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Cover Letter Preview */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-slate-50 border-b border-slate-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">
-              Cover Letter Preview
+      <div className="bg-slate-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-slate-700 border-b border-slate-600 px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">
+              <span className="hidden md:inline">Cover Letter</span> Preview
             </h3>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleCopy}
-                className="text-slate-600 hover:bg-slate-700"
+                className="text-slate-50 hover:bg-slate-700"
               >
                 {copied ? (
                   <>
                     <Check size={16} className="mr-1" />
-                    Copied!
+                    <span className="hidden md:inline">Copied!</span>
                   </>
                 ) : (
                   <>
                     <Copy size={16} className="mr-1" />
-                    Copy
+                    <span className="hidden md:inline">Copy</span>
                   </>
                 )}
               </Button>
               <Button variant="primary" size="sm" onClick={onDownload}>
                 <Download size={16} className="mr-1" />
-                Download
+                <span className="hidden md:block">Download</span>
               </Button>
             </div>
+          </div>
+          <div className="whitespace-pre-line text-start text-wrap">
+            <span>{coverLetter}</span>
           </div>
         </div>
       </div>
@@ -73,7 +76,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
             className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-700 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-purple-500 rounded-full hidden md:flex md:items-center md:justify-center">
                 <span className="text-white font-medium text-sm">
                   {suggestions.length}
                 </span>
@@ -95,20 +98,20 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
           </button>
 
           {showSuggestions && (
-            <div className="px-6 pb-6">
+            <div className="px-2 md:px-6 pb-6">
               <div className="space-y-4">
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
                     className="flex items-start gap-3 p-4 bg-slate-700 rounded-lg border border-slate-600"
                   >
-                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-6 h-6 bg-purple-500 rounded-full hidden md:flex md:items-center md:justify-center md:shrink-0 md:mt-0.5">
                       <span className="text-white text-xs font-semibold">
                         {index + 1}
                       </span>
                     </div>
-                    <p className="text-slate-200 leading-relaxed">
-                      {suggestion}
+                    <p className="text-slate-200 text-start text-sm md:text-base">
+                      {cleanMarkdownText(suggestion).replace("*", "")}
                     </p>
                   </div>
                 ))}
@@ -119,4 +122,13 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
       )}
     </div>
   );
+};
+
+const cleanMarkdownText = (text: string): string => {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markdown
+    .replace(/\*(.*?)\*/g, "$1") // Remove italic markdown
+    .replace(/`(.*?)`/g, "$1") // Remove inline code
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1") // Remove links, keep text
+    .trim();
 };
