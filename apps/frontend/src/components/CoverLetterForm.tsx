@@ -5,7 +5,7 @@ import { Button } from "./ui/Button";
 import { ProgressIndicator } from "./ui/ProgressIndicator";
 import type { FormValues, FormErrors, GenerationStatus } from "../types";
 import { validateForm, getCharacterCount } from "../utils/validation";
-import { FileText, Save, Download, Eye, AlertCircle } from "lucide-react";
+import { Save, Download, AlertCircle } from "lucide-react";
 import axios from "axios";
 import {
   BACKEND_URL,
@@ -15,6 +15,8 @@ import {
 } from "@cover-letter-ai/constants";
 import { useAuth } from "../hooks/useAuth";
 import { ModalContext } from "../Contexts";
+import { Spinner } from "./ui/Spinner";
+import { CoverLetterPreview } from "./ui/CoverLetterPreview";
 
 export const CoverLetterForm: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading, user, guest } = useAuth();
@@ -57,6 +59,11 @@ export const CoverLetterForm: React.FC = () => {
     e.preventDefault();
     setError(null);
 
+    if (!formValues.resume) {
+      setFormErrors((prev) => ({ ...prev, resume: "Resume is required" }));
+      return;
+    }
+
     if (!isAuthenticated) {
       setError("Please sign in to generate a cover letter");
       return;
@@ -66,7 +73,7 @@ export const CoverLetterForm: React.FC = () => {
     const currentUser = user || guest;
     if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit) {
       setError(
-        "You have reached your usage limit. Please sign up with an email or contact me on X for more uses."
+        "You have reached your usage limit. Please sign up with a new email or contact me on X for more use credits."
       );
       return;
     }
@@ -143,71 +150,6 @@ export const CoverLetterForm: React.FC = () => {
     alert("Cover letter downloaded successfully!");
   };
 
-  const handlePreview = () => {
-    // Create a new window for previewing the cover letter
-    const previewWindow = window.open("", "_blank");
-    if (previewWindow) {
-      previewWindow.document.writeln(`
-        <html>
-          <head>
-            <title>Cover Letter Preview</title>
-            <style>
-              body { 
-                font-family: Arial, sans-serif; 
-                line-height: 1.6; 
-                max-width: 800px; 
-                margin: 40px auto; 
-                padding: 20px;
-                background: #f5f5f5;
-              }
-              .cover-letter {
-                background: white;
-                padding: 40px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                white-space: pre-wrap;
-              }
-              .suggestions {
-                margin-top: 30px;
-                padding: 20px;
-                background: #f8f9fa;
-                border-radius: 8px;
-              }
-              .suggestions h3 {
-                color: #333;
-                margin-bottom: 15px;
-              }
-              .suggestions ul {
-                margin: 0;
-                padding-left: 20px;
-              }
-              .suggestions li {
-                margin-bottom: 8px;
-                color: #555;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="cover-letter">${apiResponse.coverLetter}</div>
-            ${
-              apiResponse.suggestions && apiResponse.suggestions.length > 0
-                ? `
-              <div class="suggestions">
-                <h3>Suggestions for Improvement:</h3>
-                <ul>
-                  ${apiResponse.suggestions.map((suggestion) => `<li>${suggestion}</li>`).join("")}
-                </ul>
-              </div>
-            `
-                : ""
-            }
-          </body>
-        </html>
-      `);
-      previewWindow.document.close();
-    }
-  };
-
   if (!isAuthenticated && !authLoading) {
     return (
       <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
@@ -265,6 +207,14 @@ export const CoverLetterForm: React.FC = () => {
             </div>
           )}
 
+          {currentStep === 1 && (
+            <Spinner
+              variant="overlay"
+              size="xl"
+              message="Generating your personalized cover letter..."
+            />
+          )}
+
           {status === "complete" ? (
             <div className="mt-8 text-center">
               <div className="flex justify-center mb-6">
@@ -293,7 +243,14 @@ export const CoverLetterForm: React.FC = () => {
                 Tailored specifically to the job description you provided.
               </p>
 
-              <div className="bg-slate-800 rounded-lg p-6 mb-8">
+              {/* Inline Cover Letter Preview */}
+              <CoverLetterPreview
+                coverLetter={apiResponse.coverLetter}
+                suggestions={apiResponse.suggestions}
+                onDownload={handleDownload}
+              />
+
+              {/* <div className="bg-slate-800 rounded-lg p-6 mb-8">
                 <div className="flex items-start">
                   <FileText className="text-purple-400 mt-1 mr-3" size={24} />
                   <div className="text-left">
@@ -305,16 +262,20 @@ export const CoverLetterForm: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Button variant="primary" size="lg" onClick={handleDownload}>
                   <Download size={18} className="mr-2" />
-                  Download
+                  Download Cover Letter
                 </Button>
-                <Button variant="outline" size="lg" onClick={handlePreview}>
-                  <Eye size={18} className="mr-2" />
-                  Preview
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => window.location.reload()}
+                >
+                  Generate Another
                 </Button>
               </div>
             </div>
@@ -331,6 +292,7 @@ export const CoverLetterForm: React.FC = () => {
                 error={formErrors.jobDescription}
                 showCount={true}
                 currentCount={getCharacterCount(formValues.jobDescription)}
+                disabled={currentStep !== 0}
                 required
               />
 
@@ -340,6 +302,8 @@ export const CoverLetterForm: React.FC = () => {
                   onFileChange={handleFileChange}
                   error={formErrors.resume}
                   currentFile={formValues.resume}
+                  disabled={currentStep !== 0}
+                  required
                 />
 
                 <TextArea
@@ -353,6 +317,7 @@ export const CoverLetterForm: React.FC = () => {
                   optional={true}
                   showCount={true}
                   currentCount={getCharacterCount(formValues.additionalInfo)}
+                  disabled={currentStep !== 0}
                 />
               </div>
 

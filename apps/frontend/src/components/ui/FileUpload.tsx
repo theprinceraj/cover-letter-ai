@@ -7,6 +7,8 @@ interface FileUploadProps {
   acceptedTypes?: string;
   label?: string;
   currentFile: File | null;
+  disabled?: boolean;
+  required?: boolean;
 }
 
 export const FileUpload: React.FC<FileUploadProps> = ({
@@ -15,6 +17,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   acceptedTypes = ".pdf,application/pdf",
   label = "Upload Resume",
   currentFile,
+  disabled = false,
+  required = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +65,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   return (
     <div className="w-full mb-4">
       <label className="block text-sm font-medium text-slate-200 mb-1.5">
-        {label} <span className="text-slate-400 text-xs">(Optional)</span>
+        {label} {required && <span className="text-purple-400 ml-1">*</span>}
       </label>
 
       <div
@@ -70,8 +74,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
+          ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
           w-full h-32 rounded-lg border-2 border-dashed 
-          flex flex-col items-center justify-center cursor-pointer
+          flex flex-col items-center justify-center
           transition-colors duration-200
           ${isDragging ? "border-purple-500 bg-slate-800/50" : "border-slate-700 bg-slate-800"}
           ${error ? "border-red-500" : ""}
@@ -84,6 +89,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           onChange={handleChange}
           accept={acceptedTypes}
           className="hidden"
+          disabled={disabled}
         />
 
         {currentFile ? (
@@ -106,9 +112,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             <p className="text-sm text-slate-400 mb-1">
               Drag and drop your resume here
             </p>
-            <p className="text-xs text-slate-500">
-              Supported formats: PDF
-            </p>
+            <p className="text-xs text-slate-500">Supported formats: PDF</p>
           </>
         )}
       </div>
