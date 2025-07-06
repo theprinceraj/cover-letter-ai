@@ -31,4 +31,11 @@ export class AuthController {
   async getMe(@GetUser() user: UserDocument | GuestDocument) {
     return this.authService.getMe(user);
   }
+
+  @Get('check-is-alive')
+  async checkIsAlive() {
+    return {
+      message: 'Server is alive',
+    };
+  }
 }
