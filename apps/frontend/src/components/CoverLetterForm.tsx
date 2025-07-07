@@ -5,7 +5,7 @@ import { Button } from "./ui/Button";
 import { ProgressIndicator } from "./ui/ProgressIndicator";
 import type { FormValues, FormErrors, GenerationStatus } from "../types";
 import { validateForm, getCharacterCount } from "../utils/validation";
-import { Save, Download, AlertCircle } from "lucide-react";
+import { Download, AlertCircle } from "lucide-react";
 import axios from "axios";
 import {
   BACKEND_URL,
