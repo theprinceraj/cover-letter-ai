@@ -208,14 +208,6 @@ export const CoverLetterForm: React.FC = () => {
             </div>
           )}
 
-          {currentStep === 1 && (
-            <Spinner
-              variant="overlay"
-              size="xl"
-              message="Generating your personalized cover letter..."
-            />
-          )}
-
           {status === "complete" ? (
             <div className="mt-8 text-center">
               <div className="flex justify-center mb-6">
@@ -268,44 +260,55 @@ export const CoverLetterForm: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-8">
-              <TextArea
-                label="Job Description"
-                name="jobDescription"
-                value={formValues.jobDescription}
-                maxCount={MAX_JOB_DESCRIPTION_LENGTH}
-                onChange={handleTextChange}
-                placeholder="Paste the job description here"
-                rows={6}
-                error={formErrors.jobDescription}
-                showCount={true}
-                currentCount={getCharacterCount(formValues.jobDescription)}
-                disabled={currentStep !== 0}
-                required
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FileUpload
-                  label="Resume"
-                  onFileChange={handleFileChange}
-                  error={formErrors.resume}
-                  currentFile={formValues.resume}
+              <div className="relative">
+                <TextArea
+                  label="Job Description"
+                  name="jobDescription"
+                  value={formValues.jobDescription}
+                  maxCount={MAX_JOB_DESCRIPTION_LENGTH}
+                  onChange={handleTextChange}
+                  placeholder="Paste the job description here"
+                  rows={6}
+                  error={formErrors.jobDescription}
+                  showCount={true}
+                  currentCount={getCharacterCount(formValues.jobDescription)}
                   disabled={currentStep !== 0}
                   required
                 />
 
-                <TextArea
-                  label="Additional Information"
-                  name="additionalInfo"
-                  value={formValues.additionalInfo}
-                  maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
-                  onChange={handleTextChange}
-                  placeholder="Add any specific details you'd like to highlight"
-                  rows={4}
-                  optional={true}
-                  showCount={true}
-                  currentCount={getCharacterCount(formValues.additionalInfo)}
-                  disabled={currentStep !== 0}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FileUpload
+                    label="Resume"
+                    onFileChange={handleFileChange}
+                    error={formErrors.resume}
+                    currentFile={formValues.resume}
+                    disabled={currentStep !== 0}
+                    required
+                  />
+
+                  <TextArea
+                    label="Additional Information"
+                    name="additionalInfo"
+                    value={formValues.additionalInfo}
+                    maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
+                    onChange={handleTextChange}
+                    placeholder="Add any specific details you'd like to highlight"
+                    rows={4}
+                    optional={true}
+                    showCount={true}
+                    currentCount={getCharacterCount(formValues.additionalInfo)}
+                    disabled={currentStep !== 0}
+                  />
+                </div>
+                {currentStep === 1 && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
+                    <Spinner
+                      variant="default"
+                      size="xl"
+                      message="Generating your personalized cover letter..."
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="mt-8 w-full m-auto flex justify-center items-center gap-4">
@@ -314,7 +317,7 @@ export const CoverLetterForm: React.FC = () => {
                   variant="primary"
                   size="lg"
                   isLoading={status === "generating"}
-                  disabled={status === "generating"}
+                  disabled={status === "generating" || currentStep === 1}
                 >
                   Generate Cover Letter
                 </Button>
