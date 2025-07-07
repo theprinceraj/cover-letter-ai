@@ -1,4 +1,11 @@
-import { LogOut, User, UserCheck2Icon } from "lucide-react";
+import {
+  ChevronDown,
+  CreditCard,
+  LogIn,
+  LogOut,
+  User,
+  UserCheck2Icon,
+} from "lucide-react";
 import FullLogo from "../assets/full-logo.webp";
 import { useState, useEffect, useContext } from "react";
 import { Button } from "./ui/Button";
@@ -6,6 +13,7 @@ import { Modal } from "./ui/Modal";
 import GoogleIcon from "../assets/google-icon.svg?react";
 import { AuthContext, ModalContext } from "../Contexts";
 import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
+import { Dropdown, DropdownItem } from "./ui/Dropdown";
 
 export const Header: React.FC = () => {
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
@@ -84,6 +92,22 @@ export const Header: React.FC = () => {
     return "0/0 uses";
   };
 
+  const profileTrigger = (
+    <Button variant="secondary">
+      <div className="flex items-center gap-2 text-sm text-slate-300">
+        <User size={16} />
+        <span className="hidden sm:inline text-slate-400">
+          ({getUsesInfo()})
+        </span>
+        <ChevronDown size={14} className="text-slate-400" />
+      </div>
+    </Button>
+  );
+
+  const handleBuyCredits = () => {
+    alert("Buy Credits");
+  };
+
   return (
     <>
       <header
@@ -103,11 +127,33 @@ export const Header: React.FC = () => {
           <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <div className="hidden sm:flex items-center gap-2 text-sm text-slate-300">
-                  <User size={16} />
-                  <span>{user ? user.email : "Guest"}</span>
-                  <span className="text-slate-400">({getUsesInfo()})</span>
-                </div>
+                <Dropdown trigger={profileTrigger}>
+                  <div className="px-4 py-3 border-b border-slate-600">
+                    <div className="text-sm text-slate-400 mb-1">
+                      {user ? "Account Credits" : "Guest Credits"}
+                    </div>
+                    <div className="text-lg font-semibold text-slate-200">
+                      {getUsesInfo()} used
+                    </div>
+                  </div>
+
+                  {user ? (
+                    <DropdownItem onClick={handleBuyCredits}>
+                      <div className="flex items-center gap-3">
+                        <CreditCard size={16} className="text-purple-400" />
+                        <span>Buy More Credits</span>
+                      </div>
+                    </DropdownItem>
+                  ) : (
+                    <DropdownItem onClick={openSignInModal}>
+                      <div className="flex items-center gap-3">
+                        <LogIn size={16} className="text-purple-400" />
+                        <span>Sign In For More Credits</span>
+                      </div>
+                    </DropdownItem>
+                  )}
+                </Dropdown>
+                {/* Logout Button */}
                 <Button
                   variant="secondary"
                   onClick={handleLogout}
