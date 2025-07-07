@@ -13,13 +13,18 @@ import {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
 } from "@cover-letter-ai/constants";
-import { useAuth } from "../hooks/useAuth";
-import { ModalContext } from "../Contexts";
+import { AuthContext, ModalContext } from "../Contexts";
 import { Spinner } from "./ui/Spinner";
 import { CoverLetterPreview } from "./ui/CoverLetterPreview";
 
 export const CoverLetterForm: React.FC = () => {
-  const { isAuthenticated, isLoading: authLoading, user, guest } = useAuth();
+  const {
+    isAuthenticated,
+    isLoading: authLoading,
+    user,
+    guest,
+    incrementExhaustedUses,
+  } = useContext(AuthContext)!;
   const [formValues, setFormValues] = useState<FormValues>({
     jobDescription: "",
     resume: null,
@@ -120,6 +125,7 @@ export const CoverLetterForm: React.FC = () => {
         setApiResponse(response.data as APIResponse);
         setStatus("complete");
         setCurrentStep(2);
+        incrementExhaustedUses();
       } catch (error) {
         console.error("Error generating cover letter:", error);
         setError(
@@ -131,11 +137,6 @@ export const CoverLetterForm: React.FC = () => {
         setCurrentStep(0);
       }
     }
-  };
-
-  const handleSaveDraft = () => {
-    // Implementation for saving draft would go here
-    alert("Draft saved successfully!");
   };
 
   const handleDownload = () => {
@@ -307,16 +308,7 @@ export const CoverLetterForm: React.FC = () => {
                 />
               </div>
 
-              <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleSaveDraft}
-                >
-                  <Save size={18} className="mr-2" />
-                  Save Draft
-                </Button>
-
+              <div className="mt-8 w-full m-auto flex justify-center items-center gap-4">
                 <Button
                   type="submit"
                   variant="primary"

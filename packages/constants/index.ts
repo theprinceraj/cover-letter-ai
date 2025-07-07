@@ -12,9 +12,9 @@ export interface APIResponse {
 }
 
 export enum AUTH_PROVIDERS {
-  GOOGLE = "google",
-  EMAIL = "email",
-  GUEST = "guest",
+  GOOGLE = "GOOGLE",
+  EMAIL = "EMAIL",
+  GUEST = "GUEST",
 }
 
 export default {

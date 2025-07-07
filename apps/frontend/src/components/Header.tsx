@@ -4,8 +4,8 @@ import { useState, useEffect, useContext } from "react";
 import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import GoogleIcon from "../assets/google-icon.svg?react";
-import { useAuth } from "../hooks/useAuth";
-import { ModalContext } from "../Contexts";
+import { AuthContext, ModalContext } from "../Contexts";
+import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 
 export const Header: React.FC = () => {
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
@@ -22,7 +22,7 @@ export const Header: React.FC = () => {
     isLoading,
     user,
     guest,
-  } = useAuth();
+  } = useContext(AuthContext)!;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -191,7 +191,10 @@ export const Header: React.FC = () => {
           disabled={isLoading}
         >
           <p className="flex items-center gap-2">
-            <span className="text-md">Guest Login (1 Use)</span>
+            <span className="text-md">
+              Guest Login ({DEFAULT_USE_LIMIT_FOR_GUEST}{" "}
+              {DEFAULT_USE_LIMIT_FOR_GUEST > 1 ? "Uses" : "Use"})
+            </span>
             <UserCheck2Icon className="size-5" />
           </p>
         </Button>

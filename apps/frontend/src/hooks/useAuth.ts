@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
 import axios from "axios";
+import { AUTH_PROVIDERS } from "@cover-letter-ai/constants";
 
 export interface User {
   id: string;
@@ -32,6 +33,7 @@ export interface UseAuthReturn extends AuthState {
   loginGuest: () => Promise<void>;
   logout: () => void;
   refreshAuth: () => Promise<void>;
+  incrementExhaustedUses: () => void;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -91,10 +93,10 @@ export const useAuth = (): UseAuthReturn => {
 
         setAuthState((prev) => ({
           ...prev,
-          user: userData.type === "guest" ? null : userData,
-          guest: userData.type === "guest" ? userData : null,
+          user: userData.type === AUTH_PROVIDERS.GUEST ? null : userData,
+          guest: userData.type === AUTH_PROVIDERS.GUEST ? userData : null,
           isAuthenticated: true,
-          isGuest: userData.type === "guest",
+          isGuest: userData.type === AUTH_PROVIDERS.GUEST,
           isLoading: false,
         }));
       } catch (error) {
@@ -182,10 +184,10 @@ export const useAuth = (): UseAuthReturn => {
 
       setAuthState((prev) => ({
         ...prev,
-        user: userData.type === "guest" ? null : userData,
-        guest: userData.type === "guest" ? userData : null,
+        user: userData.type === AUTH_PROVIDERS.GUEST ? null : userData,
+        guest: userData.type === AUTH_PROVIDERS.GUEST ? userData : null,
         isAuthenticated: true,
-        isGuest: userData.type === "guest",
+        isGuest: userData.type === AUTH_PROVIDERS.GUEST,
         isLoading: false,
       }));
     } catch (error) {
@@ -193,6 +195,24 @@ export const useAuth = (): UseAuthReturn => {
       logout();
     }
   }, [logout]);
+
+  const incrementExhaustedUses = useCallback(() => {
+    setAuthState((prev) => {
+      if (prev.user) {
+        return {
+          ...prev,
+          user: { ...prev.user, exhaustedUses: prev.user.exhaustedUses + 1 },
+        };
+      }
+      if (prev.guest) {
+        return {
+          ...prev,
+          guest: { ...prev.guest, exhaustedUses: prev.guest.exhaustedUses + 1 },
+        };
+      }
+      return prev;
+    });
+  }, []);
 
   useEffect(() => {
     refreshAuth();
@@ -205,5 +225,6 @@ export const useAuth = (): UseAuthReturn => {
     loginGuest,
     logout,
     refreshAuth,
+    incrementExhaustedUses,
   };
 };

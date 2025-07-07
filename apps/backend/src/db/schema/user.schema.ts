@@ -24,7 +24,7 @@ export class User {
   useLimit!: number;
 
   @Prop({ type: SchemaTypes.String, required: true, default: AUTH_PROVIDERS.EMAIL })
-  provider!: string;
+  provider!: AUTH_PROVIDERS;
 
   @Prop({ type: SchemaTypes.Boolean, required: true, default: false, select: false })
   isDisabled!: boolean;

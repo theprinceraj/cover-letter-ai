@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { LocalDto } from './dto';
 import { AUTH_PROVIDERS, DEFAULT_USE_LIMIT_FOR_GUEST, DEFAULT_USE_LIMIT_FOR_REGISTERED_USER } from '@cover-letter-ai/constants';
@@ -65,7 +65,7 @@ export class AuthService {
   }
 
   async genGuestJwtToken(guest: any): Promise<{ access_token: string }> {
-    const payload = { guestId: guest.id, sub: guest._id, type: 'guest' };
+    const payload = { guestId: guest.id, sub: guest._id, type: AUTH_PROVIDERS.GUEST };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -78,7 +78,7 @@ export class AuthService {
         ipAddress: user.ipAddress,
         exhaustedUses: user.exhaustedUses,
         useLimit: user.useLimit,
-        type: 'guest',
+        type: AUTH_PROVIDERS.GUEST,
       };
     }
 
