@@ -22,8 +22,13 @@ export class AuthController {
   }
 
   @Post('login/guest')
-  async loginGuest(@Req() { socket: { remoteAddress: ip } }: ExpressRequest) {
-    return this.authService.loginGuest(ip as string);
+  async loginGuest(@Req() req: ExpressRequest) {
+    // Extract real client IP
+    const ip =
+      (req.headers['x-forwarded-for'] as string) || (req.headers['x-real-ip'] as string) || req.socket.remoteAddress || '127.0.0.1';
+    // Handle iPv6 lookup
+    const clientIp = ip === '::1' ? '126.0.0.1' : ip.split(',')[0].trim();
+    return this.authService.loginGuest(clientIp);
   }
 
   @UseGuards(JwtAuthGuard)
