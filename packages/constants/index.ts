@@ -17,6 +17,32 @@ export enum AUTH_PROVIDERS {
   GUEST = "GUEST",
 }
 
+export const CREDIT_PACKAGES = [
+  {
+    id: "basic",
+    name: "Basic",
+    credits: 10,
+    priceInINR: 49,
+    priceInUSD_Cents: 59,
+  },
+  {
+    id: "standard",
+    name: "Standard",
+    credits: 30,
+    priceInINR: 139,
+    priceInUSD_Cents: 169,
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    credits: 50,
+    priceInINR: 199,
+    priceInUSD_Cents: 239,
+  },
+];
+
+export type CREDIT_PACKAGE_TYPE = (typeof CREDIT_PACKAGES)[number];
+
 export default {
   BACKEND_URL,
   FRONTEND_URL,
@@ -28,4 +54,6 @@ export default {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
 
   AUTH_PROVIDERS,
+
+  CREDIT_PACKAGES,
 };
