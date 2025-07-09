@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
-import axios from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 import { AUTH_PROVIDERS } from "@cover-letter-ai/constants";
 
 export interface User {
@@ -34,6 +34,7 @@ export interface UseAuthReturn extends AuthState {
   logout: () => void;
   refreshAuth: () => Promise<void>;
   incrementExhaustedUses: () => void;
+  fetchWithAuth: <T = any>(config: AxiosRequestConfig) => Promise<T>;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -214,6 +215,18 @@ export const useAuth = (): UseAuthReturn => {
     });
   }, []);
 
+  const fetchWithAuth = useCallback(
+    async <T = any>(config: AxiosRequestConfig): Promise<T> => {
+      try {
+        const response = await api.request<T>(config);
+        return response.data;
+      } catch (error) {
+        throw error;
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     refreshAuth();
   }, [refreshAuth]);
@@ -226,5 +239,6 @@ export const useAuth = (): UseAuthReturn => {
     logout,
     refreshAuth,
     incrementExhaustedUses,
+    fetchWithAuth,
   };
 };

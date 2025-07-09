@@ -14,7 +14,7 @@ import GoogleIcon from "../assets/google-icon.svg?react";
 import { AuthContext, ModalContext } from "../Contexts";
 import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 import { Dropdown, DropdownItem } from "./ui/Dropdown";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -116,9 +116,9 @@ export const Header: React.FC = () => {
         `}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img src={FullLogo} alt="CoverGenius" className="h-7 md:h-10" />
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center space-x-6"></nav>
 

@@ -20,6 +20,7 @@
     "react-dom": "^19.1.0",
     "react-razorpay": "^3.0.1",
     "react-router-dom": "^7.6.3",
+    "sonner": "^2.0.6",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {

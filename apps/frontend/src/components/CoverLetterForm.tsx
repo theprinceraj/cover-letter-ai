@@ -106,6 +106,7 @@ export const CoverLetterForm: React.FC = () => {
         );
         formData.append("resume", formValues.resume as Blob);
 
+        // TODO: Use useAuth hook instead of localStorage
         const token = localStorage.getItem("auth_token");
         if (!token) {
           throw new Error("No authentication token found");
