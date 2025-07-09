@@ -5,6 +5,7 @@ import { DbModule } from './db/db.module';
 import { AuthModule } from './auth/auth.module';
 import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CreditsModule } from './credits/credits.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     DbModule,
     AuthModule,
     EvalModule,
+    CreditsModule,
   ],
 })
 export class AppModule {}

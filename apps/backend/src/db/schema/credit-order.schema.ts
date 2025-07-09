@@ -1,0 +1,50 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, SchemaTypes } from 'mongoose';
+import { UserModelName } from './user.schema';
+
+export type CreditOrderDocument = HydratedDocument<CreditOrder>;
+export const CreditOrderModelName = 'credit_orders';
+
+export enum CREDIT_ORDER_STATUS {
+  CREATED = 'created',
+  ATTEMPTED = 'attempted',
+  PAID = 'paid',
+}
+
+@Schema()
+export class CreditOrder {
+  @Prop({ type: SchemaTypes.String, required: true, unique: true })
+  id!: string; // Razorpay order id
+
+  @Prop({ type: SchemaTypes.String, required: true, ref: UserModelName })
+  userId!: string;
+
+  /**
+   * Amount to be paid, in the smallest currency unit (e.g., paise, cents)
+   */
+  @Prop({ type: SchemaTypes.Number, required: true })
+  amountToBePaidInMinorUnits!: number;
+
+  @Prop({ type: SchemaTypes.String, required: true })
+  currency!: string;
+
+  @Prop({ type: SchemaTypes.String, required: true, enum: CREDIT_ORDER_STATUS })
+  status!: CREDIT_ORDER_STATUS;
+
+  @Prop({ type: SchemaTypes.String, required: false, default: null })
+  paymentId?: string | null;
+
+  @Prop({ type: SchemaTypes.Date, required: false, default: null })
+  paymentVerifiedAt?: Date | null;
+
+  @Prop({ type: SchemaTypes.String, required: true })
+  receipt!: string;
+
+  @Prop({ type: SchemaTypes.Mixed, required: true, default: {} })
+  notes!: Record<string, string>;
+
+  @Prop({ type: SchemaTypes.Date, required: true })
+  orderCreatedAt!: Date;
+}
+
+export const CreditOrderSchema = SchemaFactory.createForClass(CreditOrder);
