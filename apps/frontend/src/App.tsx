@@ -6,6 +6,7 @@ import { Home } from "./pages/Home";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { useAuth } from "./hooks/useAuth";
+import { CreditsShop } from "./pages/CreditsShop";
 
 export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -26,6 +27,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/buy-credits" element={<CreditsShop />} />
               </Routes>
             </Router>
           </ModalContext>

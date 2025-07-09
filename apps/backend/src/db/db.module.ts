@@ -3,6 +3,7 @@ import { DbService } from './db.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModelName, UserSchema, UseModelName, UseSchema, GuestSchema, GuestModelName } from './schema';
+import { CreditOrderModelName, CreditOrderSchema } from './schema/credit-order.schema';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { UserModelName, UserSchema, UseModelName, UseSchema, GuestSchema, GuestM
       { schema: UserSchema, name: UserModelName },
       { schema: UseSchema, name: UseModelName },
       { schema: GuestSchema, name: GuestModelName },
+      { schema: CreditOrderSchema, name: CreditOrderModelName },
     ]),
   ],
   providers: [DbService],

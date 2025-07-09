@@ -14,8 +14,10 @@ import GoogleIcon from "../assets/google-icon.svg?react";
 import { AuthContext, ModalContext } from "../Contexts";
 import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 import { Dropdown, DropdownItem } from "./ui/Dropdown";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Header: React.FC = () => {
+  const navigate = useNavigate();
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
     useContext(ModalContext)!;
   const [isScrolled, setIsScrolled] = useState(false);
@@ -26,6 +28,7 @@ export const Header: React.FC = () => {
     signup,
     loginGuest,
     logout,
+    refreshAuth,
     isAuthenticated,
     isLoading,
     user,
@@ -57,7 +60,7 @@ export const Header: React.FC = () => {
         await login(email, password);
       }
       closeSignInModal();
-      window.location.reload();
+      refreshAuth();
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Authentication failed"
@@ -69,7 +72,7 @@ export const Header: React.FC = () => {
       setError(null);
       await loginGuest();
       closeSignInModal();
-      window.location.reload();
+      refreshAuth();
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Authentication failed"
@@ -79,7 +82,6 @@ export const Header: React.FC = () => {
 
   const handleLogout = async () => {
     logout();
-    window.location.reload();
   };
 
   const getUsesInfo = () => {
@@ -104,10 +106,6 @@ export const Header: React.FC = () => {
     </Button>
   );
 
-  const handleBuyCredits = () => {
-    alert("Buy Credits");
-  };
-
   return (
     <>
       <header
@@ -118,9 +116,9 @@ export const Header: React.FC = () => {
         `}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img src={FullLogo} alt="CoverGenius" className="h-7 md:h-10" />
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center space-x-6"></nav>
 
@@ -138,7 +136,7 @@ export const Header: React.FC = () => {
                   </div>
 
                   {user ? (
-                    <DropdownItem onClick={handleBuyCredits}>
+                    <DropdownItem onClick={() => navigate("/buy-credits")}>
                       <div className="flex items-center gap-3">
                         <CreditCard size={16} className="text-purple-400" />
                         <span>Buy More Credits</span>
@@ -219,20 +217,25 @@ export const Header: React.FC = () => {
 
         <hr className="my-5 text-slate-200/30" />
 
+        {/* Google Login */}
         <Button
           variant="secondary"
-          className="w-full mb-2"
-          disabled={isLoading}
+          fullWidth={true}
+          className="mb-2"
+          // disabled={isLoading}
+          disabled={true}
         >
-          <p className="flex items-center gap-2">
-            <span className="text-md">Sign in with Google</span>
+          <div className="flex items-center gap-2 text-md">
             <GoogleIcon className="size-5" />
-          </p>
+            <p>Sign In</p>
+            <p className="text-slate-400">(Coming Soon)</p>
+          </div>
         </Button>
 
+        {/* Guest Login */}
         <Button
           variant="secondary"
-          className="w-full"
+          fullWidth={true}
           onClick={handleGuestLogin}
           disabled={isLoading}
         >

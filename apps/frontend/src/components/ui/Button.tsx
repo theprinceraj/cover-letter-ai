@@ -13,11 +13,11 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   children,
   className = "",
-  disabled,
+  disabled = false,
   ...props
 }) => {
   const baseStyles =
-    "cursor-pointer inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-purple-500";
+    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-purple-500";
 
   const variantStyles = {
     primary:
@@ -33,13 +33,14 @@ export const Button: React.FC<ButtonProps> = ({
     lg: "text-lg py-3 px-6",
   };
 
+  const cursorStyle =
+    disabled || isLoading ? "cursor-not-allowed" : "cursor-pointer";
   const widthStyle = fullWidth ? "w-full" : "";
-  const disabledStyle =
-    disabled || isLoading ? "opacity-70 cursor-not-allowed" : "";
+  const disabledStyle = disabled || isLoading ? "opacity-70" : "";
 
   return (
     <button
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${disabledStyle} ${className}`}
+      className={`${baseStyles} ${cursorStyle} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${disabledStyle} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

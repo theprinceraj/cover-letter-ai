@@ -17,6 +17,38 @@ export enum AUTH_PROVIDERS {
   GUEST = "GUEST",
 }
 
+export enum CREDIT_PACKAGES_ID {
+  BASIC = "basic",
+  STANDARD = "standard",
+  PREMIUM = "premium",
+}
+
+export const CREDIT_PACKAGES = [
+  {
+    id: CREDIT_PACKAGES_ID.BASIC,
+    name: "Basic",
+    credits: 10,
+    priceInINR: 49,
+    priceInUSD_Cents: 59,
+  },
+  {
+    id: CREDIT_PACKAGES_ID.STANDARD,
+    name: "Standard",
+    credits: 30,
+    priceInINR: 139,
+    priceInUSD_Cents: 169,
+  },
+  {
+    id: CREDIT_PACKAGES_ID.PREMIUM,
+    name: "Premium",
+    credits: 50,
+    priceInINR: 199,
+    priceInUSD_Cents: 239,
+  },
+];
+
+export type CREDIT_PACKAGE_TYPE = (typeof CREDIT_PACKAGES)[number];
+
 export default {
   BACKEND_URL,
   FRONTEND_URL,
@@ -28,4 +60,7 @@ export default {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
 
   AUTH_PROVIDERS,
+
+  CREDIT_PACKAGES,
+  CREDIT_PACKAGES_ID,
 };
