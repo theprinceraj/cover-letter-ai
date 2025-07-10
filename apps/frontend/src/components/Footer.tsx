@@ -69,12 +69,24 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/cancellation-and-refund-policy"
                   className="text-slate-400 hover:text-white transition-colors"
                 >
-                  Cookie Settings
-                </a>
+                  Cancellation and Refund Policy
+                  <ExternalLink
+                    size={14}
+                    className="inline-block ml-1 text-slate-500 group-hover:text-white"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  Contact Me
+                </Link>
               </li>
             </ul>
           </div>

@@ -7,6 +7,8 @@ import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { useAuth } from "./hooks/useAuth";
 import { CreditsShop } from "./pages/CreditsShop";
+import { ContactMe } from "./pages/ContactMe";
+import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy";
 
 export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -25,6 +27,11 @@ export default function App() {
             <Router>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/contact" element={<ContactMe />} />
+                <Route
+                  path="/cancellation-and-refund-policy"
+                  element={<CancellationAndRefundPolicy />}
+                />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/buy-credits" element={<CreditsShop />} />
