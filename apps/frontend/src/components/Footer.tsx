@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="/contact-us"
                   className="text-slate-400 hover:text-white transition-colors"
                 >
                   Contact Me

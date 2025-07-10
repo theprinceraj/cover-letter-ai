@@ -10,7 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { EMAIL_ADDRESS } from "../constants";
 
-export const ContactMe: React.FC = () => {
+export const ContactUs: React.FC = () => {
   const navigate = useNavigate();
 
   return (

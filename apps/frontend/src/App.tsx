@@ -7,7 +7,7 @@ import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { useAuth } from "./hooks/useAuth";
 import { CreditsShop } from "./pages/CreditsShop";
-import { ContactMe } from "./pages/ContactMe";
+import { ContactUs } from "./pages/ContactUs";
 import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy";
 
 export default function App() {
@@ -27,7 +27,7 @@ export default function App() {
             <Router>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/contact" element={<ContactMe />} />
+                <Route path="/contact-us" element={<ContactUs />} />
                 <Route
                   path="/cancellation-and-refund-policy"
                   element={<CancellationAndRefundPolicy />}
