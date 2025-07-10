@@ -139,7 +139,7 @@ export const CreditsShop: React.FC = () => {
         </Button>
       </div>
     ));
-  }, [CREDIT_PACKAGES, handlePurchase]);
+  }, [CREDIT_PACKAGES, handlePurchase, isAuthenticated]);
 
   return (
     <>
