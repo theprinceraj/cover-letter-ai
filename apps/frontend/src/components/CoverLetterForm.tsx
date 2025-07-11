@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TextArea } from "./ui/TextArea";
 import { FileUpload } from "./ui/FileUpload";
 import { Button } from "./ui/Button";
@@ -28,6 +28,7 @@ const TurnstileWidget: React.FC<{
       sitekey={
         import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA" // fallback to a test key
       }
+      execution="render"
       onVerify={(token) => {
         setCaptchaToken(token);
       }}
@@ -60,9 +61,7 @@ export const CoverLetterForm: React.FC = () => {
     resume: null,
     additionalInfo: "",
   });
-
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [status, setStatus] = useState<GenerationStatus>("idle");
@@ -342,6 +341,10 @@ export const CoverLetterForm: React.FC = () => {
                       disabled={currentStep !== 0}
                     />
                   </div>
+                  <TurnstileWidget
+                    setCaptchaToken={setCaptchaToken}
+                    setError={setError}
+                  />
                   {currentStep === 1 && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
                       <Spinner
@@ -352,10 +355,6 @@ export const CoverLetterForm: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <TurnstileWidget
-                  setCaptchaToken={setCaptchaToken}
-                  setError={setError}
-                />
               </div>
               <div className="mt-8 w-full m-auto flex justify-center items-center gap-4">
                 <Button
