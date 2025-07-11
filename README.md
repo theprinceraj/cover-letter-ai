@@ -335,7 +335,7 @@ This project is private and proprietary. All rights reserved.
 
 ## 🆘 Support
 
-For support, email [your-email] or create an issue in the repository.
+For support, <a href="mailto:profile.princeraj@gmail.com">click here</a> to email me or create an issue in the repository.
 
 ## 🏆 Acknowledgments
 
