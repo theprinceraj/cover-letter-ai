@@ -32,7 +32,13 @@ export class EvalService {
     cloudinary.config(options);
   }
 
-  async eval({ jobDescription, additionalInfo }: EvalClDto, resume: Express.Multer.File, currentUser: UserDocument | GuestDocument) {
+  async eval(
+    { jobDescription, additionalInfo, captchaToken }: EvalClDto,
+    resume: Express.Multer.File,
+    currentUser: UserDocument | GuestDocument,
+  ) {
+    if (!(await this.verifyCaptchaToken(captchaToken, currentUser.ipAddress))) throw new BadRequestException('Invalid captcha token');
+
     if (currentUser.exhaustedUses >= currentUser.useLimit) throw new BadRequestException('You have exhausted your use limit');
 
     let textualPrompt: string;
@@ -69,14 +75,12 @@ export class EvalService {
       .split('\n')
       .map((s) => s.trim());
 
-    console.log('AUTH_PROVIDERS:::::', AUTH_PROVIDERS);
-
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
       await this.db.user.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     } else {
       await this.db.guest.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
     }
-    console.log('currentUser.provider:::::', currentUser.provider);
+
     await this.db.use.create({
       userId: currentUser.id,
       useCount: currentUser.exhaustedUses + 1,
@@ -112,5 +116,26 @@ export class EvalService {
         )
         .end(fileBuffer);
     });
+  }
+
+  private async verifyCaptchaToken(token: string, ip: string | null | undefined): Promise<boolean> {
+    const formData = new FormData();
+    formData.append('secret', this.config.get('TURNSTILE_SECRET_KEY') as string);
+    formData.append('response', token);
+    if (ip) formData.append('remoteip', ip);
+
+    const url = `https://challenges.cloudflare.com/turnstile/v0/siteverify`;
+
+    const response = await fetch(url, {
+      body: formData,
+      method: 'POST',
+    });
+
+    const data = await response.json();
+    if (data.success) return true;
+    else {
+      console.error('Error verifying captcha token', data);
+      return false;
+    }
   }
 }

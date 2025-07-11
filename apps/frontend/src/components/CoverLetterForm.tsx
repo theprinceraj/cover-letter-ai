@@ -16,7 +16,37 @@ import {
 import { AuthContext, ModalContext } from "../Contexts";
 import { Spinner } from "./ui/Spinner";
 import { CoverLetterPreview } from "./ui/CoverLetterPreview";
+import Turnstile, { useTurnstile } from "react-turnstile";
 
+const TurnstileWidget: React.FC<{
+  setCaptchaToken: (token: string | null) => void;
+  setError: (error: string | null) => void;
+}> = ({ setCaptchaToken, setError }) => {
+  useTurnstile();
+  return (
+    <Turnstile
+      sitekey={
+        import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA" // fallback to a test key
+      }
+      onVerify={(token) => {
+        setCaptchaToken(token);
+      }}
+      onExpire={() => {
+        setCaptchaToken(null);
+      }}
+      onError={(error) => {
+        console.error("Turnstile error:", error);
+        setCaptchaToken(null);
+      }}
+      onUnsupported={() => {
+        setError("Captcha verification is not supported on this browser");
+      }}
+      fixedSize={true}
+      className="w-auto m-auto"
+      theme="dark"
+    />
+  );
+};
 export const CoverLetterForm: React.FC = () => {
   const {
     isAuthenticated,
@@ -30,6 +60,8 @@ export const CoverLetterForm: React.FC = () => {
     resume: null,
     additionalInfo: "",
   });
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [currentStep, setCurrentStep] = useState(0);
@@ -74,6 +106,11 @@ export const CoverLetterForm: React.FC = () => {
       return;
     }
 
+    if (!captchaToken) {
+      setError("You need to complete the captcha to generate a cover letter");
+      return;
+    }
+
     // Check usage limits
     const currentUser = user || guest;
     if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit) {
@@ -104,6 +141,7 @@ export const CoverLetterForm: React.FC = () => {
             MAX_OTHER_RELEVANT_INFORMATION_LENGTH
           )
         );
+        formData.append("captchaToken", captchaToken);
         formData.append("resume", formValues.resume as Blob);
 
         // TODO: Use useAuth hook instead of localStorage
@@ -311,7 +349,10 @@ export const CoverLetterForm: React.FC = () => {
                   </div>
                 )}
               </div>
-
+              <TurnstileWidget
+                setCaptchaToken={setCaptchaToken}
+                setError={setError}
+              />
               <div className="mt-8 w-full m-auto flex justify-center items-center gap-4">
                 <Button
                   type="submit"
