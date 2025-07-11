@@ -11,4 +11,9 @@ export class EvalClDto {
   @IsString()
   @IsOptional()
   additionalInfo?: string;
+
+  @Transform(({ value }) => value.trim())
+  @IsString()
+  @IsNotEmpty({ message: 'Captcha token is required' })
+  captchaToken!: string;
 }

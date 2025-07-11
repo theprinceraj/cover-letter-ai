@@ -16,7 +16,38 @@ import {
 import { AuthContext, ModalContext } from "../Contexts";
 import { Spinner } from "./ui/Spinner";
 import { CoverLetterPreview } from "./ui/CoverLetterPreview";
+import Turnstile, { useTurnstile } from "react-turnstile";
 
+const TurnstileWidget: React.FC<{
+  setCaptchaToken: (token: string | null) => void;
+  setError: (error: string | null) => void;
+}> = ({ setCaptchaToken, setError }) => {
+  useTurnstile();
+  return (
+    <Turnstile
+      sitekey={
+        import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA" // fallback to a test key
+      }
+      execution="render"
+      onVerify={(token) => {
+        setCaptchaToken(token);
+      }}
+      onExpire={() => {
+        setCaptchaToken(null);
+      }}
+      onError={(error) => {
+        console.error("Turnstile error:", error);
+        setCaptchaToken(null);
+      }}
+      onUnsupported={() => {
+        setError("Captcha verification is not supported on this browser");
+      }}
+      fixedSize={true}
+      className="w-auto m-auto"
+      theme="dark"
+    />
+  );
+};
 export const CoverLetterForm: React.FC = () => {
   const {
     isAuthenticated,
@@ -30,7 +61,7 @@ export const CoverLetterForm: React.FC = () => {
     resume: null,
     additionalInfo: "",
   });
-
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [currentStep, setCurrentStep] = useState(0);
   const [status, setStatus] = useState<GenerationStatus>("idle");
@@ -74,6 +105,11 @@ export const CoverLetterForm: React.FC = () => {
       return;
     }
 
+    if (!captchaToken) {
+      setError("You need to complete the captcha to generate a cover letter");
+      return;
+    }
+
     // Check usage limits
     const currentUser = user || guest;
     if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit) {
@@ -104,6 +140,7 @@ export const CoverLetterForm: React.FC = () => {
             MAX_OTHER_RELEVANT_INFORMATION_LENGTH
           )
         );
+        formData.append("captchaToken", captchaToken);
         formData.append("resume", formValues.resume as Blob);
 
         // TODO: Use useAuth hook instead of localStorage
@@ -261,57 +298,64 @@ export const CoverLetterForm: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="mt-8">
-              <div className="relative">
-                <TextArea
-                  label="Job Description"
-                  name="jobDescription"
-                  value={formValues.jobDescription}
-                  maxCount={MAX_JOB_DESCRIPTION_LENGTH}
-                  onChange={handleTextChange}
-                  placeholder="Paste the job description here"
-                  rows={6}
-                  error={formErrors.jobDescription}
-                  showCount={true}
-                  currentCount={getCharacterCount(formValues.jobDescription)}
-                  disabled={currentStep !== 0}
-                  required
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FileUpload
-                    label="Resume"
-                    onFileChange={handleFileChange}
-                    error={formErrors.resume}
-                    currentFile={formValues.resume}
+              <div>
+                <div className="relative">
+                  <TextArea
+                    label="Job Description"
+                    name="jobDescription"
+                    value={formValues.jobDescription}
+                    maxCount={MAX_JOB_DESCRIPTION_LENGTH}
+                    onChange={handleTextChange}
+                    placeholder="Paste the job description here"
+                    rows={6}
+                    error={formErrors.jobDescription}
+                    showCount={true}
+                    currentCount={getCharacterCount(formValues.jobDescription)}
                     disabled={currentStep !== 0}
                     required
                   />
 
-                  <TextArea
-                    label="Additional Information"
-                    name="additionalInfo"
-                    value={formValues.additionalInfo}
-                    maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
-                    onChange={handleTextChange}
-                    placeholder="Add any specific details you'd like to highlight"
-                    rows={4}
-                    optional={true}
-                    showCount={true}
-                    currentCount={getCharacterCount(formValues.additionalInfo)}
-                    disabled={currentStep !== 0}
-                  />
-                </div>
-                {currentStep === 1 && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
-                    <Spinner
-                      variant="default"
-                      size="xl"
-                      message="Generating your personalized cover letter..."
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FileUpload
+                      label="Resume"
+                      onFileChange={handleFileChange}
+                      error={formErrors.resume}
+                      currentFile={formValues.resume}
+                      disabled={currentStep !== 0}
+                      required
+                    />
+
+                    <TextArea
+                      label="Additional Information"
+                      name="additionalInfo"
+                      value={formValues.additionalInfo}
+                      maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
+                      onChange={handleTextChange}
+                      placeholder="Add any specific details you'd like to highlight"
+                      rows={4}
+                      optional={true}
+                      showCount={true}
+                      currentCount={getCharacterCount(
+                        formValues.additionalInfo
+                      )}
+                      disabled={currentStep !== 0}
                     />
                   </div>
-                )}
+                  <TurnstileWidget
+                    setCaptchaToken={setCaptchaToken}
+                    setError={setError}
+                  />
+                  {currentStep === 1 && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
+                      <Spinner
+                        variant="default"
+                        size="xl"
+                        message="Generating your personalized cover letter..."
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-
               <div className="mt-8 w-full m-auto flex justify-center items-center gap-4">
                 <Button
                   type="submit"

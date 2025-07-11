@@ -86,10 +86,10 @@ export const Header: React.FC = () => {
 
   const getUsesInfo = () => {
     if (user) {
-      return `${user.exhaustedUses}/${user.useLimit} uses`;
+      return `${user.exhaustedUses}/${user.useLimit} credits`;
     }
     if (guest) {
-      return `${guest.exhaustedUses}/${guest.useLimit} uses`;
+      return `${guest.exhaustedUses}/${guest.useLimit} credits`;
     }
     return "0/0 uses";
   };
