@@ -31,20 +31,6 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-3">
               <li>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.overleaf.com/latex/templates/tagged/cv"
-                  className="text-slate-400 hover:text-white transition-colors"
-                >
-                  Resume Templates
-                  <ExternalLink
-                    size={14}
-                    className="inline-block ml-1 text-slate-500 group-hover:text-white"
-                  />
-                </a>
-              </li>
-              <li>
                 <Link
                   to="/terms-of-service"
                   className="text-slate-400 hover:text-white transition-colors group"

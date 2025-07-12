@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import {
   DEFAULT_USE_LIMIT_FOR_GUEST,
   DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
+  MAX_JOB_DESCRIPTION_LENGTH,
+  MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
 } from "@cover-letter-ai/constants";
+import { EMAIL_ADDRESS } from "../constants";
 
 export const TermsOfService: React.FC = () => {
   const navigate = useNavigate();
@@ -24,8 +27,11 @@ export const TermsOfService: React.FC = () => {
           <h1 className="text-3xl font-bold text-white mb-2">
             Terms of Service
           </h1>
-          <p className="text-slate-400">
+          <p className="text-slate-400 mb-2">
             Last updated: {new Date().toLocaleDateString()}
+          </p>
+          <p className="text-slate-400 text-sm">
+            Business Name: <strong>PRINCE RAJ</strong>
           </p>
         </div>
 
@@ -35,10 +41,10 @@ export const TermsOfService: React.FC = () => {
               1. Acceptance of Terms
             </h2>
             <p className="text-slate-300 mb-4">
-              By accessing and using CoverGenius ("the Service"), you accept and
-              agree to be bound by the terms and provision of this agreement. If
-              you do not agree to abide by the above, please do not use this
-              service.
+              By accessing and using CoverGenius ("the Service"), operated by{" "}
+              <strong>PRINCE RAJ</strong>, you accept and agree to be bound by
+              the terms and provision of this agreement. If you do not agree to
+              abide by the above, please do not use this service.
             </p>
           </section>
 
@@ -47,7 +53,8 @@ export const TermsOfService: React.FC = () => {
               2. Description of Service
             </h2>
             <p className="text-slate-300 mb-4">
-              CoverGenius is an AI-powered cover letter generation service that:
+              CoverGenius, operated by <strong>PRINCE RAJ</strong>, is an
+              AI-powered cover letter generation service that:
             </p>
             <ul className="list-disc list-inside text-slate-300 mb-4 space-y-2">
               <li>
@@ -123,9 +130,9 @@ export const TermsOfService: React.FC = () => {
                 resume uploads
               </li>
               <li>
-                <strong>Content Limits:</strong> Job descriptions limited to
-                4,499 characters; additional information limited to 500
-                characters
+                <strong>Content Limits:</strong> Job descriptions limited to{" "}
+                {MAX_JOB_DESCRIPTION_LENGTH} characters; additional information
+                limited to {MAX_OTHER_RELEVANT_INFORMATION_LENGTH} characters
               </li>
             </ul>
           </section>
@@ -190,9 +197,9 @@ export const TermsOfService: React.FC = () => {
             </h3>
             <p className="text-slate-300 mb-4">
               The Service and its original content, features, and functionality
-              are owned by CoverGenius and are protected by international
-              copyright, trademark, patent, trade secret, and other intellectual
-              property laws.
+              are owned by <strong>PRINCE RAJ</strong> and are protected by
+              international copyright, trademark, patent, trade secret, and
+              other intellectual property laws.
             </p>
 
             <h3 className="text-xl font-medium text-white mb-3">
@@ -314,8 +321,11 @@ export const TermsOfService: React.FC = () => {
               contact us:
             </p>
             <ul className="list-disc list-inside text-slate-300 space-y-2">
-              <li>Email: legal@covergenius.com</li>
-              <li>X (Twitter): @covergenius</li>
+              <li>
+                Business Name: <strong>PRINCE RAJ</strong>
+              </li>
+              <li>Email: {EMAIL_ADDRESS}</li>
+              <li>X (Twitter): @theprinceraj</li>
             </ul>
           </section>
         </div>
