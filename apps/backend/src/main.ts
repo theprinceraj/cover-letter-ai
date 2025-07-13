@@ -13,7 +13,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [FRONTEND_URL, 'https://cl-writer.vercel.app', process.env.FRONTEND_URL],
+    origin: [FRONTEND_URL, 'https://cl-writer.vercel.app', 'https://covergenius.vercel.app', process.env.FRONTEND_URL],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
