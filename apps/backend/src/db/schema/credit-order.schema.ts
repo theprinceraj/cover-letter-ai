@@ -25,7 +25,7 @@ export class CreditOrder {
   @Prop({ type: SchemaTypes.Number, required: true })
   amountToBePaidInMinorUnits!: number;
 
-  @Prop({ type: SchemaTypes.String, required: true })
+  @Prop({ type: SchemaTypes.String, required: true, uppercase: true })
   currency!: string;
 
   @Prop({ type: SchemaTypes.String, required: true, enum: CREDIT_ORDER_STATUS })

@@ -15,6 +15,7 @@ import { AuthContext, ModalContext } from "../Contexts";
 import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 import { Dropdown, DropdownItem } from "./ui/Dropdown";
 import { Link, useNavigate } from "react-router-dom";
+import { EmailVerificationForm } from "./EmailVerificationForm";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -24,15 +25,17 @@ export const Header: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {
+    isAuthenticated,
+    isLoading,
+    user,
+    guest,
+    isEmailVerificationModalOpen,
     login,
     signup,
     loginGuest,
     logout,
     refreshAuth,
-    isAuthenticated,
-    isLoading,
-    user,
-    guest,
+    setIsEmailVerificationModalOpen,
   } = useContext(AuthContext)!;
 
   useEffect(() => {
@@ -45,7 +48,9 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignInFormSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
     setError(null);
 
@@ -56,6 +61,7 @@ export const Header: React.FC = () => {
     try {
       if (isSignUp) {
         await signup(email, password);
+        setIsEmailVerificationModalOpen(true);
       } else {
         await login(email, password);
       }
@@ -79,7 +85,6 @@ export const Header: React.FC = () => {
       );
     }
   };
-
   const handleLogout = async () => {
     logout();
   };
@@ -174,12 +179,13 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
+      {/* Sign In Modal */}
       <Modal
         isOpen={isSignInModalOpen}
         onClose={closeSignInModal}
         title={isSignUp ? "Sign Up" : "Sign In"}
       >
-        <form className="text-slate-200" onSubmit={handleFormSubmit}>
+        <form className="text-slate-200" onSubmit={handleSignInFormSubmit}>
           <div className="flex flex-col gap-4">
             {error && (
               <div className="text-red-500 text-sm text-center">{error}</div>
@@ -247,6 +253,17 @@ export const Header: React.FC = () => {
             <UserCheck2Icon className="size-5" />
           </p>
         </Button>
+      </Modal>
+
+      {/* Email Verification Modal */}
+      <Modal
+        isOpen={isEmailVerificationModalOpen}
+        onClose={() => setIsEmailVerificationModalOpen(false)}
+        showCloseButton={false}
+        closeOnBackdropClick={false}
+        closeOnEscape={false}
+      >
+        <EmailVerificationForm />
       </Modal>
     </>
   );

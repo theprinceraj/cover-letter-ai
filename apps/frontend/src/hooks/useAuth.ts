@@ -25,6 +25,8 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   isGuest: boolean;
+  isEmailVerificationModalOpen: boolean;
+  setIsEmailVerificationModalOpen: (isOpen: boolean) => void;
 }
 
 export interface UseAuthReturn extends AuthState {
@@ -64,6 +66,8 @@ export const useAuth = (): UseAuthReturn => {
     isLoading: false,
     isAuthenticated: false,
     isGuest: false,
+    isEmailVerificationModalOpen: false,
+    setIsEmailVerificationModalOpen: () => {},
   });
 
   const setToken = useCallback((token: string | null) => {
@@ -99,6 +103,9 @@ export const useAuth = (): UseAuthReturn => {
           isAuthenticated: true,
           isGuest: userData.type === AUTH_PROVIDERS.GUEST,
           isLoading: false,
+          isEmailVerificationModalOpen:
+            userData.type !== AUTH_PROVIDERS.GUEST &&
+            userData.emailVerified === false,
         }));
       } catch (error) {
         setAuthState((prev) => ({ ...prev, isLoading: false }));
@@ -169,6 +176,8 @@ export const useAuth = (): UseAuthReturn => {
       isLoading: false,
       isAuthenticated: false,
       isGuest: false,
+      isEmailVerificationModalOpen: false,
+      setIsEmailVerificationModalOpen: () => {},
     });
   }, [setToken]);
 
@@ -190,6 +199,9 @@ export const useAuth = (): UseAuthReturn => {
         isAuthenticated: true,
         isGuest: userData.type === AUTH_PROVIDERS.GUEST,
         isLoading: false,
+        isEmailVerificationModalOpen:
+          userData.type !== AUTH_PROVIDERS.GUEST &&
+          userData.emailVerified === false,
       }));
     } catch (error) {
       console.error("Error refreshing auth:", error);
@@ -240,5 +252,11 @@ export const useAuth = (): UseAuthReturn => {
     refreshAuth,
     incrementExhaustedUses,
     fetchWithAuth,
+    setIsEmailVerificationModalOpen: (isOpen: boolean) => {
+      setAuthState((prev) => ({
+        ...prev,
+        isEmailVerificationModalOpen: isOpen,
+      }));
+    },
   };
 };

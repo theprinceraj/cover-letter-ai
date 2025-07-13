@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalDto } from './dto';
+import { LocalDto, VerifyEmailDto } from './dto';
 import { Request as ExpressRequest } from 'express';
 import { GetUser } from './decorators/get-user.decorator';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
 import { GuestDocument, UserDocument } from 'src/db/schema';
+import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
     const ip =
       (req.headers['x-forwarded-for'] as string) || (req.headers['x-real-ip'] as string) || req.socket.remoteAddress || '127.0.0.1';
     // Handle iPv6 lookup
-    const clientIp = ip === '::1' ? '126.0.0.1' : ip.split(',')[0].trim();
+    const clientIp = ip === '::1' ? '127.0.0.1' : ip.split(',')[0].trim();
     return this.authService.loginGuest(clientIp);
   }
 
@@ -35,6 +36,20 @@ export class AuthController {
   @Get('me')
   async getMe(@GetUser() user: UserDocument | GuestDocument) {
     return this.authService.getMe(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('verify-email')
+  async verifyEmail(@Body() dto: VerifyEmailDto, @GetUser() user: UserDocument | GuestDocument) {
+    if (user.provider === AUTH_PROVIDERS.GUEST) throw new UnauthorizedException('Invalid token.');
+    return this.authService.verifyEmail(dto, user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  async resendVerification(@GetUser() user: UserDocument | GuestDocument) {
+    if (user.provider === AUTH_PROVIDERS.GUEST) throw new UnauthorizedException('Invalid token.');
+    return this.authService.resendVerification(user);
   }
 
   @Get('check-is-alive')

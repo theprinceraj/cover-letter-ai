@@ -1,3 +1,9 @@
+export const OTP_EXPIRATION_TIME_IN_SECONDS = 600; // 10 minutes
+export const OTP_CODE_LENGTH = 6;
+export const OTP_CODE_MIN = 111111;
+export const OTP_CODE_MAX = 999999;
+export const EMAIL_MAX_LENGTH = 255;
+export const EMAIL_MIN_LENGTH = 3;
 export const MAX_JOB_DESCRIPTION_LENGTH = 4499;
 export const MAX_OTHER_RELEVANT_INFORMATION_LENGTH = 500;
 export const BACKEND_URL = "http://localhost:3000";

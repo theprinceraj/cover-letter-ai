@@ -2,8 +2,18 @@ import { Global, Module } from '@nestjs/common';
 import { DbService } from './db.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModelName, UserSchema, UseModelName, UseSchema, GuestSchema, GuestModelName } from './schema';
-import { CreditOrderModelName, CreditOrderSchema } from './schema/credit-order.schema';
+import {
+  UserModelName,
+  UserSchema,
+  UseModelName,
+  UseSchema,
+  GuestSchema,
+  GuestModelName,
+  CreditOrderSchema,
+  CreditOrderModelName,
+  OtpSchema,
+  OtpModelName,
+} from './schema';
 
 @Global()
 @Module({
@@ -20,6 +30,7 @@ import { CreditOrderModelName, CreditOrderSchema } from './schema/credit-order.s
       { schema: UseSchema, name: UseModelName },
       { schema: GuestSchema, name: GuestModelName },
       { schema: CreditOrderSchema, name: CreditOrderModelName },
+      { schema: OtpSchema, name: OtpModelName },
     ]),
   ],
   providers: [DbService],
