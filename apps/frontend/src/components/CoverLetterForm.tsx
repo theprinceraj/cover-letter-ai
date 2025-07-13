@@ -25,18 +25,12 @@ const TurnstileWidget: React.FC<{
   useTurnstile();
   return (
     <Turnstile
-      sitekey={
-        import.meta.env.VITE_TURNSTILE_SITE_KEY ?? "1x00000000000000000000AA" // fallback to a test key
-      }
+      sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
       execution="render"
       onVerify={(token) => {
         setCaptchaToken(token);
       }}
       onExpire={() => {
-        setCaptchaToken(null);
-      }}
-      onError={(error) => {
-        console.error("Turnstile error:", error);
         setCaptchaToken(null);
       }}
       onUnsupported={() => {
