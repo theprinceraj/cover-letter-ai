@@ -4,7 +4,7 @@
 
 CoverGenius AI is a sophisticated full-stack application that leverages Google's Gemini 2.0 Flash AI model to generate professional, personalized cover letters tailored to specific job descriptions and candidate resumes. Built with modern technologies and designed for scalability, it offers both registered user accounts and guest access with a flexible credit-based system.
 
-![CoverGenius AI](https://img.shields.io/badge/AI-Powered-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white) ![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB) ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?logo=mongodb&logoColor=white)
+![AI-Powered](https://img.shields.io/badge/AI-Powered-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white) ![React](https://img.shields.io/badge/React-19.1.0-20232A?logo=react&logoColor=61DAFB) ![NestJS](https://img.shields.io/badge/NestJS-11.0.1-E0234E?logo=nestjs&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?logo=mongodb&logoColor=white) ![Turbo](https://img.shields.io/badge/Turbo-2.5.4-FF6B6B?logo=turbo&logoColor=white)
 
 ## ✨ Features
 
@@ -15,14 +15,16 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 - **Job Matching**: Tailors cover letters to specific job descriptions and requirements
 - **Professional Templates**: Generates properly formatted, business-standard cover letters
 - **Enhancement Suggestions**: Provides AI-generated improvement recommendations
+- **Real-time Processing**: Fast generation with progress indicators
 
 ### 🔐 Authentication & Access
 
 - **Dual Access Modes**:
   - Registered users with email/password authentication
   - Guest access with IP-based tracking
-- **JWT Security**: Secure token-based authentication
+- **JWT Security**: Secure token-based authentication with 24-hour expiration
 - **Usage Limits**: Built-in credit system to manage access
+- **Email Verification**: Optional email verification for registered users
 
 ### 💳 Monetization & Credits
 
@@ -30,6 +32,7 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 - **Payment Integration**: Razorpay integration for credit purchases
 - **Package Options**: Multiple credit packages (Basic, Standard, Premium)
 - **Order Management**: Complete payment verification and tracking
+- **Turnstile Protection**: Cloudflare Turnstile for bot protection
 
 ### 🛡️ Security & Performance
 
@@ -37,6 +40,7 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 - **Input Validation**: Comprehensive form validation and sanitization
 - **File Security**: PDF-only upload restrictions with size limits
 - **CORS Protection**: Configured for secure cross-origin requests
+- **Error Handling**: Sanitized error messages and proper logging
 
 ## 🏗️ Architecture
 
@@ -48,17 +52,26 @@ cover-letter-ai/
 │   ├── backend/                 # NestJS API Server
 │   │   ├── src/
 │   │   │   ├── auth/           # Authentication module
+│   │   │   │   ├── decorators/ # Custom decorators
+│   │   │   │   ├── dto/        # Data transfer objects
+│   │   │   │   ├── guards/     # Authentication guards
+│   │   │   │   └── strategies/ # Passport strategies
 │   │   │   ├── credits/        # Payment & credit management
 │   │   │   ├── db/             # Database schemas & service
+│   │   │   │   └── schema/     # MongoDB schemas
 │   │   │   ├── eval/           # AI evaluation service
-│   │   │   └── assets/         # Static resources
+│   │   │   ├── assets/         # Static resources
+│   │   │   └── gemini.service.ts # Gemini AI integration
 │   │   └── render.yaml         # Deployment configuration
 │   └── frontend/               # React Application
 │       ├── src/
 │       │   ├── components/     # Reusable UI components
+│       │   │   └── ui/         # Base UI components
 │       │   ├── pages/          # Route components
 │       │   ├── hooks/          # Custom React hooks
-│       │   └── utils/          # Utility functions
+│       │   ├── utils/          # Utility functions
+│       │   ├── types/          # TypeScript type definitions
+│       │   └── assets/         # Static assets
 │       └── vercel.json         # Deployment configuration
 ├── packages/
 │   ├── constants/              # Shared constants
@@ -71,34 +84,39 @@ cover-letter-ai/
 
 #### Frontend
 
-- **Framework**: React 19 with TypeScript
-- **Build Tool**: Vite for fast development and optimized builds
-- **Styling**: TailwindCSS 4.x with modern design system
-- **Routing**: React Router v7 for client-side navigation
+- **Framework**: React 19.1.0 with TypeScript 5.8.3
+- **Build Tool**: Vite 6.3.5 for fast development and optimized builds
+- **Styling**: TailwindCSS 4.1.8 with modern design system
+- **Routing**: React Router v7.6.3 for client-side navigation
 - **State Management**: React Context for authentication and modals
-- **UI Components**: Custom component library with Lucide icons
-- **HTTP Client**: Axios for API communication
-- **Notifications**: Sonner for toast notifications
+- **UI Components**: Custom component library with Lucide React icons
+- **HTTP Client**: Axios 1.9.0 for API communication
+- **Notifications**: Sonner 2.0.6 for toast notifications
+- **Payment**: React Razorpay 3.0.1 for payment processing
+- **Security**: React Turnstile 1.1.4 for bot protection
 
 #### Backend
 
-- **Framework**: NestJS with TypeScript
-- **Database**: MongoDB with Mongoose ODM
+- **Framework**: NestJS 11.0.1 with TypeScript 5.7.3
+- **Database**: MongoDB 8.15.1 with Mongoose ODM
 - **Authentication**: Passport.js with JWT and local strategies
-- **File Upload**: Multer with Cloudinary integration
-- **AI Integration**: Google Gemini API (@google/genai)
-- **Payment Processing**: Razorpay SDK
-- **Security**: bcryptjs for password hashing, rate limiting
-- **Validation**: class-validator and class-transformer
+- **File Upload**: Cloudinary 2.6.1 for resume storage
+- **AI Integration**: Google Gemini API (@google/genai 1.4.0)
+- **Payment Processing**: Razorpay SDK 2.9.6
+- **Security**: bcryptjs 3.0.2 for password hashing, rate limiting
+- **Validation**: class-validator 0.14.2 and class-transformer 0.5.1
+- **Email**: Nodemailer 7.0.5 for email notifications
+- **Utilities**: Snowflake ID generation with @sapphire/snowflake 3.5.5
 
 #### DevOps & Deployment
 
-- **Monorepo**: Turbo for efficient builds and development
-- **Package Manager**: Bun for fast package management
+- **Monorepo**: Turbo 2.5.4 for efficient builds and development
+- **Package Manager**: Bun 1.2.12 for fast package management
 - **Frontend Hosting**: Vercel with automatic deployments
 - **Backend Hosting**: Render with environment management
 - **Database**: MongoDB Atlas (cloud-hosted)
 - **File Storage**: Cloudinary for resume uploads
+- **Email Service**: Brevo (formerly Sendinblue) for SMTP
 
 ## 🚀 Getting Started
 
@@ -110,6 +128,7 @@ cover-letter-ai/
 - **Google Gemini API** key
 - **Cloudinary** account for file uploads
 - **Razorpay** account for payments (optional for development)
+- **Brevo** account for email services (optional for development)
 
 ### 📦 Installation
 
@@ -149,6 +168,12 @@ cover-letter-ai/
    # Razorpay (for payments)
    RAZORPAY_KEY_ID=your-razorpay-key-id
    RAZORPAY_KEY_SECRET=your-razorpay-secret
+
+   # Brevo SMTP (for email notifications)
+   BREVO_SMTP_HOST=smtp-relay.brevo.com
+   BREVO_SMTP_PORT=587
+   BREVO_SMTP_USER=your-brevo-username
+   BREVO_SMTP_KEY=your-brevo-api-key
 
    # URLs (adjust for production)
    BACKEND_URL=http://localhost:3000
@@ -230,7 +255,7 @@ POST /auth/signup/local          # Create new user account
 POST /auth/login/local           # Login with email/password
 POST /auth/login/guest           # Get guest access token
 GET  /auth/me                    # Get current user info
-GET  /auth/check-is-alive        # Health check
+GET  /auth/check-is-alive        # API Health check
 ```
 
 ### Cover Letter Generation
@@ -288,6 +313,7 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 - **EvalService**: Manages AI cover letter generation with Gemini
 - **CreditsService**: Processes payments and manages user credits
 - **DbService**: Database operations and schema management
+- **GeminiService**: Direct integration with Google Gemini AI
 
 ### Frontend Components
 
@@ -295,6 +321,8 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 - **CoverLetterPreview**: Display and download generated content
 - **AuthContext**: Global authentication state management
 - **ProgressIndicator**: Multi-step form progress tracking
+- **CreditsShop**: Payment and credit purchase interface
+- **Modal System**: Reusable modal components for authentication
 
 ## 🔒 Security Features
 
@@ -305,6 +333,7 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 - **Password Hashing**: bcrypt with salt rounds
 - **CORS Configuration**: Restricted to known origins
 - **Error Handling**: Sanitized error messages
+- **Bot Protection**: Cloudflare Turnstile integration
 
 ## 📊 Monitoring & Analytics
 
@@ -328,6 +357,7 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 - Write descriptive commit messages
 - Add proper error handling
 - Update documentation for new features
+- Test thoroughly before submitting PRs
 
 ## 📄 License
 
@@ -344,6 +374,8 @@ For support, <a href="mailto:profile.princeraj@gmail.com">click here</a> to emai
 - **React Team** for the amazing frontend library
 - **TailwindCSS** for beautiful, utility-first styling
 - **Vercel & Render** for reliable hosting platforms
+- **Turbo** for efficient monorepo management
+- **Bun** for fast package management and runtime
 
 ---
 
