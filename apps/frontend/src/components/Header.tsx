@@ -21,21 +21,21 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const { isSignInModalOpen, openSignInModal, closeSignInModal } =
     useContext(ModalContext)!;
-  const [isEmailVerificationModalOpen, setIsEmailVerificationModalOpen] =
-    useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {
+    isAuthenticated,
+    isLoading,
+    user,
+    guest,
+    isEmailVerificationModalOpen,
     login,
     signup,
     loginGuest,
     logout,
     refreshAuth,
-    isAuthenticated,
-    isLoading,
-    user,
-    guest,
+    setIsEmailVerificationModalOpen,
   } = useContext(AuthContext)!;
 
   useEffect(() => {
@@ -260,6 +260,8 @@ export const Header: React.FC = () => {
         isOpen={isEmailVerificationModalOpen}
         onClose={() => setIsEmailVerificationModalOpen(false)}
         showCloseButton={false}
+        closeOnBackdropClick={false}
+        closeOnEscape={false}
       >
         <EmailVerificationForm />
       </Modal>

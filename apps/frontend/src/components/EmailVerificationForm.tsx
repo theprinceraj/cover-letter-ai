@@ -1,6 +1,9 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Button } from "./ui/Button";
 import { Mail } from "lucide-react";
+import { BACKEND_URL, OTP_CODE_LENGTH } from "@cover-letter-ai/constants";
+import axios from "axios";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { Button } from "./ui/Button";
+import { AuthContext } from "../Contexts";
 
 interface OTPInputProps {
   length: number;
@@ -108,11 +111,24 @@ export const EmailVerificationForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isResent, setIsResent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const { user, setIsEmailVerificationModalOpen, refreshAuth } =
+    useContext(AuthContext)!;
+  if (!user) return null;
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (otp.length !== 6) {
+    if (otp.length !== OTP_CODE_LENGTH) {
       setError("Please enter a complete 6-digit verification code");
       return;
     }
@@ -126,23 +142,20 @@ export const EmailVerificationForm = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch("/api/auth/verify-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      await axios.post(
+        `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/auth/verify-email`,
+        {
+          code: parseInt(otp),
         },
-        body: JSON.stringify({ otp }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Verification failed");
-      }
-
-      // Handle successful verification
-      console.log("Email verified successfully");
-      // TODO: Redirect or show success message
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
+      setIsEmailVerificationModalOpen(false);
+      refreshAuth();
     } catch (err) {
       setError(
         err instanceof Error
@@ -155,29 +168,58 @@ export const EmailVerificationForm = () => {
   };
 
   const handleResendCode = async () => {
+    if (resendCooldown > 0) return;
+
     setIsLoading(true);
     setError("");
 
     try {
-      // TODO: Replace with actual API call
-      const response = await fetch("/api/auth/resend-verification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/auth/resend-verification`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+          },
+        }
+      );
 
-      if (!response.ok) {
-        throw new Error("Failed to resend verification code");
+      if (response.data.success) {
+        setIsResent(true);
+        setResendCooldown(60);
+        setTimeout(() => setIsResent(false), 10000);
       }
-
-      setIsResent(true);
-      setTimeout(() => setIsResent(false), 10000); // Reset after 10 seconds
     } catch (err) {
-      setError("Failed to resend verification code. Please try again.");
+      if (axios.isAxiosError(err)) {
+        const errorMessage =
+          err.response?.data?.message ||
+          "Failed to resend verification code. Please try again.";
+        setError(errorMessage);
+
+        // If it's a cooldown error, extract the remaining time
+        if (
+          errorMessage.includes("Please wait") &&
+          errorMessage.includes("seconds")
+        ) {
+          const timeMatch = errorMessage.match(/(\d+)/);
+          if (timeMatch && timeMatch.length > 0) {
+            const time = parseInt(timeMatch[0]);
+            setResendCooldown(time);
+          }
+        }
+      } else {
+        setError("Failed to resend verification code. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const formatCooldown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
   };
 
   return (
@@ -221,7 +263,9 @@ export const EmailVerificationForm = () => {
           >
             {isResent
               ? "Code resent successfully!"
-              : "Resend verification code"}
+              : resendCooldown > 0
+                ? `Resend code in ${formatCooldown(resendCooldown)}`
+                : "Resend verification code"}
           </button>
         </div>
       </form>

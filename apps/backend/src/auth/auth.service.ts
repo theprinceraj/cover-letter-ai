@@ -1,9 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
-import { LocalDto } from './dto';
-import { AUTH_PROVIDERS, DEFAULT_USE_LIMIT_FOR_GUEST, DEFAULT_USE_LIMIT_FOR_REGISTERED_USER } from '@cover-letter-ai/constants';
+import { LocalDto, VerifyEmailDto } from './dto';
+import {
+  AUTH_PROVIDERS,
+  DEFAULT_USE_LIMIT_FOR_GUEST,
+  DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
+  OTP_CODE_MAX,
+  OTP_CODE_MIN,
+  OTP_EXPIRATION_TIME_IN_SECONDS,
+} from '@cover-letter-ai/constants';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { UserDocument } from 'src/db/schema';
+import { sendMail } from 'src/send-mail.util';
 
 @Injectable()
 export class AuthService {
@@ -23,12 +32,21 @@ export class AuthService {
       ipAddress: ip,
       useLimit: DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
     });
+    await this.sendOtpMail(dto.email);
     return this.db.deleteConfidentialData(user); // interceptor implement to replace this
   }
 
-  async loginLocal(user: any): Promise<{ access_token: string }> {
+  async loginLocal(user: any): Promise<{ access_token: string; user: { emailVerified: boolean } }> {
     await this.db.user.updateOne({ id: user.id }, { $push: { lastLogin: new Date() } });
-    return this.genJwtToken(user);
+    if (!user.emailVerified) {
+      await this.sendOtpMail(user.email);
+    }
+    return {
+      access_token: this.genJwtToken(user),
+      user: {
+        emailVerified: user.emailVerified,
+      },
+    };
   }
 
   async loginGuest(ip: string): Promise<{ access_token: string; guest: any }> {
@@ -57,14 +75,12 @@ export class AuthService {
     };
   }
 
-  async genJwtToken(user: any): Promise<{ access_token: string }> {
+  private genJwtToken(user: any): string {
     const payload = { email: user.email, sub: user._id };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    return this.jwtService.sign(payload);
   }
 
-  async genGuestJwtToken(guest: any): Promise<{ access_token: string }> {
+  private async genGuestJwtToken(guest: any): Promise<{ access_token: string }> {
     const payload = { guestId: guest.id, sub: guest._id, type: AUTH_PROVIDERS.GUEST };
     return {
       access_token: this.jwtService.sign(payload),
@@ -83,5 +99,74 @@ export class AuthService {
     }
 
     return this.db.deleteConfidentialData(user);
+  }
+
+  async verifyEmail(dto: VerifyEmailDto, user: UserDocument) {
+    const otp = await this.db.otp.findOne({ email: user.email, code: dto.code });
+    if (!otp) throw new BadRequestException('OTP incorrect or expired. Please request a new one.');
+    await this.db.otp.deleteOne({ id: otp.id });
+    await this.db.user.updateOne({ id: user.id }, { $set: { emailVerified: true } });
+    return {
+      success: true,
+      message: 'Email verified successfully',
+    };
+  }
+
+  async resendVerification(user: UserDocument): Promise<{ success: boolean; message: string }> {
+    // Check if user is already verified
+    if (user.emailVerified) {
+      throw new BadRequestException('Email is already verified');
+    }
+
+    // Check for existing OTP and rate limiting
+    const existingOtp = await this.db.otp.findOne({ email: user.email });
+
+    if (existingOtp) {
+      const timeSinceCreation = Date.now() - new Date(existingOtp['createdAt']).getTime();
+      const cooldownPeriod = 60 * 1000; // 1 minute cooldown
+
+      if (timeSinceCreation < cooldownPeriod) {
+        const remainingSeconds = Math.ceil((cooldownPeriod - timeSinceCreation) / 1000);
+        throw new BadRequestException(`Please wait ${remainingSeconds} seconds before requesting another code`);
+      }
+    }
+
+    // Send new OTP
+    await this.sendOtpMail(user.email);
+
+    return {
+      success: true,
+      message: 'Verification code sent successfully',
+    };
+  }
+
+  private async sendOtpMail(email: string): Promise<void> {
+    const existingOtp = await this.db.otp.findOne({ email });
+
+    if (existingOtp) {
+      // Check if OTP is still valid (not expired)
+      const timeSinceCreation = Date.now() - new Date(existingOtp['createdAt']).getTime();
+      const otpExpirationMs = OTP_EXPIRATION_TIME_IN_SECONDS * 1000;
+
+      if (timeSinceCreation < otpExpirationMs) {
+        // OTP is still valid, resend the same code
+        const remainingTimeInMinutes = Math.floor((otpExpirationMs - timeSinceCreation) / 60000);
+        await sendMail(
+          email,
+          `Your Cover Genius Verification Code is ${existingOtp.code.toString()}`,
+          existingOtp.code,
+          remainingTimeInMinutes,
+        );
+        return;
+      } else {
+        // OTP expired, delete it
+        await this.db.otp.deleteOne({ id: existingOtp.id });
+      }
+    }
+
+    // Create new OTP
+    const otp = Math.floor(OTP_CODE_MIN + Math.random() * (OTP_CODE_MAX - OTP_CODE_MIN));
+    await this.db.otp.create({ email, code: otp });
+    await sendMail(email, `Your Cover Genius Verification Code is ${otp}`, otp, OTP_EXPIRATION_TIME_IN_SECONDS / 60);
   }
 }

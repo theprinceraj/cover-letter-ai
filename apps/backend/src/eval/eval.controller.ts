@@ -6,6 +6,7 @@ import { EvalClDto } from './eval-cl.dto';
 import { GuestDocument, UserDocument } from 'src/db/schema';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { memoryStorage } from 'multer';
+import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 
 @Controller('eval')
 export class EvalController {
@@ -26,6 +27,8 @@ export class EvalController {
   )
   async eval(@Body() body: EvalClDto, @UploadedFile() resume: Express.Multer.File, @GetUser() user: UserDocument | GuestDocument) {
     if (!resume) throw new BadRequestException('Resume is required');
+    if (user.provider !== AUTH_PROVIDERS.GUEST && !user.emailVerified)
+      throw new BadRequestException('Please verify your email to use the service');
     return this.evalService.eval(body, resume, user);
   }
 }

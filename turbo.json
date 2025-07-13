@@ -14,7 +14,11 @@
         "CLOUDINARY_API_SECRET",
         "CLOUDINARY_CLOUD_NAME",
         "VITE_API_URL",
-        "BACKEND_URL"
+        "BACKEND_URL",
+        "BREVO_SMTP_HOST",
+        "BREVO_SMTP_PORT",
+        "BREVO_SMTP_USER",
+        "BREVO_SMTP_KEY"
       ]
     },
     "lint": {
@@ -34,7 +38,11 @@
         "CLOUDINARY_API_SECRET",
         "CLOUDINARY_CLOUD_NAME",
         "VITE_API_URL",
-        "BACKEND_URL"
+        "BACKEND_URL",
+        "BREVO_SMTP_HOST",
+        "BREVO_SMTP_PORT",
+        "BREVO_SMTP_USER",
+        "BREVO_SMTP_KEY"
       ]
     },
     "start": {
@@ -48,7 +56,11 @@
         "CLOUDINARY_API_SECRET",
         "CLOUDINARY_CLOUD_NAME",
         "VITE_API_URL",
-        "BACKEND_URL"
+        "BACKEND_URL",
+        "BREVO_SMTP_HOST",
+        "BREVO_SMTP_PORT",
+        "BREVO_SMTP_USER",
+        "BREVO_SMTP_KEY"
       ]
     }
   }

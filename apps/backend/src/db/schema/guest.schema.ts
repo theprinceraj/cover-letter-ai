@@ -11,7 +11,7 @@ export class Guest {
   @Prop({ type: SchemaTypes.String, required: true, unique: true, default: () => generateSnowflake() })
   id!: string;
 
-  @Prop({ type: SchemaTypes.String, required: true, unique: true })
+  @Prop({ type: SchemaTypes.String, required: true, unique: true, trim: true })
   ipAddress!: string;
 
   @Prop({ type: SchemaTypes.Number, required: true, default: 0 })
@@ -20,7 +20,7 @@ export class Guest {
   @Prop({ type: SchemaTypes.Number, required: true, default: 1 })
   useLimit!: number;
 
-  @Prop({ type: SchemaTypes.String, required: true, default: AUTH_PROVIDERS.GUEST })
+  @Prop({ type: SchemaTypes.String, required: true, default: AUTH_PROVIDERS.GUEST, uppercase: true, enum: [AUTH_PROVIDERS.GUEST] })
   provider!: AUTH_PROVIDERS.GUEST;
 }
 

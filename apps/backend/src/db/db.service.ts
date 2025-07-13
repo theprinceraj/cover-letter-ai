@@ -1,9 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { GuestDocument, GuestModelName, UseDocument, UseModelName, UserDocument, UserModelName } from './schema';
+import {
+  CreditOrderDocument,
+  CreditOrderModelName,
+  GuestDocument,
+  GuestModelName,
+  OtpDocument,
+  OtpModelName,
+  UseDocument,
+  UseModelName,
+  UserDocument,
+  UserModelName,
+} from './schema';
 import { isValidSnowflakeUtil } from './snowflake.util';
-import { CreditOrderDocument, CreditOrderModelName } from './schema/credit-order.schema';
 
 @Injectable()
 export class DbService {
@@ -11,17 +21,20 @@ export class DbService {
   readonly use: Model<UseDocument>;
   readonly guest: Model<GuestDocument>;
   readonly creditOrder: Model<CreditOrderDocument>;
+  readonly otp: Model<OtpDocument>;
 
   constructor(
     @InjectModel(UserModelName) private readonly userModel: Model<UserDocument>,
     @InjectModel(UseModelName) private readonly useModel: Model<UseDocument>,
     @InjectModel(GuestModelName) private readonly guestModel: Model<GuestDocument>,
     @InjectModel(CreditOrderModelName) private readonly creditOrderModel: Model<CreditOrderDocument>,
+    @InjectModel(OtpModelName) private readonly otpModel: Model<OtpDocument>,
   ) {
     this.user = this.userModel;
     this.use = this.useModel;
     this.guest = this.guestModel;
     this.creditOrder = this.creditOrderModel;
+    this.otp = this.otpModel;
   }
 
   /**
