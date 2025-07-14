@@ -17,14 +17,14 @@ export class CreditsController {
   @UseGuards(JwtAuthGuard)
   @Post('orders')
   createOrder(@GetUser() user: UserDocument, @Body() dto: CreateOrderDto) {
-    if (!user.emailVerified) throw new BadRequestException('Email is not verified');
+    if (!user.emailVerified) throw new BadRequestException('Email is not verified or it is a guest user');
     return this.creditsService.createOrder(user, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('orders/verify-payment/:orderId')
   verifyCreditOrderPayment(@Param('orderId') orderId: string, @Body() dto: VerifyCreditOrderPaymentDto, @GetUser() user: UserDocument) {
-    if (!user.emailVerified) throw new BadRequestException('Email is not verified');
+    if (!user.emailVerified) throw new BadRequestException('Email is not verified or it is a guest user');
     return this.creditsService.verifyCreditOrderPayment(orderId, dto);
   }
 }

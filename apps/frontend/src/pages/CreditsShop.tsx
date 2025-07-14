@@ -21,7 +21,7 @@ interface RazorpaySuccessfulPaymentResponse {
 }
 
 export const CreditsShop: React.FC = () => {
-  const { isAuthenticated, fetchWithAuth, refreshAuth } = useAuth();
+  const { isAuthenticated, isGuest, isEmailVerified, fetchWithAuth, refreshAuth } = useAuth();
   const { openSignInModal } = useContext(ModalContext)!;
   const [CREDIT_PACKAGES, setCREDIT_PACKAGES] = useState<CREDIT_PACKAGE_TYPE[]>(
     []
@@ -56,7 +56,13 @@ export const CreditsShop: React.FC = () => {
           currencyCodeInISOFormat: currency,
         },
       });
-      initiateRazorpayDialog(pkg, currency, response.order.id);
+      if (response.order?.id) {
+        initiateRazorpayDialog(pkg, currency, response.order.id);
+      } else if (response.error) {
+        toast.error(response.message);
+      } else {
+        toast.error("Failed to create order. Please try again later.");
+      }
     },
     [fetchWithAuth]
   );
@@ -127,19 +133,27 @@ export const CreditsShop: React.FC = () => {
           size="lg"
           fullWidth={true}
           onClick={() => {
-            if (isAuthenticated) {
-              handlePurchase(pkg, "INR");
-            } else {
+            if (!isAuthenticated) {
               openSignInModal();
               toast.error("Please sign in using your email to buy credits");
+              return;
             }
+            if (isGuest) {
+              toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
+              return;
+            }
+            if (!isEmailVerified) {
+              toast.error("Please verify your email before buying credits.");
+              return;
+            }
+            handlePurchase(pkg, "INR");
           }}
         >
           Buy Now
         </Button>
       </div>
     ));
-  }, [CREDIT_PACKAGES, handlePurchase, isAuthenticated]);
+  }, [CREDIT_PACKAGES, handlePurchase, isAuthenticated, isEmailVerified, isGuest, openSignInModal]);
 
   return (
     <>
@@ -160,6 +174,7 @@ export const CreditsShop: React.FC = () => {
               </div>
             )}
           </div>
+          {/* Payment Status Modal */}
           {isPaymentStatusModalOpen && (
             <Modal
               isOpen={isPaymentStatusModalOpen}
@@ -209,6 +224,7 @@ export const CreditsShop: React.FC = () => {
               </Button>
             </Modal>
           )}
+          {/* Razorpay Error Modal */}
           {error && (
             <Modal
               isOpen={isErrorModalOpen}

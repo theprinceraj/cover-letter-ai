@@ -25,6 +25,7 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   isGuest: boolean;
+  isEmailVerified: boolean;
   isEmailVerificationModalOpen: boolean;
   setIsEmailVerificationModalOpen: (isOpen: boolean) => void;
 }
@@ -66,6 +67,7 @@ export const useAuth = (): UseAuthReturn => {
     isLoading: false,
     isAuthenticated: false,
     isGuest: false,
+    isEmailVerified: false,
     isEmailVerificationModalOpen: false,
     setIsEmailVerificationModalOpen: () => {},
   });
@@ -81,6 +83,7 @@ export const useAuth = (): UseAuthReturn => {
 
   const login = useCallback(
     async (email: string, password: string) => {
+      logout();
       try {
         setAuthState((prev) => ({ ...prev, isLoading: true }));
 
@@ -103,6 +106,7 @@ export const useAuth = (): UseAuthReturn => {
           isAuthenticated: true,
           isGuest: userData.type === AUTH_PROVIDERS.GUEST,
           isLoading: false,
+          isEmailVerified: userData.emailVerified,
           isEmailVerificationModalOpen:
             userData.type !== AUTH_PROVIDERS.GUEST &&
             userData.emailVerified === false,
@@ -176,6 +180,7 @@ export const useAuth = (): UseAuthReturn => {
       isLoading: false,
       isAuthenticated: false,
       isGuest: false,
+      isEmailVerified: false,
       isEmailVerificationModalOpen: false,
       setIsEmailVerificationModalOpen: () => {},
     });
@@ -199,6 +204,7 @@ export const useAuth = (): UseAuthReturn => {
         isAuthenticated: true,
         isGuest: userData.type === AUTH_PROVIDERS.GUEST,
         isLoading: false,
+        isEmailVerified: userData.emailVerified,
         isEmailVerificationModalOpen:
           userData.type !== AUTH_PROVIDERS.GUEST &&
           userData.emailVerified === false,
@@ -229,14 +235,33 @@ export const useAuth = (): UseAuthReturn => {
 
   const fetchWithAuth = useCallback(
     async <T = any>(config: AxiosRequestConfig): Promise<T> => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        return {
+          error: true,
+          message: "You are not authenticated. Please sign in.",
+        } as T;
+      }
       try {
         const response = await api.request<T>(config);
         return response.data;
       } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          await refreshAuth();
+          return {
+            error: true,
+            message: "Session expired. Please login again.",
+          } as T;
+        } else if (axios.isAxiosError(error)) {
+          return {
+            error: true,
+            message: error.response?.data?.message || "An error occurred",
+          } as T;
+        }
         throw error;
       }
     },
-    []
+    [refreshAuth]
   );
 
   useEffect(() => {
