@@ -6,9 +6,7 @@ import { ProgressIndicator } from "./ui/ProgressIndicator";
 import type { FormValues, FormErrors, GenerationStatus } from "../types";
 import { validateForm, getCharacterCount } from "../utils/validation";
 import { Download, AlertCircle } from "lucide-react";
-import axios from "axios";
 import {
-  BACKEND_URL,
   MAX_JOB_DESCRIPTION_LENGTH,
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
@@ -17,6 +15,7 @@ import { AuthContext, ModalContext } from "../Contexts";
 import { Spinner } from "./ui/Spinner";
 import { CoverLetterPreview } from "./ui/CoverLetterPreview";
 import Turnstile, { useTurnstile } from "react-turnstile";
+import { toast } from "sonner";
 
 const TurnstileWidget: React.FC<{
   setCaptchaToken: (token: string | null) => void;
@@ -42,8 +41,36 @@ const TurnstileWidget: React.FC<{
     />
   );
 };
+
+const handleTextChange = (
+  e: React.ChangeEvent<HTMLTextAreaElement>,
+  setFormValues: React.Dispatch<React.SetStateAction<FormValues>>,
+  setFormErrors: React.Dispatch<React.SetStateAction<FormErrors>>,
+  formErrors: FormErrors
+) => {
+  const { name, value } = e.target;
+  setFormValues((prev) => ({ ...prev, [name]: value }));
+  // Clear error when user starts typing
+  if (formErrors[name as keyof FormErrors]) {
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+  }
+};
+
+const handleDownload = (coverLetter: string) => {
+  // Implementation for downloading the cover letter
+  const blob = new Blob([coverLetter], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cover-letter.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Cover letter downloaded successfully!");
+};
+
 export const CoverLetterForm: React.FC = () => {
   const {
+    fetchWithAuth,
     isAuthenticated,
     isLoading: authLoading,
     user,
@@ -67,15 +94,6 @@ export const CoverLetterForm: React.FC = () => {
   const { openSignInModal } = useContext(ModalContext)!;
 
   const steps = ["Enter Details", "Generate", "Preview"];
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (formErrors[name as keyof FormErrors]) {
-      setFormErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
 
   const handleFileChange = (file: File | null) => {
     setFormValues((prev) => ({ ...prev, resume: file }));
@@ -137,24 +155,21 @@ export const CoverLetterForm: React.FC = () => {
         formData.append("captchaToken", captchaToken);
         formData.append("resume", formValues.resume as Blob);
 
-        // TODO: Use useAuth hook instead of localStorage
-        const token = localStorage.getItem("auth_token");
-        if (!token) {
-          throw new Error("No authentication token found");
+        const response = await fetchWithAuth({
+          url: "/eval/cl",
+          method: "POST",
+          data: formData,
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.error) {
+          setError(response.message);
+          setStatus("error");
+          setCurrentStep(0);
+          return;
         }
 
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/eval/cl`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        setApiResponse(response.data as APIResponse);
+        setApiResponse(response as APIResponse);
         setStatus("complete");
         setCurrentStep(2);
         incrementExhaustedUses();
@@ -169,18 +184,6 @@ export const CoverLetterForm: React.FC = () => {
         setCurrentStep(0);
       }
     }
-  };
-
-  const handleDownload = () => {
-    // Implementation for downloading the cover letter would go here
-    const blob = new Blob([apiResponse.coverLetter], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "cover-letter.txt";
-    a.click();
-    URL.revokeObjectURL(url);
-    alert("Cover letter downloaded successfully!");
   };
 
   if (!isAuthenticated && !authLoading) {
@@ -272,12 +275,16 @@ export const CoverLetterForm: React.FC = () => {
               <CoverLetterPreview
                 coverLetter={apiResponse.coverLetter}
                 suggestions={apiResponse.suggestions}
-                onDownload={handleDownload}
+                onDownload={() => handleDownload(apiResponse.coverLetter)}
               />
 
               {/* Action Buttons */}
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button variant="primary" size="lg" onClick={handleDownload}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onClick={() => handleDownload(apiResponse.coverLetter)}
+                >
                   <Download size={18} className="mr-2" />
                   Download Cover Letter
                 </Button>
@@ -299,7 +306,14 @@ export const CoverLetterForm: React.FC = () => {
                     name="jobDescription"
                     value={formValues.jobDescription}
                     maxCount={MAX_JOB_DESCRIPTION_LENGTH}
-                    onChange={handleTextChange}
+                    onChange={(e) =>
+                      handleTextChange(
+                        e,
+                        setFormValues,
+                        setFormErrors,
+                        formErrors
+                      )
+                    }
                     placeholder="Paste the job description here"
                     rows={6}
                     error={formErrors.jobDescription}
@@ -324,7 +338,14 @@ export const CoverLetterForm: React.FC = () => {
                       name="additionalInfo"
                       value={formValues.additionalInfo}
                       maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
-                      onChange={handleTextChange}
+                      onChange={(e) =>
+                        handleTextChange(
+                          e,
+                          setFormValues,
+                          setFormErrors,
+                          formErrors
+                        )
+                      }
                       placeholder="Add any specific details you'd like to highlight"
                       rows={4}
                       optional={true}

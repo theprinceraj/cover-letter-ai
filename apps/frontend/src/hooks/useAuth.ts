@@ -37,7 +37,15 @@ export interface UseAuthReturn extends AuthState {
   logout: () => void;
   refreshAuth: () => Promise<void>;
   incrementExhaustedUses: () => void;
-  fetchWithAuth: <T = any>(config: AxiosRequestConfig) => Promise<T>;
+  fetchWithAuth: <T = any>(
+    config: AxiosRequestConfig
+  ) => Promise<
+    | T
+    | {
+        error: true;
+        message: string;
+      }
+  >;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -234,13 +242,21 @@ export const useAuth = (): UseAuthReturn => {
   }, []);
 
   const fetchWithAuth = useCallback(
-    async <T = any>(config: AxiosRequestConfig): Promise<T> => {
+    async <T = any>(
+      config: AxiosRequestConfig
+    ): Promise<
+      | T
+      | {
+          error: true;
+          message: string;
+        }
+    > => {
       const token = localStorage.getItem("auth_token");
       if (!token) {
         return {
           error: true,
           message: "You are not authenticated. Please sign in.",
-        } as T;
+        };
       }
       try {
         const response = await api.request<T>(config);
@@ -251,12 +267,12 @@ export const useAuth = (): UseAuthReturn => {
           return {
             error: true,
             message: "Session expired. Please login again.",
-          } as T;
+          };
         } else if (axios.isAxiosError(error)) {
           return {
             error: true,
             message: error.response?.data?.message || "An error occurred",
-          } as T;
+          };
         }
         throw error;
       }

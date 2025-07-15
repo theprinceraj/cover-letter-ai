@@ -1,6 +1,5 @@
 import { Mail } from "lucide-react";
-import { BACKEND_URL, OTP_CODE_LENGTH } from "@cover-letter-ai/constants";
-import axios from "axios";
+import { OTP_CODE_LENGTH } from "@cover-letter-ai/constants";
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Button } from "./ui/Button";
 import { AuthContext } from "../Contexts";
@@ -112,7 +111,7 @@ export const EmailVerificationForm = () => {
   const [error, setError] = useState("");
   const [isResent, setIsResent] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const { user, setIsEmailVerificationModalOpen, refreshAuth } =
+  const { user, setIsEmailVerificationModalOpen, refreshAuth, fetchWithAuth } =
     useContext(AuthContext)!;
   if (!user) return null;
 
@@ -142,18 +141,17 @@ export const EmailVerificationForm = () => {
     setIsLoading(true);
 
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/auth/verify-email`,
-        {
+      const response = await fetchWithAuth({
+        url: "/auth/verify-email",
+        method: "POST",
+        data: {
           code: parseInt(otp),
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-          },
-        }
-      );
+      });
+      if (response.error) {
+        setError(response.message);
+        return;
+      }
       setIsEmailVerificationModalOpen(false);
       refreshAuth();
     } catch (err) {
@@ -174,43 +172,35 @@ export const EmailVerificationForm = () => {
     setError("");
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL ?? BACKEND_URL}/auth/resend-verification`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-          },
-        }
-      );
+      const response = await fetchWithAuth({
+        url: "/auth/resend-verification",
+        method: "POST",
+      });
 
-      if (response.data.success) {
+      if (response.success) {
         setIsResent(true);
         setResendCooldown(60);
         setTimeout(() => setIsResent(false), 10000);
       }
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const errorMessage =
-          err.response?.data?.message ||
-          "Failed to resend verification code. Please try again.";
-        setError(errorMessage);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to resend verification code. Please try again.";
+      setError(errorMessage);
 
-        // If it's a cooldown error, extract the remaining time
-        if (
-          errorMessage.includes("Please wait") &&
-          errorMessage.includes("seconds")
-        ) {
-          const timeMatch = errorMessage.match(/(\d+)/);
-          if (timeMatch && timeMatch.length > 0) {
-            const time = parseInt(timeMatch[0]);
-            setResendCooldown(time);
-          }
+      // If it's a cooldown error, extract the remaining time
+      if (
+        errorMessage.includes("Please wait") &&
+        errorMessage.includes("seconds")
+      ) {
+        const timeMatch = errorMessage.match(/(\d+)/);
+        if (timeMatch && timeMatch.length > 0) {
+          const time = parseInt(timeMatch[0]);
+          setResendCooldown(time);
         }
-      } else {
-        setError("Failed to resend verification code. Please try again.");
       }
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

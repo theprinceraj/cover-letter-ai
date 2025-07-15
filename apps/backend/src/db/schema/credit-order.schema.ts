@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { UserModelName } from './user.schema';
+import { ACCEPTED_CURRENCY_CODES } from '@cover-letter-ai/constants';
 
 export type CreditOrderDocument = HydratedDocument<CreditOrder>;
 export const CreditOrderModelName = 'credit_orders';
@@ -22,11 +23,11 @@ export class CreditOrder {
   /**
    * Amount to be paid, in the smallest currency unit (e.g., paise, cents)
    */
-  @Prop({ type: SchemaTypes.Number, required: true })
+  @Prop({ type: SchemaTypes.Number, required: true, min: 0,  })
   amountToBePaidInMinorUnits!: number;
 
-  @Prop({ type: SchemaTypes.String, required: true, uppercase: true })
-  currency!: string;
+  @Prop({ type: SchemaTypes.String, required: true, uppercase: true, enum: ACCEPTED_CURRENCY_CODES })
+  currency!: ACCEPTED_CURRENCY_CODES;
 
   @Prop({ type: SchemaTypes.String, required: true, enum: CREDIT_ORDER_STATUS })
   status!: CREDIT_ORDER_STATUS;
