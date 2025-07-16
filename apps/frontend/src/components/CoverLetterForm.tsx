@@ -7,6 +7,7 @@ import type { FormValues, FormErrors, GenerationStatus } from "../types";
 import { validateForm, getCharacterCount } from "../utils/validation";
 import { Download, AlertCircle } from "lucide-react";
 import {
+  DEFAULT_USE_LIMIT_FOR_GUEST,
   MAX_JOB_DESCRIPTION_LENGTH,
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
@@ -198,7 +199,7 @@ export const CoverLetterForm: React.FC = () => {
               </span>
               <p className="text-slate-300 mb-6">
                 Please sign in to generate your cover letter. You can use a
-                guest account for one free use.
+                guest account for {DEFAULT_USE_LIMIT_FOR_GUEST} free uses.
               </p>
               <Button variant="primary" size="lg" onClick={openSignInModal}>
                 Sign In to Continue
