@@ -11,3 +11,8 @@ export interface FormErrors {
 }
 
 export type GenerationStatus = "idle" | "generating" | "complete" | "error";
+
+export interface SignInFormErrors {
+  errors: { email: string[]; password: string[] };
+  isValid: boolean;
+}

@@ -1,6 +1,9 @@
 import { useCallback, useState, useEffect } from "react";
 import axios, { type AxiosRequestConfig } from "axios";
-import { AUTH_PROVIDERS } from "@cover-letter-ai/constants";
+import {
+  AUTH_PROVIDERS,
+  PASSWORD_TEST_REGEX,
+} from "@cover-letter-ai/constants";
 
 export interface User {
   id: string;
@@ -92,6 +95,9 @@ export const useAuth = (): UseAuthReturn => {
   const login = useCallback(
     async (email: string, password: string) => {
       logout();
+      if (!PASSWORD_TEST_REGEX.test(password)) {
+        throw new Error(`Password conditions not met.`);
+      }
       try {
         setAuthState((prev) => ({ ...prev, isLoading: true }));
 

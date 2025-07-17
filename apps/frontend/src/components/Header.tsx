@@ -12,10 +12,12 @@ import { Button } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import GoogleIcon from "../assets/google-icon.svg?react";
 import { AuthContext, ModalContext } from "../Contexts";
-import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 import { Dropdown, DropdownItem } from "./ui/Dropdown";
 import { Link, useNavigate } from "react-router-dom";
 import { EmailVerificationForm } from "./EmailVerificationForm";
+import { validateSignInForm } from "../utils/validation";
+import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
+import type { SignInFormErrors } from "../types";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ export const Header: React.FC = () => {
     useContext(ModalContext)!;
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
   const {
     isAuthenticated,
     isLoading,
@@ -48,11 +50,25 @@ export const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { errors, isValid } =
+      e.target.name === "email"
+        ? validateSignInForm(e.target.value, null)
+        : validateSignInForm(null, e.target.value);
+    if (!isValid) {
+      e.target.setCustomValidity(
+        errors[e.target.type as keyof SignInFormErrors["errors"]].join("\n")
+      );
+    } else {
+      e.target.setCustomValidity("");
+    }
+  };
+
   const handleSignInFormSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    setError(null);
+    setApiError(null);
 
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
@@ -68,19 +84,19 @@ export const Header: React.FC = () => {
       closeSignInModal();
       refreshAuth();
     } catch (error) {
-      setError(
+      setApiError(
         error instanceof Error ? error.message : "Authentication failed"
       );
     }
   };
   const handleGuestLogin = async () => {
     try {
-      setError(null);
+      setApiError(null);
       await loginGuest();
       closeSignInModal();
       refreshAuth();
     } catch (error) {
-      setError(
+      setApiError(
         error instanceof Error ? error.message : "Authentication failed"
       );
     }
@@ -187,14 +203,16 @@ export const Header: React.FC = () => {
       >
         <form className="text-slate-200" onSubmit={handleSignInFormSubmit}>
           <div className="flex flex-col gap-4">
-            {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
+            {apiError && (
+              <div className="text-red-500 text-sm text-center">{apiError}</div>
             )}
             <input
               type="email"
               className="p-4 outline-1 outline-slate-200/30 rounded-md"
               placeholder="Email"
               name="email"
+              onChange={handleInputOnChange}
+              autoComplete="email"
               required
             />
             <input
@@ -202,6 +220,8 @@ export const Header: React.FC = () => {
               className="p-4 outline-1 outline-slate-200/30 rounded-md"
               placeholder="Password"
               name="password"
+              onChange={handleInputOnChange}
+              autoComplete="current-password"
               required
             />
             <Button variant="primary" type="submit" disabled={isLoading}>

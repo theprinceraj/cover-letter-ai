@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { TextArea } from "./ui/TextArea";
 import { FileUpload } from "./ui/FileUpload";
 import { Button } from "./ui/Button";
@@ -43,20 +43,6 @@ const TurnstileWidget: React.FC<{
   );
 };
 
-const handleTextChange = (
-  e: React.ChangeEvent<HTMLTextAreaElement>,
-  setFormValues: React.Dispatch<React.SetStateAction<FormValues>>,
-  setFormErrors: React.Dispatch<React.SetStateAction<FormErrors>>,
-  formErrors: FormErrors
-) => {
-  const { name, value } = e.target;
-  setFormValues((prev) => ({ ...prev, [name]: value }));
-  // Clear error when user starts typing
-  if (formErrors[name as keyof FormErrors]) {
-    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
-  }
-};
-
 const handleDownload = (coverLetter: string) => {
   // Implementation for downloading the cover letter
   const blob = new Blob([coverLetter], { type: "text/plain" });
@@ -68,6 +54,14 @@ const handleDownload = (coverLetter: string) => {
   URL.revokeObjectURL(url);
   toast("Cover letter downloaded successfully!");
 };
+
+const statusToStep: Record<GenerationStatus, number> = {
+  idle: 0,
+  generating: 1,
+  complete: 2,
+  error: 0,
+};
+const steps = ["Enter Details", "Generate", "Preview"];
 
 export const CoverLetterForm: React.FC = () => {
   const {
@@ -85,7 +79,6 @@ export const CoverLetterForm: React.FC = () => {
   });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [currentStep, setCurrentStep] = useState(0);
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [apiResponse, setApiResponse] = useState<APIResponse>({
     coverLetter: "",
@@ -94,98 +87,109 @@ export const CoverLetterForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { openSignInModal } = useContext(ModalContext)!;
 
-  const steps = ["Enter Details", "Generate", "Preview"];
+  const currentStep = statusToStep[status];
 
-  const handleFileChange = (file: File | null) => {
-    setFormValues((prev) => ({ ...prev, resume: file }));
-    // Clear error when user uploads a file
-    if (formErrors.resume) {
-      setFormErrors((prev) => ({ ...prev, resume: undefined }));
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!formValues.resume) {
-      setFormErrors((prev) => ({ ...prev, resume: "Resume is required" }));
-      return;
-    }
-
-    if (!isAuthenticated) {
-      setError("Please sign in to generate a cover letter");
-      return;
-    }
-
-    if (!captchaToken) {
-      setError("You need to complete the captcha to generate a cover letter");
-      return;
-    }
-
-    // Check usage limits
-    const currentUser = user || guest;
-    if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit) {
-      setError(
-        "You have reached your usage limit. Please sign up with a new email or contact me on X for more use credits."
-      );
-      return;
-    }
-
-    // Validate form
-    const errors = validateForm(formValues);
-    setFormErrors(errors);
-
-    if (Object.keys(errors).length === 0) {
-      setStatus("generating");
-      setCurrentStep(1);
-
-      try {
-        const formData = new FormData();
-        formData.append(
-          "jobDescription",
-          formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH)
-        );
-        formData.append(
-          "additionalInfo",
-          formValues.additionalInfo.substring(
-            0,
-            MAX_OTHER_RELEVANT_INFORMATION_LENGTH
-          )
-        );
-        formData.append("captchaToken", captchaToken);
-        formData.append("resume", formValues.resume as Blob);
-
-        const response = await fetchWithAuth({
-          url: "/eval/cl",
-          method: "POST",
-          data: formData,
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-
-        if (response.error) {
-          setError(response.message);
-          setStatus("error");
-          setCurrentStep(0);
-          return;
-        }
-
-        setApiResponse(response as APIResponse);
-        setStatus("complete");
-        setCurrentStep(2);
-        incrementExhaustedUses();
-      } catch (error) {
-        console.error("Error generating cover letter:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to generate cover letter"
-        );
-        setStatus("error");
-        setCurrentStep(0);
+  const handleTextChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormValues((prev) => ({ ...prev, [name]: value }));
+      // Clear error when user starts typing
+      if (formErrors[name as keyof FormErrors]) {
+        setFormErrors((prev) => ({ ...prev, [name]: undefined }));
       }
-    }
-  };
+    },
+    [formErrors]
+  );
+
+  const handleFileChange = useCallback(
+    (file: File | null) => {
+      setFormValues((prev) => ({ ...prev, resume: file }));
+      // Clear error when user uploads a file
+      if (formErrors.resume) {
+        setFormErrors((prev) => ({ ...prev, resume: undefined }));
+      }
+    },
+    [formErrors]
+  );
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+
+      if (!formValues.resume)
+        return setFormErrors((prev) => ({
+          ...prev,
+          resume: "Resume is required",
+        }));
+
+      if (!isAuthenticated)
+        return setError("Please sign in to generate a cover letter");
+
+      if (!captchaToken)
+        return setError(
+          "You need to complete the captcha to generate a cover letter"
+        );
+
+      // Check usage limits
+      const currentUser = user || guest;
+      if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit)
+        return setError(
+          "You have reached your usage limit. Please sign up with a new email or contact me on X for more use credits."
+        );
+
+      // Validate form
+      const errors = validateForm(formValues);
+      setFormErrors(errors);
+
+      if (Object.keys(errors).length === 0) {
+        setStatus("generating");
+
+        try {
+          const formData = new FormData();
+          formData.append(
+            "jobDescription",
+            formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH)
+          );
+          formData.append(
+            "additionalInfo",
+            formValues.additionalInfo.substring(
+              0,
+              MAX_OTHER_RELEVANT_INFORMATION_LENGTH
+            )
+          );
+          formData.append("captchaToken", captchaToken);
+          formData.append("resume", formValues.resume as Blob);
+
+          const response = await fetchWithAuth({
+            url: "/eval/cl",
+            method: "POST",
+            data: formData,
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+
+          if (response.error) {
+            setError(response.message);
+            setStatus("error");
+            return;
+          }
+
+          setApiResponse(response as APIResponse);
+          setStatus("complete");
+          incrementExhaustedUses();
+        } catch (error) {
+          console.error("Error generating cover letter:", error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Failed to generate cover letter"
+          );
+          setStatus("error");
+        }
+      }
+    },
+    [captchaToken, formValues, user, guest]
+  );
 
   if (!isAuthenticated && !authLoading) {
     return (
@@ -236,7 +240,10 @@ export const CoverLetterForm: React.FC = () => {
           <ProgressIndicator steps={steps} currentStep={currentStep} />
 
           {error && (
-            <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-md">
+            <div
+              className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-md"
+              aria-live="polite"
+            >
               <div className="flex items-center gap-2 text-red-300">
                 <AlertCircle size={16} />
                 <span>{error}</span>
@@ -292,7 +299,18 @@ export const CoverLetterForm: React.FC = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    setFormValues({
+                      jobDescription: "",
+                      resume: null,
+                      additionalInfo: "",
+                    });
+                    setFormErrors({});
+                    setApiResponse({ coverLetter: "", suggestions: [] });
+                    setError(null);
+                    setCaptchaToken(null);
+                    setStatus("idle");
+                  }}
                 >
                   Generate Another
                 </Button>
@@ -307,14 +325,7 @@ export const CoverLetterForm: React.FC = () => {
                     name="jobDescription"
                     value={formValues.jobDescription}
                     maxCount={MAX_JOB_DESCRIPTION_LENGTH}
-                    onChange={(e) =>
-                      handleTextChange(
-                        e,
-                        setFormValues,
-                        setFormErrors,
-                        formErrors
-                      )
-                    }
+                    onChange={handleTextChange}
                     placeholder="Paste the job description here"
                     rows={6}
                     error={formErrors.jobDescription}
@@ -339,14 +350,7 @@ export const CoverLetterForm: React.FC = () => {
                       name="additionalInfo"
                       value={formValues.additionalInfo}
                       maxCount={MAX_OTHER_RELEVANT_INFORMATION_LENGTH}
-                      onChange={(e) =>
-                        handleTextChange(
-                          e,
-                          setFormValues,
-                          setFormErrors,
-                          formErrors
-                        )
-                      }
+                      onChange={handleTextChange}
                       placeholder="Add any specific details you'd like to highlight"
                       rows={4}
                       optional={true}
@@ -361,7 +365,7 @@ export const CoverLetterForm: React.FC = () => {
                     setCaptchaToken={setCaptchaToken}
                     setError={setError}
                   />
-                  {currentStep === 1 && (
+                  {status === "generating" && (
                     <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
                       <Spinner
                         variant="default"
@@ -378,7 +382,7 @@ export const CoverLetterForm: React.FC = () => {
                   variant="primary"
                   size="lg"
                   isLoading={status === "generating"}
-                  disabled={status === "generating" || currentStep === 1}
+                  disabled={status === "generating"}
                 >
                   Generate Cover Letter
                 </Button>

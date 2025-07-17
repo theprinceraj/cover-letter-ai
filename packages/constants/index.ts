@@ -15,6 +15,16 @@ export const OTP_CODE_MAX = 999999;
 export const EMAIL_MAX_LENGTH = 255;
 export const EMAIL_MIN_LENGTH = 3;
 
+export const PASSWORD_MIN_LENGTH = 7;
+export const PASSWORD_MAX_LENGTH = 20;
+export const PASSWORD_MIN_UPPER_CASE_LETTERS = 1;
+export const PASSWORD_MIN_LOWER_CASE_LETTERS = 1;
+export const PASSWORD_MIN_DIGITS = 1;
+export const PASSWORD_MIN_SPECIAL_CHARACTERS = 1;
+export const PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX = /[!@#$%^&*]/;
+export const PASSWORD_TEST_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,20}$/;
+
 export interface APIResponse {
   coverLetter: string;
   suggestions: string[];
