@@ -11,9 +11,15 @@ import {
 } from '@cover-letter-ai/constants';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import * as sanitizeHtml from 'sanitize-html';
 
 export class LocalDto {
-  @Transform(({ value }) => value.trim().toLowerCase())
+  @Transform(({ value }) =>
+    sanitizeHtml(value.trim().toLowerCase(), {
+      allowedTags: [],
+      allowedAttributes: {},
+    }),
+  )
   @IsNotEmpty()
   @IsEmail()
   @Length(EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH)
