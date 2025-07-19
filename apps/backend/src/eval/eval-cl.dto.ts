@@ -1,9 +1,15 @@
 import { MAX_JOB_DESCRIPTION_LENGTH, MAX_OTHER_RELEVANT_INFORMATION_LENGTH, MIN_JOB_DESCRIPTION_LENGTH } from '@cover-letter-ai/constants';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import * as sanitizeHtml from 'sanitize-html';
 
 export class EvalClDto {
-  @Transform(({ value }: { value: string }) => value.trim().replace(/\r\n/g, '\n'))
+  @Transform(({ value }) =>
+    sanitizeHtml(value.trim().replace(/\r\n/g, '\n'), {
+      allowedTags: [],
+      allowedAttributes: {},
+    }),
+  )
   @IsNotEmpty()
   @IsString()
   @Length(MIN_JOB_DESCRIPTION_LENGTH, MAX_JOB_DESCRIPTION_LENGTH, {
@@ -11,7 +17,12 @@ export class EvalClDto {
   })
   jobDescription!: string;
 
-  @Transform(({ value }: { value: string }) => value.trim().replace(/\r\n/g, '\n'))
+  @Transform(({ value }) =>
+    sanitizeHtml(value.trim().replace(/\r\n/g, '\n'), {
+      allowedTags: [],
+      allowedAttributes: {},
+    }),
+  )
   @IsOptional()
   @IsString()
   @Length(0, MAX_OTHER_RELEVANT_INFORMATION_LENGTH, {
@@ -19,7 +30,7 @@ export class EvalClDto {
   })
   additionalInfo?: string;
 
-  @Transform(({ value }) => value.trim())
+  @Transform(({ value }) => sanitizeHtml(value.trim(), { allowedTags: [] }))
   @IsString()
   @IsNotEmpty()
   captchaToken!: string;
