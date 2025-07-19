@@ -9,6 +9,7 @@ import { useAuth } from "./hooks/useAuth";
 import { CreditsShop } from "./pages/CreditsShop";
 import { ContactUs } from "./pages/ContactUs";
 import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -40,6 +41,7 @@ export default function App() {
           </ModalContext>
         </AuthContext>
       </div>
+      <Analytics />
     </>
   );
 }
