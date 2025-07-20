@@ -12,7 +12,7 @@ import { useAuth } from "../hooks/useAuth";
 import SadCryGif from "../assets/sad-cry.gif";
 import HappyDanceGif from "../assets/happy-dance.gif";
 import { ModalContext } from "../Contexts";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -21,7 +21,13 @@ interface RazorpaySuccessfulPaymentResponse {
 }
 
 export const CreditsShop: React.FC = () => {
-  const { isAuthenticated, isGuest, isEmailVerified, fetchWithAuth, refreshAuth } = useAuth();
+  const {
+    isAuthenticated,
+    isGuest,
+    isEmailVerified,
+    fetchWithAuth,
+    refreshAuth,
+  } = useAuth();
   const { openSignInModal } = useContext(ModalContext)!;
   const [CREDIT_PACKAGES, setCREDIT_PACKAGES] = useState<CREDIT_PACKAGE_TYPE[]>(
     []
@@ -139,7 +145,9 @@ export const CreditsShop: React.FC = () => {
               return;
             }
             if (isGuest) {
-              toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
+              toast.error(
+                "Guest users cannot buy credits. Please sign in with a registered account."
+              );
               return;
             }
             if (!isEmailVerified) {
@@ -153,7 +161,14 @@ export const CreditsShop: React.FC = () => {
         </Button>
       </div>
     ));
-  }, [CREDIT_PACKAGES, handlePurchase, isAuthenticated, isEmailVerified, isGuest, openSignInModal]);
+  }, [
+    CREDIT_PACKAGES,
+    handlePurchase,
+    isAuthenticated,
+    isEmailVerified,
+    isGuest,
+    openSignInModal,
+  ]);
 
   return (
     <>
@@ -243,7 +258,6 @@ export const CreditsShop: React.FC = () => {
             </Modal>
           )}
         </div>
-        <Toaster richColors />
       </main>
       <Footer />
     </>

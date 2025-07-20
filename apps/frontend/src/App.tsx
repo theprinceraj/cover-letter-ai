@@ -10,6 +10,9 @@ import { CreditsShop } from "./pages/CreditsShop";
 import { ContactUs } from "./pages/ContactUs";
 import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy";
 import { Analytics } from "@vercel/analytics/react";
+import { Landing } from "./pages/Landing";
+import { SignInModal } from "./components/SignInModal";
+import { Toaster } from "sonner";
 
 export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -20,13 +23,15 @@ export default function App() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white">
-        <AuthContext value={auth}>
-          <ModalContext
-            value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
-          >
+      <AuthContext value={auth}>
+        <ModalContext
+          value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
+        >
+          <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white">
             <Router>
               <Routes>
+                <Route path="/landing" element={<Landing />} />
+
                 <Route path="/" element={<Home />} />
                 <Route path="/contact-us" element={<ContactUs />} />
                 <Route
@@ -38,9 +43,11 @@ export default function App() {
                 <Route path="/buy-credits" element={<CreditsShop />} />
               </Routes>
             </Router>
-          </ModalContext>
-        </AuthContext>
-      </div>
+          </div>
+          <SignInModal />
+          <Toaster richColors />
+        </ModalContext>
+      </AuthContext>
       <Analytics />
     </>
   );

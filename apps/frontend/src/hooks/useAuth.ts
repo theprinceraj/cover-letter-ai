@@ -54,7 +54,7 @@ export interface UseAuthReturn extends AuthState {
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Create axios instance with base configuration
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
@@ -249,7 +249,8 @@ export const useAuth = (): UseAuthReturn => {
 
   const fetchWithAuth = useCallback(
     async <T = any>(
-      config: AxiosRequestConfig
+      config: AxiosRequestConfig,
+      auth: boolean = true
     ): Promise<
       | T
       | {
@@ -257,12 +258,14 @@ export const useAuth = (): UseAuthReturn => {
           message: string;
         }
     > => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        return {
-          error: true,
-          message: "You are not authenticated. Please sign in.",
-        };
+      if (auth) {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+          return {
+            error: true,
+            message: "You are not authenticated. Please sign in.",
+          };
+        }
       }
       try {
         const response = await api.request<T>(config);
