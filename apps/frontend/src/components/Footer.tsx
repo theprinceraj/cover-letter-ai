@@ -6,6 +6,8 @@ import {
   TWITTER_URL,
   FRONTEND_ENDPOINTS,
 } from "../constants";
+import { useContext } from "react";
+import { AuthContext } from "../Contexts";
 
 type Link = {
   href: string;
@@ -48,6 +50,7 @@ const IMPORTANT_LINKS: Link[] = [
 
 export const Footer: React.FC = () => {
   const location = useLocation();
+  const { isAuthenticated } = useContext(AuthContext)!;
   return (
     <footer className="bg-neutral-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -121,6 +124,26 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
+              {isAuthenticated && (
+                <>
+                  <li>
+                    <Link
+                      to={FRONTEND_ENDPOINTS.GENERATOR}
+                      className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                    >
+                      Cover Letter Generator
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to={FRONTEND_ENDPOINTS.CREDITS_SHOP}
+                      className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                    >
+                      Pricing
+                    </Link>
+                  </li>
+                </>
+              )}
               <li>
                 <Link
                   to={FRONTEND_ENDPOINTS.CONTACT}

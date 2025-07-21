@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ChevronRight, Sparkles, FileText, Send } from "lucide-react";
 import { Button } from "../ui/Button";
-import { ModalContext } from "../../Contexts";
+import { AuthContext, ModalContext } from "../../Contexts";
 import { toast } from "sonner";
+import { HeroTemplate } from "../ui/HeroTemplate";
+import { FRONTEND_ENDPOINTS } from "../../constants";
+import { useNavigate } from "react-router-dom";
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useContext(AuthContext)!;
   const { openSignInModal } = useContext(ModalContext)!;
-
   const [currentText, setCurrentText] = useState("");
 
   const textSequence = [
@@ -50,67 +54,62 @@ export const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-neutral-50">
-        <div className="absolute top-20 left-20 w-64 h-64 bg-primary-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-primary-100 rounded-full opacity-10 animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-purple-100 rounded-full opacity-15 animate-pulse delay-2000"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Column - Content */}
-          <div className="text-center lg:text-left">
-            <div className="inline-flex items-center px-4 py-2 bg-primary-50 border border-primary-200 rounded-full mb-6 shadow-soft">
-              <Sparkles className="w-4 h-4 text-orange-500 mr-2" />
-              <span className="text-sm font-medium text-orange-700">
-                AI-Powered Writing Assistant
-              </span>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-15">
-              <span className="text-primary-500">Craft Perfect</span>
-              <br />
-              <span className="text-neutral-800">Cover Letters</span>
-              <br />
-              <span className="text-2xl md:text-3xl text-secondary-600">
-                in Seconds
-              </span>
-            </h1>
-
-            <p className="text-xl text-secondary-600 mb-8 max-w-2xl">
-              Transform your job applications with AI tool that understands your
-              story. Create compelling, personalized cover letters that get you
-              noticed.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button
-                variant="primary"
-                className="px-8 py-4 flex items-center justify-center"
-                onClick={() => {
-                  openSignInModal();
-                  toast.info("Please sign in to continue");
-                }}
-              >
-                Start Writing Now
-                <ChevronRight className="w-5 h-5 ml-2" />
-              </Button>
-              <a
-                className="btn-secondary px-8 py-4 flex items-center justify-center"
-                href="#demo"
-              >
-                Watch Demo
-              </a>
-            </div>
+    <HeroTemplate>
+      <div className="grid lg:grid-cols-2 gap-12 items-center">
+        {/* Left Column - Content */}
+        <div className="text-center lg:text-left">
+          <div className="inline-flex items-center px-4 py-2 bg-primary-50 border border-primary-200 rounded-full mt-6 md:mt-10 lg:mt-0 mb-6 shadow-soft">
+            <Sparkles className="size-4 text-orange-500 mr-2" />
+            <span className="text-sm font-medium text-orange-700">
+              AI-Powered Writing Assistant
+            </span>
           </div>
 
-          {/* Right Column - Interactive Demo */}
-          <DemoView currentText={currentText} />
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-14 md:leading-17">
+            <span className="text-primary-500">Craft Perfect</span>
+            <br />
+            <span className="text-neutral-800">Cover Letters</span>
+            <br />
+            <span className="text-2xl md:text-3xl text-secondary-600">
+              in Seconds
+            </span>
+          </h1>
+
+          <p className="text-base text-balance md:text-xl text-secondary-600 mb-8 max-w-2xl">
+            Transform your job applications with AI tool that understands your
+            story. Create compelling, personalized cover letters that get you
+            noticed.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <Button
+              variant="primary"
+              className="px-8 py-4 flex items-center justify-center"
+              onClick={() => {
+                if (isAuthenticated) {
+                  navigate(FRONTEND_ENDPOINTS.GENERATOR);
+                } else {
+                  openSignInModal();
+                  toast.info("Please sign in to continue");
+                }
+              }}
+            >
+              Start Writing Now
+              <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <a
+              className="btn-secondary px-8 py-4 flex items-center justify-center"
+              href="#demo"
+            >
+              Watch Demo
+            </a>
+          </div>
         </div>
+
+        {/* Right Column - Interactive Demo */}
+        <DemoView currentText={currentText} />
       </div>
-    </section>
+    </HeroTemplate>
   );
 };
 

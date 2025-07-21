@@ -17,7 +17,6 @@ export const SignInModal = () => {
     login,
     signup,
     loginGuest,
-    refreshAuth,
     isEmailVerificationModalOpen,
     setIsEmailVerificationModalOpen,
   } = useContext(AuthContext)!;
@@ -55,7 +54,6 @@ export const SignInModal = () => {
         await login(email, password);
       }
       closeSignInModal();
-      refreshAuth();
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Authentication failed"
@@ -68,7 +66,6 @@ export const SignInModal = () => {
       setApiError(null);
       await loginGuest();
       closeSignInModal();
-      refreshAuth();
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Authentication failed"

@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { Check, Star, Zap, Crown, type LucideIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, useAuth } from "../../hooks/useAuth";
+import { api } from "../../hooks/useAuth";
 import {
   CREDIT_PACKAGES_ID,
   type CREDIT_PACKAGE_TYPE,
 } from "@cover-letter-ai/constants";
 import { toast } from "sonner";
-import { ModalContext } from "../../Contexts";
+import { ModalContext, AuthContext } from "../../Contexts";
 
 type CreditPlan = {
   id: string;
@@ -23,7 +23,7 @@ type CreditPlan = {
 
 export const Pricing: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchWithAuth, isAuthenticated, isGuest } = useAuth();
+  const { fetchWithAuth, isAuthenticated, isGuest } = useContext(AuthContext)!;
   const { openSignInModal } = useContext(ModalContext)!;
   const [isINR, setIsINR] = useState(true);
   const [plans, setPlans] = useState<CreditPlan[]>([]);

@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-export const Hero = ({ children }: PropsWithChildren) => {
+export const HeroTemplate = ({ children }: PropsWithChildren) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated Background */}

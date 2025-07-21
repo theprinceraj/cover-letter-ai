@@ -7,10 +7,9 @@ import { Search } from "lucide-react";
 import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
 import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
 import { type CREDIT_PACKAGE_TYPE } from "@cover-letter-ai/constants";
-import { useAuth } from "../hooks/useAuth";
 import SadCryGif from "../assets/sad-cry.gif";
 import HappyDanceGif from "../assets/happy-dance.gif";
-import { ModalContext } from "../Contexts";
+import { ModalContext, AuthContext } from "../Contexts";
 import { toast } from "sonner";
 import { Header } from "../components/Header";
 
@@ -27,7 +26,7 @@ export const CreditsShop: React.FC = () => {
     isEmailVerified,
     fetchWithAuth,
     refreshAuth,
-  } = useAuth();
+  } = useContext(AuthContext)!;
   const { openSignInModal } = useContext(ModalContext)!;
   const [CREDIT_PACKAGES, setCREDIT_PACKAGES] = useState<CREDIT_PACKAGE_TYPE[]>(
     []
