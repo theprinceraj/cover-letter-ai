@@ -3,6 +3,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   fullWidth?: boolean;
+  ref?: React.RefObject<HTMLButtonElement>;
   children: React.ReactNode;
 }
 
@@ -11,20 +12,22 @@ export const Button: React.FC<ButtonProps> = ({
   size = "md",
   isLoading = false,
   fullWidth = false,
+  ref,
   children,
   className = "",
   disabled = false,
   ...props
 }) => {
   const baseStyles =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-purple-500";
+    "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
 
   const variantStyles = {
     primary:
-      "bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20",
-    secondary: "bg-slate-700 hover:bg-slate-600 text-white",
+      "bg-primary-500 text-white shadow-soft hover:bg-primary-600 hover:shadow-medium focus:ring-primary-500 focus:ring-offset-primary-500",
+    secondary:
+      "bg-orange-500 text-white shadow-soft hover:bg-orange-600 hover:shadow-medium focus:ring-orange-500 focus:ring-offset-orange-500",
     outline:
-      "bg-transparent border border-slate-600 hover:border-slate-500 text-slate-200 hover:text-white",
+      "border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white hover:shadow-medium focus:ring-purple-500 focus:ring-offset-purple-500",
   };
 
   const sizeStyles = {
@@ -36,12 +39,13 @@ export const Button: React.FC<ButtonProps> = ({
   const cursorStyle =
     disabled || isLoading ? "cursor-not-allowed" : "cursor-pointer";
   const widthStyle = fullWidth ? "w-full" : "";
-  const disabledStyle = disabled || isLoading ? "opacity-70" : "";
+  const disabledStyle = disabled || isLoading ? "opacity-50" : "";
 
   return (
     <button
       className={`${baseStyles} ${cursorStyle} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${disabledStyle} ${className}`}
       disabled={disabled || isLoading}
+      ref={ref}
       {...props}
     >
       {isLoading ? (

@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Footer } from "../components/Footer";
-import { Header } from "../components/Header";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import { Spinner } from "../components/ui/Spinner";
@@ -13,6 +12,7 @@ import SadCryGif from "../assets/sad-cry.gif";
 import HappyDanceGif from "../assets/happy-dance.gif";
 import { ModalContext } from "../Contexts";
 import { toast } from "sonner";
+import { Header_ } from "../components/Header";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -172,7 +172,7 @@ export const CreditsShop: React.FC = () => {
 
   return (
     <>
-      <Header />
+      <Header_ />
       <main className="py-12 px-4 flex justify-center items-center">
         <div className="min-h-screen w-full xl:w-3/4 mx-auto">
           <h1 className="text-3xl font-bold my-16 md:my-24 text-center">

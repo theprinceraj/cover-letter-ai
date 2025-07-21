@@ -1,10 +1,10 @@
 import React, { useCallback, useContext, useState } from "react";
-import { TextArea } from "./ui/TextArea";
-import { FileUpload } from "./ui/FileUpload";
-import { Button } from "./ui/Button";
-import { ProgressIndicator } from "./ui/ProgressIndicator";
-import type { FormValues, FormErrors, GenerationStatus } from "../types";
-import { validateForm, getCharacterCount } from "../utils/validation";
+import { TextArea } from "../ui/TextArea";
+import { FileUpload } from "../ui/FileUpload";
+import { Button } from "../ui/Button";
+import { ProgressIndicator } from "../ui/ProgressIndicator";
+import type { FormValues, FormErrors, GenerationStatus } from "../../types";
+import { validateForm, getCharacterCount } from "../../utils/validation";
 import { Download, AlertCircle } from "lucide-react";
 import {
   DEFAULT_USE_LIMIT_FOR_GUEST,
@@ -12,9 +12,9 @@ import {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
 } from "@cover-letter-ai/constants";
-import { AuthContext, ModalContext } from "../Contexts";
-import { Spinner } from "./ui/Spinner";
-import { CoverLetterPreview } from "./ui/CoverLetterPreview";
+import { AuthContext, ModalContext } from "../../Contexts";
+import { Spinner } from "../ui/Spinner";
+import { CoverLetterPreview } from "../ui/CoverLetterPreview";
 import Turnstile, { useTurnstile } from "react-turnstile";
 import { toast } from "sonner";
 

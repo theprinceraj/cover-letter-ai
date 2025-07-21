@@ -1,8 +1,9 @@
 import "./App.css";
+import { FRONTEND_ENDPOINTS } from "./constants";
 import { AuthContext, ModalContext } from "./Contexts";
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Home } from "./pages/Home";
+import { Generator } from "./pages/Generator";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { useAuth } from "./hooks/useAuth";
@@ -27,20 +28,38 @@ export default function App() {
         <ModalContext
           value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
         >
-          <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white">
+          <div className="min-h-screen bg-white">
             <Router>
               <Routes>
-                <Route path="/landing" element={<Landing />} />
-
-                <Route path="/" element={<Home />} />
-                <Route path="/contact-us" element={<ContactUs />} />
                 <Route
-                  path="/cancellation-and-refund-policy"
+                  path={FRONTEND_ENDPOINTS.LANDING}
+                  element={<Landing />}
+                />
+
+                <Route
+                  path={FRONTEND_ENDPOINTS.GENERATOR}
+                  element={<Generator />}
+                />
+                <Route
+                  path={FRONTEND_ENDPOINTS.CONTACT}
+                  element={<ContactUs />}
+                />
+                <Route
+                  path={FRONTEND_ENDPOINTS.CANCELLATION}
                   element={<CancellationAndRefundPolicy />}
                 />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/buy-credits" element={<CreditsShop />} />
+                <Route
+                  path={FRONTEND_ENDPOINTS.TERMS}
+                  element={<TermsOfService />}
+                />
+                <Route
+                  path={FRONTEND_ENDPOINTS.PRIVACY}
+                  element={<PrivacyPolicy />}
+                />
+                <Route
+                  path={FRONTEND_ENDPOINTS.CREDITS_SHOP}
+                  element={<CreditsShop />}
+                />
               </Routes>
             </Router>
           </div>

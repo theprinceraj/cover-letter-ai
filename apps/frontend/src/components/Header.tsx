@@ -1,111 +1,70 @@
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
 import {
-  ChevronDown,
-  CreditCard,
-  LogIn,
-  LogOut,
+  Menu,
+  X,
+  PenTool,
   User,
-  UserCheck2Icon,
+  ChevronDown,
+  LogOut,
+  CreditCard,
 } from "lucide-react";
-import FullLogo from "../assets/full-logo.webp";
-import { useState, useEffect, useContext } from "react";
 import { Button } from "./ui/Button";
-import { Modal } from "./ui/Modal";
-import GoogleIcon from "../assets/google-icon.svg?react";
+import {
+  Link,
+  type Location,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { FRONTEND_ENDPOINTS } from "../constants";
 import { AuthContext, ModalContext } from "../Contexts";
-import { Dropdown, DropdownItem } from "./ui/Dropdown";
-import { Link, useNavigate } from "react-router-dom";
-import { EmailVerificationForm } from "./EmailVerificationForm";
-import { validateSignInForm } from "../utils/validation";
-import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
-import type { SignInFormErrors } from "../types";
+import { toast } from "sonner";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
-  const { isSignInModalOpen, openSignInModal, closeSignInModal } =
-    useContext(ModalContext)!;
+  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const {
-    isAuthenticated,
-    isLoading,
-    user,
-    guest,
-    isEmailVerificationModalOpen,
-    login,
-    signup,
-    loginGuest,
-    logout,
-    refreshAuth,
-    setIsEmailVerificationModalOpen,
-  } = useContext(AuthContext)!;
+  const { isAuthenticated, logout, user, guest } = useContext(AuthContext)!;
+  const { openSignInModal } = useContext(ModalContext)!;
+  const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setIsScrolled(scrollPosition > 10);
+      setIsScrolled(window.scrollY > 50);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { errors, isValid } =
-      e.target.name === "email"
-        ? validateSignInForm(e.target.value, null)
-        : validateSignInForm(null, e.target.value);
-    if (!isValid) {
-      e.target.setCustomValidity(
-        errors[e.target.type as keyof SignInFormErrors["errors"]].join("\n")
-      );
-    } else {
-      e.target.setCustomValidity("");
-    }
-  };
-
-  const handleSignInFormSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-    setApiError(null);
-
-    const formData = new FormData(e.target as HTMLFormElement);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-      if (isSignUp) {
-        await signup(email, password);
-        setIsEmailVerificationModalOpen(true);
-      } else {
-        await login(email, password);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        mobileMenuButtonRef.current &&
+        !mobileMenuButtonRef.current.contains(event.target as Node) &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
       }
-      closeSignInModal();
-      refreshAuth();
-    } catch (error) {
-      setApiError(
-        error instanceof Error ? error.message : "Authentication failed"
-      );
-    }
-  };
-  const handleGuestLogin = async () => {
-    try {
-      setApiError(null);
-      await loginGuest();
-      closeSignInModal();
-      refreshAuth();
-    } catch (error) {
-      setApiError(
-        error instanceof Error ? error.message : "Authentication failed"
-      );
-    }
-  };
-  const handleLogout = async () => {
-    logout();
-  };
+    };
+    document.addEventListener("mousedown", handleClickOutside, true);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside, true);
+  }, []);
 
-  const getUsesInfo = () => {
+  const handleLogout = useCallback(async () => {
+    logout();
+    navigate("/");
+  }, [logout, navigate]);
+
+  const getUsesInfo = useCallback(() => {
     if (user) {
       return `${user.exhaustedUses}/${user.useLimit} credits`;
     }
@@ -113,178 +72,327 @@ export const Header: React.FC = () => {
       return `${guest.exhaustedUses}/${guest.useLimit} credits`;
     }
     return "0/0 uses";
-  };
+  }, [user, guest]);
 
-  const profileTrigger = (
-    <Button variant="secondary">
-      <div className="flex items-center gap-2 text-sm text-slate-300">
-        <User size={16} />
-        <span className="hidden sm:inline text-slate-400">
-          ({getUsesInfo()})
-        </span>
-        <ChevronDown size={14} className="text-slate-400" />
+  const handleMobileMenuButtonClick = useCallback(() => {
+    setIsMenuOpen(!isMenuOpen);
+  }, [isMenuOpen, setIsMenuOpen]);
+
+  return (
+    <header
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white shadow-strong" : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 md:h-16">
+          {/* Logo */}
+          <Link
+            to={
+              user || guest
+                ? FRONTEND_ENDPOINTS.GENERATOR
+                : FRONTEND_ENDPOINTS.LANDING
+            }
+            className="flex items-center space-x-2"
+          >
+            <div className="bg-primary-500 p-2 rounded-lg shadow-soft">
+              <PenTool className="size-5 lg:size-6 text-white" />
+            </div>
+            <span className="text-xl font-bold text-primary-500">
+              CoverGenius
+            </span>
+          </Link>
+
+          {/* Desktop Navigation - hidden on mobile */}
+          <DesktopNavigation
+            location={location}
+            isAuthenticated={isAuthenticated}
+            openSignInModal={openSignInModal}
+            handleLogout={handleLogout}
+            user={user}
+            getUsesInfo={getUsesInfo}
+          />
+
+          {/* Mobile Menu Button - hidden on desktop */}
+          <button
+            ref={mobileMenuButtonRef}
+            className="md:hidden p-2 rounded-lg text-slate-700 hover:bg-primary-100 transition-colors"
+            onClick={handleMobileMenuButtonClick}
+          >
+            {isMenuOpen ? (
+              <X className="size-6" />
+            ) : (
+              <Menu className="size-6" />
+            )}
+          </button>
+        </div>
+
+        {/* Mobile Menu - hidden on desktop */}
+        {isMenuOpen && (
+          <MobileNavigation
+            ref={mobileMenuRef as React.RefObject<HTMLDivElement>}
+            location={location}
+            isAuthenticated={isAuthenticated}
+            openSignInModal={openSignInModal}
+            handleLogout={handleLogout}
+            user={user}
+            navigate={navigate}
+            setIsMenuOpen={setIsMenuOpen}
+            getUsesInfo={getUsesInfo}
+          />
+        )}
       </div>
-    </Button>
+    </header>
+  );
+};
+
+const DesktopNavigation = ({
+  location,
+  isAuthenticated,
+  openSignInModal,
+  handleLogout,
+  user,
+  getUsesInfo,
+}: {
+  location: Location;
+  isAuthenticated: boolean;
+  openSignInModal: () => void;
+  handleLogout: () => void;
+  user: any | undefined;
+  getUsesInfo: () => string;
+}) => {
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const navigate = useNavigate();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!isProfileDropdownOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside, true);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside, true);
+    };
+  }, [isProfileDropdownOpen]);
+
+  const handleBuyCredits = useCallback(() => {
+    setIsProfileDropdownOpen(false);
+    if (location.pathname !== FRONTEND_ENDPOINTS.CREDITS_SHOP) {
+      navigate(FRONTEND_ENDPOINTS.CREDITS_SHOP);
+    } else {
+      toast.warning("You are already on the Credits Shop");
+    }
+  }, [location.pathname, navigate]);
+
+  const profileDropdown = (
+    <div
+      ref={dropdownRef}
+      className="absolute top-14 right-24 lg:left-0 w-64 bg-white rounded-xl shadow-xl border border-slate-100 py-3 px-4 z-50 animate-fade-in duration-150"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div className="bg-primary-100 rounded-full p-2">
+          <User className="size-5 text-primary-500" />
+        </div>
+        <div>
+          <div className="text-xs text-slate-400 font-medium">
+            {user ? "Account Credits" : "Guest Credits"}
+          </div>
+          <div className="text-lg font-bold text-slate-800">
+            {getUsesInfo()}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <Button
+          variant="primary"
+          size="sm"
+          className="flex items-center gap-2 justify-center"
+          onClick={handleBuyCredits}
+        >
+          <CreditCard className="size-5" />
+          <span>Buy More Credits</span>
+        </Button>
+      </div>
+    </div>
   );
 
   return (
     <>
-      <header
-        className={`
-          fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8
-          transition-all duration-300 ease-in-out
-          ${isScrolled ? "py-3 bg-slate-900/95 backdrop-blur-sm shadow-md" : "py-5 bg-transparent"}
-        `}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <img src={FullLogo} alt="CoverGenius" className="h-7 md:h-10" />
-          </Link>
+      {location.pathname === FRONTEND_ENDPOINTS.LANDING && (
+        <nav className="hidden md:flex md:space-x-2 lg:space-x-8">
+          <a href="#features" className="btn-ghost">
+            Features
+          </a>
+          <a href="#demo" className="btn-ghost">
+            Demo
+          </a>
+          <a href="#pricing" className="btn-ghost">
+            Pricing
+          </a>
+          <a href="#testimonials" className="btn-ghost">
+            Reviews
+          </a>
+        </nav>
+      )}
+      <div className="hidden md:flex items-center space-x-4 relative">
+        {isAuthenticated && isProfileDropdownOpen && profileDropdown}
+        {isAuthenticated ? (
+          <>
+            <Button
+              ref={buttonRef as React.RefObject<HTMLButtonElement>}
+              variant="primary"
+              size="sm"
+              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              className={`flex items-center gap-2 ${isProfileDropdownOpen ? "bg-primary-100 text-primary-600" : ""}`}
+            >
+              <User className="size-5" />
+              <span className="hidden lg:inline text-md text-white font-medium">
+                {getUsesInfo()}
+              </span>
+              <ChevronDown
+                className={`size-4 transition-transform duration-300 ml-2 lg:ml-3 ${
+                  isProfileDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              className="bg-red-500 hover:bg-red-600"
+              onClick={handleLogout}
+            >
+              <LogOut className="size-5 mr-2 text-white" />
+              <span className="inline">Logout</span>
+            </Button>
+          </>
+        ) : (
+          <Button variant="primary" size="sm" onClick={openSignInModal}>
+            Start Now
+          </Button>
+        )}
+      </div>
+    </>
+  );
+};
 
-          <nav className="hidden md:flex items-center space-x-6"></nav>
+const MobileNavigation = ({
+  ref,
+  location,
+  isAuthenticated,
+  openSignInModal,
+  handleLogout,
+  user,
+  navigate,
+  setIsMenuOpen,
+  getUsesInfo,
+}: {
+  ref: React.RefObject<HTMLDivElement>;
+  location: Location;
+  isAuthenticated: boolean;
+  openSignInModal: () => void;
+  handleLogout: () => void;
+  user: any | undefined;
+  navigate: (path: string) => void;
+  setIsMenuOpen: (isOpen: boolean) => void;
+  getUsesInfo: () => string;
+}) => {
+  const handleBuyCreditsButtonClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      setIsMenuOpen(false);
+      if (location.pathname !== FRONTEND_ENDPOINTS.CREDITS_SHOP) {
+        navigate(FRONTEND_ENDPOINTS.CREDITS_SHOP);
+      } else {
+        toast.warning("You are already on the Credits Shop");
+      }
+    },
+    [location.pathname, navigate, setIsMenuOpen]
+  );
 
-          <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <>
-                <Dropdown trigger={profileTrigger}>
-                  <div className="px-4 py-3 border-b border-slate-600">
-                    <div className="text-sm text-slate-400 mb-1">
-                      {user ? "Account Credits" : "Guest Credits"}
-                    </div>
-                    <div className="text-lg font-semibold text-slate-200">
-                      {getUsesInfo()} used
-                    </div>
-                  </div>
-
-                  {user ? (
-                    <DropdownItem onClick={() => navigate("/buy-credits")}>
-                      <div className="flex items-center gap-3">
-                        <CreditCard size={16} className="text-purple-400" />
-                        <span>Buy More Credits</span>
-                      </div>
-                    </DropdownItem>
-                  ) : (
-                    <DropdownItem onClick={openSignInModal}>
-                      <div className="flex items-center gap-3">
-                        <LogIn size={16} className="text-purple-400" />
-                        <span>Sign In For More Credits</span>
-                      </div>
-                    </DropdownItem>
-                  )}
-                </Dropdown>
-                {/* Logout Button */}
-                <Button
-                  variant="secondary"
-                  onClick={handleLogout}
-                  disabled={isLoading}
-                >
-                  <LogOut size={16} className="md:mr-2" />
-                  <span className="hidden md:inline">Logout</span>
-                </Button>
-              </>
-            ) : (
+  return (
+    <div
+      ref={ref}
+      className="md:hidden bg-white border-t border-neutral-200 py-4 px-2"
+    >
+      {location.pathname === FRONTEND_ENDPOINTS.LANDING && (
+        <nav className="flex flex-col space-y-4 border-b border-neutral-200 pb-2">
+          <a href="#features" className="btn-ghost text-left">
+            Features
+          </a>
+          <a href="#demo" className="btn-ghost text-left">
+            Demo
+          </a>
+          <a href="#pricing" className="btn-ghost text-left">
+            Pricing
+          </a>
+          <a href="#testimonials" className="btn-ghost text-left">
+            Reviews
+          </a>
+        </nav>
+      )}
+      <div className="flex flex-col space-y-2 pt-4 px-4">
+        {isAuthenticated ? (
+          <div className="flex flex-col space-y-4">
+            {/* Information About Credits */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary-100 rounded-full p-2">
+                <User className="size-5 text-primary-500" />
+              </div>
+              <div>
+                <div className="text-md text-slate-800 mb-1">
+                  {user ? "Account Credits:" : "Guest Credits:"}
+                </div>
+                <div className="text-lg font-semibold text-slate-600">
+                  {getUsesInfo()} used
+                </div>
+              </div>
+            </div>
+            {/* Buttons */}
+            <div className="flex space-x-2">
               <Button
                 variant="primary"
-                onClick={openSignInModal}
-                disabled={isLoading}
+                size="sm"
+                className="bg-primary-500 hover:bg-primary-600 w-full flex items-center gap-2 justify-center"
+                onClick={handleBuyCreditsButtonClick}
               >
-                Sign In
+                <CreditCard className="size-4" />
+                Buy Credits
               </Button>
-            )}
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-red-500 hover:bg-red-600 w-full flex items-center gap-2 justify-center text-white"
+                onClick={handleLogout}
+              >
+                <LogOut className="size-4" />
+                Logout
+              </Button>
+            </div>
           </div>
-        </div>
-      </header>
-
-      {/* Sign In Modal */}
-      <Modal
-        isOpen={isSignInModalOpen}
-        onClose={closeSignInModal}
-        title={isSignUp ? "Sign Up" : "Sign In"}
-      >
-        <form className="text-slate-200" onSubmit={handleSignInFormSubmit}>
-          <div className="flex flex-col gap-4">
-            {apiError && (
-              <div className="text-red-500 text-sm text-center">{apiError}</div>
-            )}
-            <input
-              type="email"
-              className="p-4 outline-1 outline-slate-200/30 rounded-md"
-              placeholder="Email"
-              name="email"
-              onChange={handleInputOnChange}
-              autoComplete="email"
-              required
-            />
-            <input
-              type="password"
-              className="p-4 outline-1 outline-slate-200/30 rounded-md"
-              placeholder="Password"
-              name="password"
-              onChange={handleInputOnChange}
-              autoComplete="current-password"
-              required
-            />
-            <Button variant="primary" type="submit" disabled={isLoading}>
-              {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
-          </div>
-        </form>
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-sm text-slate-400 hover:text-slate-200 transition-colors"
+        ) : (
+          <Button
+            variant="primary"
+            size="sm"
+            className="w-full"
+            onClick={openSignInModal}
           >
-            {isSignUp
-              ? "Already have an account? Sign In"
-              : "Don't have an account? Sign Up"}
-          </button>
-        </div>
-
-        <hr className="my-5 text-slate-200/30" />
-
-        {/* Google Login */}
-        <Button
-          variant="secondary"
-          fullWidth={true}
-          className="mb-2"
-          // disabled={isLoading}
-          disabled={true}
-        >
-          <div className="flex items-center gap-2 text-md">
-            <GoogleIcon className="size-5" />
-            <p>Sign In</p>
-            <p className="text-slate-400">(Coming Soon)</p>
-          </div>
-        </Button>
-
-        {/* Guest Login */}
-        <Button
-          variant="secondary"
-          fullWidth={true}
-          onClick={handleGuestLogin}
-          disabled={isLoading}
-        >
-          <p className="flex items-center gap-2">
-            <span className="text-md">
-              Guest Login ({DEFAULT_USE_LIMIT_FOR_GUEST}{" "}
-              {DEFAULT_USE_LIMIT_FOR_GUEST > 1 ? "Uses" : "Use"})
-            </span>
-            <UserCheck2Icon className="size-5" />
-          </p>
-        </Button>
-      </Modal>
-
-      {/* Email Verification Modal */}
-      <Modal
-        isOpen={isEmailVerificationModalOpen}
-        onClose={() => setIsEmailVerificationModalOpen(false)}
-        showCloseButton={false}
-        closeOnBackdropClick={false}
-        closeOnEscape={false}
-      >
-        <EmailVerificationForm />
-      </Modal>
-    </>
+            Start Now
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
