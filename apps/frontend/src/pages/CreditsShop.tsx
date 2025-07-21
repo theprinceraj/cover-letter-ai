@@ -12,7 +12,7 @@ import SadCryGif from "../assets/sad-cry.gif";
 import HappyDanceGif from "../assets/happy-dance.gif";
 import { ModalContext } from "../Contexts";
 import { toast } from "sonner";
-import { Header_ } from "../components/Header";
+import { Header } from "../components/Header";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -172,7 +172,7 @@ export const CreditsShop: React.FC = () => {
 
   return (
     <>
-      <Header_ />
+      <Header />
       <main className="py-12 px-4 flex justify-center items-center">
         <div className="min-h-screen w-full xl:w-3/4 mx-auto">
           <h1 className="text-3xl font-bold my-16 md:my-24 text-center">
