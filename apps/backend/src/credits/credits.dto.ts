@@ -36,7 +36,7 @@ export class VerifyCreditOrderPaymentDto {
   @IsNotEmpty()
   @IsString()
   @Transform(({ value }) =>
-    sanitizeHtml(value.trim().toLowerCase(), {
+    sanitizeHtml(value.trim(), {
       allowedTags: [],
       allowedAttributes: {},
     }),

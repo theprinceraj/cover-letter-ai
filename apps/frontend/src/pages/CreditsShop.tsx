@@ -1,17 +1,18 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
+import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
+import { toast } from "sonner";
+import SadCryGif from "../assets/sad-cry.gif";
+import HappyDanceGif from "../assets/happy-dance.gif";
+import { useCallback, useContext, useState } from "react";
+import { ModalContext, AuthContext } from "../Contexts";
+import { useCreditPlans, type CreditPlan } from "../hooks/useCreditPlans";
 import { Footer } from "../components/Footer";
 import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import { Spinner } from "../components/ui/Spinner";
-import { Search } from "lucide-react";
-import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
-import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
-import { type CREDIT_PACKAGE_TYPE } from "@cover-letter-ai/constants";
-import SadCryGif from "../assets/sad-cry.gif";
-import HappyDanceGif from "../assets/happy-dance.gif";
-import { ModalContext, AuthContext } from "../Contexts";
-import { toast } from "sonner";
 import { Header } from "../components/Header";
+import { HeroTemplate } from "../components/ui/HeroTemplate";
+import { PricingCardsList } from "../components/ui/PricingCardsList";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -28,9 +29,7 @@ export const CreditsShop: React.FC = () => {
     refreshAuth,
   } = useContext(AuthContext)!;
   const { openSignInModal } = useContext(ModalContext)!;
-  const [CREDIT_PACKAGES, setCREDIT_PACKAGES] = useState<CREDIT_PACKAGE_TYPE[]>(
-    []
-  );
+  const { creditPlans } = useCreditPlans();
   const { error, isLoading, Razorpay } = useRazorpay();
   const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | null>(
@@ -39,19 +38,8 @@ export const CreditsShop: React.FC = () => {
   const [isPaymentStatusModalOpen, setIsPaymentStatusModalOpen] =
     useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchPackagesList = async () => {
-      const response = await fetchWithAuth({
-        url: "/credits/packages-list",
-        method: "GET",
-      });
-      setCREDIT_PACKAGES(response);
-    };
-    fetchPackagesList();
-  }, [fetchWithAuth]);
-
   const handlePurchase = useCallback(
-    async (pkg: CREDIT_PACKAGE_TYPE, currency: CurrencyCode) => {
+    async (pkg: CreditPlan, currency: CurrencyCode) => {
       // Create order through backend and get order_id from it
       let response = await fetchWithAuth({
         url: `/credits/orders`,
@@ -74,7 +62,6 @@ export const CreditsShop: React.FC = () => {
 
   const handlePaymentSuccess = useCallback(
     async (razorpayResponse: RazorpaySuccessfulPaymentResponse) => {
-      console.log(razorpayResponse);
       let response = await fetchWithAuth({
         url: `/credits/orders/verify-payment/${razorpayResponse.razorpay_order_id}`,
         method: "POST",
@@ -95,11 +82,11 @@ export const CreditsShop: React.FC = () => {
   }, []);
 
   const initiateRazorpayDialog = useCallback(
-    (pkg: CREDIT_PACKAGE_TYPE, currency: CurrencyCode, order_id: string) => {
+    (plan: CreditPlan, currency: CurrencyCode, order_id: string) => {
       const options: RazorpayOrderOptions = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         currency: currency,
-        amount: pkg.priceInINR * 100,
+        amount: plan.priceInINR * 100,
         name: "Credits",
         order_id: order_id,
         handler: handlePaymentSuccess,
@@ -113,79 +100,46 @@ export const CreditsShop: React.FC = () => {
     [handlePaymentFailure, handlePaymentSuccess]
   );
 
-  const packageCards = useMemo(() => {
-    return CREDIT_PACKAGES.map((pkg) => (
-      <div
-        key={pkg.id}
-        className="border border-slate-700 rounded-lg p-6 flex flex-col items-center gap-6 h-full w-full"
-      >
-        <h2 className="text-xl font-extrabold">{pkg.name} Package</h2>
-        <p className="mb-2 font-bold text-slate-300">
-          <span className="text-9xl">{pkg.priceInINR}</span> INR
-        </p>
-        <p className="mb-2 font-bold text-slate-300/40">
-          &asymp; {pkg.priceInUSD_Cents / 100} USD
-        </p>
-
-        <p className="text-lg font-bold flex items-center gap-2">
-          <Search className="size-4" />
-          {pkg.credits} <span className="text-sm">Credits</span>
-        </p>
-
-        {/* Container for Razorpay Button */}
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth={true}
-          onClick={() => {
-            if (!isAuthenticated) {
-              openSignInModal();
-              toast.error("Please sign in using your email to buy credits");
-              return;
-            }
-            if (isGuest) {
-              toast.error(
-                "Guest users cannot buy credits. Please sign in with a registered account."
-              );
-              return;
-            }
-            if (!isEmailVerified) {
-              toast.error("Please verify your email before buying credits.");
-              return;
-            }
-            handlePurchase(pkg, "INR");
-          }}
-        >
-          Buy Now
-        </Button>
-      </div>
-    ));
-  }, [
-    CREDIT_PACKAGES,
-    handlePurchase,
-    isAuthenticated,
-    isEmailVerified,
-    isGuest,
-    openSignInModal,
-  ]);
+  const handleBuyBtnClick = (plan: CreditPlan) => {
+    if (!isAuthenticated) {
+      openSignInModal();
+      toast.error("Please sign in using your email to buy credits");
+      return;
+    }
+    if (isGuest) {
+      toast.error(
+        "Guest users cannot buy credits. Please sign in with a registered account."
+      );
+      return;
+    }
+    if (!isEmailVerified) {
+      toast.error("Please verify your email before buying credits.");
+      return;
+    }
+    handlePurchase(plan, "INR");
+  };
 
   return (
     <>
       <Header />
-      <main className="py-12 px-4 flex justify-center items-center">
-        <div className="min-h-screen w-full xl:w-3/4 mx-auto">
-          <h1 className="text-3xl font-bold my-16 md:my-24 text-center">
-            Buy Credits
+      <HeroTemplate>
+        <>
+          <h1 className="text-3xl text-slate-950 font-bold mb-16 md:mb-24 text-center">
+            Buy Credits Now
           </h1>
           <div className="w-full">
-            {isLoading && CREDIT_PACKAGES.length === 0 ? (
+            {isLoading && creditPlans.length === 0 ? (
               <div className="flex justify-center items-center h-full">
                 <Spinner size="xl" />
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-center justify-center gap-8 w-full">
-                {CREDIT_PACKAGES! && packageCards}
-              </div>
+              creditPlans && (
+                <PricingCardsList
+                  plans={creditPlans}
+                  handleBuyBtnClick={handleBuyBtnClick}
+                  isINR={true}
+                />
+              )
             )}
           </div>
           {/* Payment Status Modal */}
@@ -256,8 +210,8 @@ export const CreditsShop: React.FC = () => {
               </Button>
             </Modal>
           )}
-        </div>
-      </main>
+        </>
+      </HeroTemplate>
       <Footer />
     </>
   );
