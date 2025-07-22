@@ -1,15 +1,16 @@
-import { Header } from "../components/Header";
 import { CoverLetterForm } from "../components/generator/CoverLetterForm";
 import { Footer } from "../components/Footer";
-import { Hero } from "../components/generator/Hero";
+import { Header } from "../components/Header";
+import { HeroTemplate } from "../components/ui/HeroTemplate";
 
 export const Generator: React.FC = () => {
   return (
     <>
       <Header />
       <main>
-        <Hero />
-        <CoverLetterForm />
+        <HeroTemplate>
+          <CoverLetterForm />
+        </HeroTemplate>
       </main>
       <Footer />
     </>
