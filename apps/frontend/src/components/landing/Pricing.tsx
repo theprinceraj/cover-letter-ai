@@ -129,7 +129,7 @@ export const Pricing: React.FC = () => {
     if (isINR) {
       return `₹${priceINR}`;
     } else {
-      return `$${priceUSD}`;
+      return `$${priceUSD / 100}`;
     }
   };
 
@@ -151,7 +151,7 @@ export const Pricing: React.FC = () => {
             <span
               className={`text-sm font-medium ${isINR ? "text-orange-500" : "text-neutral-500"}`}
             >
-              INR (₹)
+              INR (&#8377;)
             </span>
             <button
               onClick={() => setIsINR(!isINR)}
@@ -168,12 +168,12 @@ export const Pricing: React.FC = () => {
             <span
               className={`text-sm font-medium ${!isINR ? "text-orange-500" : "text-neutral-500"}`}
             >
-              USD ($)
+              USD (&#36;)
             </span>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-4 lg:gap-8 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.id}
@@ -185,13 +185,13 @@ export const Pricing: React.FC = () => {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-primary-500 text-white px-6 py-2 rounded-full text-sm font-medium shadow-medium">
+                  <div className="bg-primary-500 text-white px-3 lg:px-6 py-2 rounded-full text-sm font-medium shadow-medium">
                     Best Choice
                   </div>
                 </div>
               )}
 
-              <div className="p-8">
+              <div className="p-8 md:px-5 md:py-8 lg:p-8">
                 <div className="text-center mb-8">
                   <div
                     className={`w-16 h-16 rounded-2xl ${plan.color} flex items-center justify-center mx-auto mb-4`}

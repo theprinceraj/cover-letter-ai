@@ -1,58 +1,65 @@
 import React from "react";
-import { Brain, Zap, Target, Shield, Globe, Sparkles } from "lucide-react";
+import {
+  Brain,
+  Zap,
+  FileText,
+  Lightbulb,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
+
+const features = [
+  {
+    icon: Brain,
+    title: "AI-Powered Generation",
+    description:
+      "Leverage AI to create professional cover letters tailored to your job description and resume.",
+    color: "bg-primary-500",
+    hoverClass: "hover:bg-primary-500",
+  },
+  {
+    icon: FileText,
+    title: "Resume Integration",
+    description:
+      "Upload your PDF resume for automatic analysis and incorporation of your experience and skills.",
+    color: "bg-orange-500",
+    hoverClass: "hover:bg-orange-500",
+  },
+  {
+    icon: Zap,
+    title: "Fast & Personalized",
+    description:
+      "Generate customized cover letters in seconds, perfectly matched to job requirements.",
+    color: "bg-purple-500",
+    hoverClass: "hover:bg-purple-500",
+  },
+  {
+    icon: Lightbulb,
+    title: "Smart Suggestions",
+    description:
+      "Receive AI-generated enhancement suggestions to make your cover letter even stronger.",
+    color: "bg-green-500",
+    hoverClass: "hover:bg-green-500",
+  },
+  {
+    icon: CreditCard,
+    title: "Flexible Credits",
+    description:
+      "Use our credit system for generations, with options for guests and premium packages.",
+    color: "bg-primary-600",
+    hoverClass: "hover:bg-primary-600",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure Access",
+    description:
+      "Protected authentication with email verification and guest modes for easy starting.",
+    color: "bg-orange-600",
+    hoverClass: "hover:bg-orange-600",
+  },
+];
 
 export const Features: React.FC = () => {
-  const features = [
-    {
-      icon: Brain,
-      title: "Smart AI Analysis",
-      description:
-        "Our AI analyzes job descriptions and your experience to create perfectly tailored cover letters that speak directly to hiring managers.",
-      color: "bg-primary-500",
-      hoverClass: "hover:bg-primary-500",
-    },
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description:
-        "Generate professional cover letters in under 30 seconds. No more spending hours crafting the perfect application.",
-      color: "bg-orange-500",
-      hoverClass: "hover:bg-orange-500",
-    },
-    {
-      icon: Target,
-      title: "Precision Targeting",
-      description:
-        "Match your skills and experience to job requirements with surgical precision. Every word counts toward getting you noticed.",
-      color: "bg-purple-500",
-      hoverClass: "hover:bg-purple-500",
-    },
-    {
-      icon: Shield,
-      title: "ATS Optimized",
-      description:
-        "Ensure your cover letter passes through Applicant Tracking Systems with our ATS-friendly formatting and keyword optimization.",
-      color: "bg-green-500",
-      hoverClass: "hover:bg-green-500",
-    },
-    {
-      icon: Globe,
-      title: "Industry Expertise",
-      description:
-        "Trained on thousands of successful cover letters across 50+ industries. Get industry-specific insights and terminology.",
-      color: "bg-primary-600",
-      hoverClass: "hover:bg-primary-600",
-    },
-    {
-      icon: Sparkles,
-      title: "Continuous Learning",
-      description:
-        "Our AI improves with every interaction, learning from successful applications to make your next letter even better.",
-      color: "bg-orange-600",
-      hoverClass: "hover:bg-orange-600",
-    },
-  ];
-
   return (
     <section
       id="features"

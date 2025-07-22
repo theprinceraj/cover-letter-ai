@@ -1,27 +1,28 @@
 import { useState } from "react";
 import { Play, Pause, RefreshCw, Copy, Check } from "lucide-react";
+import { Button } from "../ui/Button";
+
+const steps = [
+  {
+    title: "1. Paste Job Description",
+    content:
+      "Software Engineer position at TechCorp requiring React, Node.js, and 3+ years experience...",
+  },
+  {
+    title: "2. AI Analysis",
+    content:
+      "✨ Analyzing requirements...\n🎯 Matching your skills...\n📝 Crafting personalized content...",
+  },
+  {
+    title: "3. Generated Cover Letter",
+    content: `Dear Hiring Manager,\n\nI am excited to apply for the Software Engineer position at TechCorp. With over 4 years of experience in React and Node.js development, I am confident in my ability to contribute to your innovative team.\n\nIn my previous role at StartupXYZ, I successfully led the development of a scalable web application using React and Node.js, resulting in a 40% increase in user engagement. My expertise in modern JavaScript frameworks aligns perfectly with TechCorp's tech stack.\n\nI am particularly drawn to TechCorp's commitment to cutting-edge technology and would welcome the opportunity to discuss how my skills can drive your projects forward.\n\nThank you for considering my application.\n\nBest regards,\n[Your Name]`,
+  },
+];
 
 export const CoverGeniusDemo: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(2);
   const [isCopied, setIsCopied] = useState(false);
-
-  const steps = [
-    {
-      title: "1. Paste Job Description",
-      content:
-        "Software Engineer position at TechCorp requiring React, Node.js, and 3+ years experience...",
-    },
-    {
-      title: "2. AI Analysis",
-      content:
-        "✨ Analyzing requirements...\n🎯 Matching your skills...\n📝 Crafting personalized content...",
-    },
-    {
-      title: "3. Generated Cover Letter",
-      content: `Dear Hiring Manager,\n\nI am excited to apply for the Software Engineer position at TechCorp. With over 4 years of experience in React and Node.js development, I am confident in my ability to contribute to your innovative team.\n\nIn my previous role at StartupXYZ, I successfully led the development of a scalable web application using React and Node.js, resulting in a 40% increase in user engagement. My expertise in modern JavaScript frameworks aligns perfectly with TechCorp's tech stack.\n\nI am particularly drawn to TechCorp's commitment to cutting-edge technology and would welcome the opportunity to discuss how my skills can drive your projects forward.\n\nThank you for considering my application.\n\nBest regards,\n[Your Name]`,
-    },
-  ];
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -69,7 +70,7 @@ export const CoverGeniusDemo: React.FC = () => {
           <div className="card overflow-hidden">
             {/* Demo Controls */}
             <div className="bg-purple-500 p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={handlePlay}
@@ -78,12 +79,12 @@ export const CoverGeniusDemo: React.FC = () => {
                   >
                     {isPlaying ? (
                       <>
-                        <Pause className="w-4 h-4" />
+                        <Pause className="size-4" />
                         <span>Playing...</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4" />
+                        <Play className="size-4" />
                         <span>Start Demo</span>
                       </>
                     )}
@@ -92,7 +93,7 @@ export const CoverGeniusDemo: React.FC = () => {
                     onClick={handleReset}
                     className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all focus:ring-2 focus:ring-white/50"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className="size-4" />
                     <span>Reset</span>
                   </button>
                 </div>
@@ -114,7 +115,7 @@ export const CoverGeniusDemo: React.FC = () => {
             </div>
 
             {/* Demo Content */}
-            <div className="p-8">
+            <div className="p-5 md:p-8">
               <div className="mb-6">
                 <h3 className="text-2xl font-semibold mb-2 text-neutral-800">
                   {steps[currentStep].title}
@@ -143,22 +144,24 @@ export const CoverGeniusDemo: React.FC = () => {
                 )}
 
                 {currentStep === 2 && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="absolute top-4 right-4 flex items-center gap-2"
                     onClick={handleCopy}
-                    className="absolute top-4 right-4 btn-primary px-4 py-2 flex items-center space-x-2"
                   >
                     {isCopied ? (
                       <>
-                        <Check className="w-4 h-4" />
-                        <span>Copied!</span>
+                        <Check className="size-4" />
+                        <span className="hidden md:inline">Copied!</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4" />
-                        <span>Copy</span>
+                        <Copy className="size-4" />
+                        <span className="hidden md:inline">Copy</span>
                       </>
                     )}
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

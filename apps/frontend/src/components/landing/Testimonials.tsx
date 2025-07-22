@@ -54,15 +54,15 @@ export const Testimonials: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-4 lg:gap-8">
           {emptyTestimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="glass rounded-2xl p-8 shadow-medium border-2 border-dashed border-neutral-300 hover:border-primary-400 transition-all duration-300 hover-glow"
+              className="glass rounded-2xl p-8 md:px-4 md:py-8 lg:p-8 shadow-medium border-2 border-dashed border-neutral-300 hover:border-primary-400 transition-all duration-300 hover-glow"
             >
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
-                  <User className="w-6 h-6 text-white" />
+                <div className="size-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                  <User className="size-6 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-neutral-800">

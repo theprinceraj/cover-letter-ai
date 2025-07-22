@@ -95,7 +95,7 @@ export const Hero: React.FC = () => {
               }}
             >
               Start Writing Now
-              <ChevronRight className="w-5 h-5 ml-2" />
+              <ChevronRight className="size-5 ml-2" />
             </Button>
             <a
               className="btn-secondary px-8 py-4 flex items-center justify-center"
@@ -114,7 +114,7 @@ export const Hero: React.FC = () => {
 };
 
 const DemoView = ({ currentText }: { currentText: string }) => (
-  <div className="relative">
+  <div className="relative mb-20">
     <div className="card p-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
@@ -124,7 +124,7 @@ const DemoView = ({ currentText }: { currentText: string }) => (
         </div>
         <div className="flex items-center space-x-2 text-sm text-neutral-500">
           <FileText className="w-4 h-4" />
-          <span>cover-letter.docx</span>
+          <span>cover-letter.txt</span>
         </div>
       </div>
 
@@ -145,19 +145,23 @@ const DemoView = ({ currentText }: { currentText: string }) => (
             <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
             <span>AI Writing...</span>
           </div>
-          <button className="btn-primary px-4 py-2 text-sm flex items-center">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => toast.info("Generate Now To Ace Your Applications")}
+          >
             <Send className="w-4 h-4 mr-2" />
             Apply Now
-          </button>
+          </Button>
         </div>
       </div>
     </div>
 
     {/* Floating Elements */}
-    <div className="absolute -top-4 -right-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-medium animate-bounce">
+    <div className="absolute -top-4 -right-2 md:-right-4 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-medium animate-bounce">
       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
     </div>
-    <div className="absolute -bottom-4 -left-4 bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-medium animate-bounce delay-1000">
+    <div className="absolute -bottom-4 -left-2 md:-left-4 bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-medium animate-bounce delay-1000">
       🚀 Instant Results
     </div>
   </div>

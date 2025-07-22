@@ -6,7 +6,7 @@ import {
   TWITTER_URL,
   FRONTEND_ENDPOINTS,
 } from "../constants";
-import { useContext } from "react";
+import { useContext, type PropsWithChildren } from "react";
 import { AuthContext } from "../Contexts";
 
 type Link = {
@@ -54,14 +54,14 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-neutral-900 text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div className="bg-primary-500 p-2 rounded-lg shadow-soft">
-                <PenTool className="w-6 h-6 text-white" />
+                <PenTool className="size-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-orange-400">
+              <span className="text-xl md:text-2xl font-bold text-orange-400">
                 CoverGenius
               </span>
             </div>
@@ -103,86 +103,77 @@ export const Footer: React.FC = () => {
 
           {/* Product */}
           {location.pathname === FRONTEND_ENDPOINTS.LANDING && (
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Product</h4>
-              <ul className="space-y-2">
-                {PRODUCT_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="text-neutral-400 hover:text-orange-500 transition-colors focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <FooterList title="Product">
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="text-base text-neutral-400 hover:text-orange-500 transition-colors focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </FooterList>
           )}
 
           {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              {isAuthenticated && (
-                <>
-                  <li>
-                    <Link
-                      to={FRONTEND_ENDPOINTS.GENERATOR}
-                      className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
-                    >
-                      Cover Letter Generator
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={FRONTEND_ENDPOINTS.CREDITS_SHOP}
-                      className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
-                    >
-                      Pricing
-                    </Link>
-                  </li>
-                </>
-              )}
-              <li>
-                <Link
-                  to={FRONTEND_ENDPOINTS.CONTACT}
-                  className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
-                >
-                  Help Center
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Important Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Important Links</h4>
-            <ul className="space-y-2">
-              {IMPORTANT_LINKS.map((link) => (
-                <li key={link.href}>
+          <FooterList title="Quick Links">
+            {isAuthenticated && (
+              <>
+                <li>
                   <Link
-                    to={link.href}
-                    className="text-neutral-400 hover:text-green-500 transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                    to={FRONTEND_ENDPOINTS.GENERATOR}
+                    className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
                   >
-                    {link.label}
+                    Cover Letter Generator
                   </Link>
                 </li>
-              ))}
-            </ul>
-          </div>
+                <li>
+                  <Link
+                    to={FRONTEND_ENDPOINTS.CREDITS_SHOP}
+                    className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+              </>
+            )}
+            <li>
+              <Link
+                to={FRONTEND_ENDPOINTS.CONTACT}
+                className="text-neutral-400 hover:text-purple-500 transition-colors focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+              >
+                Help Center
+              </Link>
+            </li>
+          </FooterList>
+
+          {/* Important Links */}
+          <FooterList title="Important Links">
+            {IMPORTANT_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  to={link.href}
+                  className="text-neutral-400 hover:text-green-500 transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </FooterList>
         </div>
 
         <div className="border-t border-neutral-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-neutral-400 text-sm">
+            <p className="text-neutral-400 text-sm md:text-base lg:text-lg">
               &copy; {new Date().getFullYear()} CoverGenius. All rights
               reserved.
             </p>
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <a
                 href={`mailto:${EMAIL_ADDRESS}`}
-                className="text-neutral-400 hover:text-orange-500 transition-colors flex items-center focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
+                className="lg:text-lg text-neutral-400 hover:text-orange-500 transition-colors flex items-center focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-neutral-900 rounded"
               >
                 <Mail className="w-4 h-4 mr-2" />
                 {EMAIL_ADDRESS}
@@ -192,5 +183,17 @@ export const Footer: React.FC = () => {
         </div>
       </div>
     </footer>
+  );
+};
+
+const FooterList: React.FC<PropsWithChildren<{ title: string }>> = ({
+  children,
+  title,
+}) => {
+  return (
+    <div>
+      <h4 className="text-lg md:text-xl font-semibold mb-4">{title}</h4>
+      <ul className="space-y-2">{children}</ul>
+    </div>
   );
 };
