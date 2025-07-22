@@ -158,7 +158,7 @@ const DesktopNavigation = ({
   isAuthenticated: boolean;
   openSignInModal: () => void;
   handleLogout: () => void;
-  user: any | undefined;
+  user: unknown | undefined;
   getUsesInfo: () => string;
 }) => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -304,7 +304,7 @@ const MobileNavigation = ({
   isAuthenticated: boolean;
   openSignInModal: () => void;
   handleLogout: () => void;
-  user: any | undefined;
+  user: unknown | undefined;
   navigate: (path: string) => void;
   setIsMenuOpen: (isOpen: boolean) => void;
   getUsesInfo: () => string;

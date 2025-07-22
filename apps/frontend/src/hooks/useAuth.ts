@@ -40,7 +40,7 @@ export interface UseAuthReturn extends AuthState {
   logout: () => void;
   refreshAuth: () => Promise<void>;
   incrementExhaustedUses: () => void;
-  fetchWithAuth: <T = any>(
+  fetchWithAuth: <T = unknown>(
     config: AxiosRequestConfig
   ) => Promise<
     | T
@@ -92,6 +92,21 @@ export const useAuth = (): UseAuthReturn => {
     setAuthState((prev) => ({ ...prev, token }));
   }, []);
 
+  const logout = useCallback(() => {
+    setToken(null);
+    setAuthState({
+      user: null,
+      guest: null,
+      token: null,
+      isLoading: false,
+      isAuthenticated: false,
+      isGuest: false,
+      isEmailVerified: false,
+      isEmailVerificationModalOpen: false,
+      setIsEmailVerificationModalOpen: () => {},
+    });
+  }, [setToken]);
+
   const login = useCallback(
     async (email: string, password: string) => {
       logout();
@@ -133,7 +148,7 @@ export const useAuth = (): UseAuthReturn => {
         throw error;
       }
     },
-    [setToken]
+    [setToken, logout]
   );
 
   const signup = useCallback(
@@ -185,21 +200,6 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [setToken]);
 
-  const logout = useCallback(() => {
-    setToken(null);
-    setAuthState({
-      user: null,
-      guest: null,
-      token: null,
-      isLoading: false,
-      isAuthenticated: false,
-      isGuest: false,
-      isEmailVerified: false,
-      isEmailVerificationModalOpen: false,
-      setIsEmailVerificationModalOpen: () => {},
-    });
-  }, [setToken]);
-
   const refreshAuth = useCallback(async () => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
@@ -248,7 +248,7 @@ export const useAuth = (): UseAuthReturn => {
   }, []);
 
   const fetchWithAuth = useCallback(
-    async <T = any>(
+    async <T = unknown>(
       config: AxiosRequestConfig,
       auth: boolean = true
     ): Promise<

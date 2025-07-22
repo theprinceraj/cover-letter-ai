@@ -161,20 +161,22 @@ export const CoverLetterForm: React.FC = () => {
           formData.append("captchaToken", captchaToken);
           formData.append("resume", formValues.resume as Blob);
 
-          const response = await fetchWithAuth({
+          const response = await fetchWithAuth<
+            APIResponse | { error: true; message: string }
+          >({
             url: "/eval/cl",
             method: "POST",
             data: formData,
             headers: { "Content-Type": "multipart/form-data" },
           });
 
-          if (response.error) {
+          if ("error" in response) {
             setError(response.message);
             setStatus("error");
             return;
           }
 
-          setApiResponse(response as APIResponse);
+          setApiResponse(response);
           setStatus("complete");
           incrementExhaustedUses();
         } catch (error) {
@@ -188,7 +190,7 @@ export const CoverLetterForm: React.FC = () => {
         }
       }
     },
-    [captchaToken, formValues, user, guest]
+    [fetchWithAuth, captchaToken, formValues, user, guest]
   );
 
   if (!isAuthenticated && !authLoading) {

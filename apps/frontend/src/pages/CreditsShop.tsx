@@ -38,31 +38,11 @@ export const CreditsShop: React.FC = () => {
   const [isPaymentStatusModalOpen, setIsPaymentStatusModalOpen] =
     useState<boolean>(false);
 
-  const handlePurchase = useCallback(
-    async (pkg: CreditPlan, currency: CurrencyCode) => {
-      // Create order through backend and get order_id from it
-      let response = await fetchWithAuth({
-        url: `/credits/orders`,
-        method: "POST",
-        data: {
-          packageId: pkg.id,
-          currencyCodeInISOFormat: currency,
-        },
-      });
-      if (response.order?.id) {
-        initiateRazorpayDialog(pkg, currency, response.order.id);
-      } else if (response.error) {
-        toast.error(response.message);
-      } else {
-        toast.error("Failed to create order. Please try again later.");
-      }
-    },
-    [fetchWithAuth]
-  );
-
   const handlePaymentSuccess = useCallback(
     async (razorpayResponse: RazorpaySuccessfulPaymentResponse) => {
-      let response = await fetchWithAuth({
+      const response = await fetchWithAuth<
+        any | { error: true; message: string }
+      >({
         url: `/credits/orders/verify-payment/${razorpayResponse.razorpay_order_id}`,
         method: "POST",
         data: {
@@ -98,6 +78,30 @@ export const CreditsShop: React.FC = () => {
       razorpayInstance.open();
     },
     [handlePaymentFailure, handlePaymentSuccess]
+  );
+
+  const handlePurchase = useCallback(
+    async (pkg: CreditPlan, currency: CurrencyCode) => {
+      // Create order through backend and get order_id from it
+      const response = await fetchWithAuth<
+        any | { error: true; message: string }
+      >({
+        url: `/credits/orders`,
+        method: "POST",
+        data: {
+          packageId: pkg.id,
+          currencyCodeInISOFormat: currency,
+        },
+      });
+      if (response.order?.id) {
+        initiateRazorpayDialog(pkg, currency, response.order.id);
+      } else if (response.error) {
+        toast.error(response.message);
+      } else {
+        toast.error("Failed to create order. Please try again later.");
+      }
+    },
+    [fetchWithAuth, initiateRazorpayDialog]
   );
 
   const handleBuyBtnClick = (plan: CreditPlan) => {
