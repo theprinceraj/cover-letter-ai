@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { CreditPlan } from "../../hooks/useCreditPlans";
+import { FRONTEND_ENDPOINTS } from "../../constants";
 
 export const PricingCardsList = ({
   plans,
@@ -11,6 +12,7 @@ export const PricingCardsList = ({
   handleBuyBtnClick: (plan: CreditPlan) => void;
   isINR?: boolean;
 }) => {
+  const location = useLocation();
   const formatPrice = (
     {
       priceINR,
@@ -96,7 +98,9 @@ export const PricingCardsList = ({
                 }`}
                 onClick={() => handleBuyBtnClick(plan)}
               >
-                Get Started
+                {location.pathname === FRONTEND_ENDPOINTS.CREDITS_SHOP
+                  ? "Buy Now"
+                  : "Get Started"}
               </button>
             </div>
           </div>

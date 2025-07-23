@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "./Button";
 import { Check, ChevronDown, ChevronUp, Copy, Download } from "lucide-react";
+import { toast } from "sonner";
 
 interface CoverLetterPreviewProps {
   coverLetter: string;
@@ -15,6 +16,9 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
   onDownload,
   className = "",
 }) => {
+  suggestions = suggestions.filter(
+    (suggestion) => cleanMarkdownText(suggestion).trim() !== ""
+  );
   const [copied, setCopied] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -24,6 +28,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
+      toast.error("Failed to copy cover letter");
       console.error("Failed to copy cover letter:", error);
     }
   };
@@ -31,19 +36,14 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Cover Letter Preview */}
-      <div className="bg-slate-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-slate-700 border-b border-slate-600 px-6 py-4">
+      <div className="bg-orange-50 text-secondary-900 rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold">
               <span className="hidden md:inline">Cover Letter</span> Preview
             </h3>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-                className="text-slate-50 hover:bg-slate-700"
-              >
+              <Button variant="secondary" size="sm" onClick={handleCopy}>
                 {copied ? (
                   <>
                     <Check size={16} className="mr-1" />
@@ -70,30 +70,34 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
 
       {/* Suggestions */}
       {suggestions && suggestions.length > 0 && (
-        <div className="bg-slate-800 rounded-lg border border-slate-700">
+        <div className="text-secondary-900 rounded-lg">
           <button
             onClick={() => setShowSuggestions(!showSuggestions)}
-            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-700 transition-colors"
+            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-primary-100 hover:rounded-lg transition-colors"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-purple-500 rounded-full hidden md:flex md:items-center md:justify-center">
-                <span className="text-white font-medium text-sm">
+              <div className="w-8 h-8 bg-orange-500 text-white rounded-full hidden md:flex md:items-center md:justify-center">
+                <span className="font-medium text-sm">
                   {suggestions.length}
                 </span>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold">
                   Suggestions for Improvement
                 </h3>
-                <p className="text-slate-400 text-sm">
+                <p className="text-sm">
                   AI-powered recommendations to enhance your cover letter
                 </p>
               </div>
             </div>
             {showSuggestions ? (
-              <ChevronUp size={20} className="text-slate-400" />
+              <div className="bg-primary-500 rounded-full p-1">
+                <ChevronUp className="size-8 text-white" />
+              </div>
             ) : (
-              <ChevronDown size={20} className="text-slate-400" />
+              <div className="bg-primary-500 rounded-full p-1">
+                <ChevronDown className="size-8 text-white" />
+              </div>
             )}
           </button>
 
@@ -103,15 +107,15 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
                 {suggestions.map((suggestion, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 p-4 bg-slate-700 rounded-lg border border-slate-600"
+                    className="flex items-start gap-3 p-4 bg-white"
                   >
-                    <div className="w-6 h-6 bg-purple-500 rounded-full hidden md:flex md:items-center md:justify-center md:shrink-0 md:mt-0.5">
+                    <div className="w-6 h-6 bg-orange-500 rounded-full hidden md:flex md:items-center md:justify-center md:shrink-0 md:mt-0.5">
                       <span className="text-white text-xs font-semibold">
                         {index + 1}
                       </span>
                     </div>
-                    <p className="text-slate-200 text-start text-sm md:text-base">
-                      {cleanMarkdownText(suggestion).replace("*", "")}
+                    <p className="text-start text-sm md:text-base">
+                      {suggestion}
                     </p>
                   </div>
                 ))}

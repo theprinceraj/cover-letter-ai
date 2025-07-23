@@ -13,6 +13,11 @@ import { Spinner } from "../components/ui/Spinner";
 import { Header } from "../components/Header";
 import { HeroTemplate } from "../components/ui/HeroTemplate";
 import { PricingCardsList } from "../components/ui/PricingCardsList";
+import type {
+  ACCEPTED_CURRENCY_CODES,
+  CREDIT_ORDER_STATUS,
+  CREDIT_PACKAGE_TYPE,
+} from "@cover-letter-ai/constants";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -41,7 +46,8 @@ export const CreditsShop: React.FC = () => {
   const handlePaymentSuccess = useCallback(
     async (razorpayResponse: RazorpaySuccessfulPaymentResponse) => {
       const response = await fetchWithAuth<
-        any | { error: true; message: string }
+        | { success: boolean; creditsAdded: number }
+        | { error: true; message: string }
       >({
         url: `/credits/orders/verify-payment/${razorpayResponse.razorpay_order_id}`,
         method: "POST",
@@ -50,6 +56,10 @@ export const CreditsShop: React.FC = () => {
           razorpay_payment_id: razorpayResponse.razorpay_payment_id,
         },
       });
+      if ("error" in response) {
+        toast.error(response.message);
+        return;
+      }
       setIsPaymentSuccess(response?.success === true ? true : false);
       setIsPaymentStatusModalOpen(true);
     },
@@ -77,14 +87,24 @@ export const CreditsShop: React.FC = () => {
       const razorpayInstance = new Razorpay(options);
       razorpayInstance.open();
     },
-    [handlePaymentFailure, handlePaymentSuccess]
+    [handlePaymentFailure, handlePaymentSuccess, Razorpay]
   );
 
   const handlePurchase = useCallback(
     async (pkg: CreditPlan, currency: CurrencyCode) => {
       // Create order through backend and get order_id from it
       const response = await fetchWithAuth<
-        any | { error: true; message: string }
+        | {
+            order: {
+              id: string;
+              amountToBePaidInMinorUnits: number;
+              currency: ACCEPTED_CURRENCY_CODES;
+              status: CREDIT_ORDER_STATUS;
+              orderCreatedAt: Date;
+            };
+            pkg: CREDIT_PACKAGE_TYPE;
+          }
+        | { error: true; message: string }
       >({
         url: `/credits/orders`,
         method: "POST",
@@ -93,10 +113,12 @@ export const CreditsShop: React.FC = () => {
           currencyCodeInISOFormat: currency,
         },
       });
-      if (response.order?.id) {
-        initiateRazorpayDialog(pkg, currency, response.order.id);
-      } else if (response.error) {
+      if ("error" in response) {
         toast.error(response.message);
+        return;
+      }
+      if ("order" in response && response.order?.id) {
+        initiateRazorpayDialog(pkg, currency, response.order.id);
       } else {
         toast.error("Failed to create order. Please try again later.");
       }

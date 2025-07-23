@@ -64,8 +64,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div className="w-full mb-4">
-      <label className="block text-sm font-medium text-slate-200 mb-1.5">
-        {label} {required && <span className="text-purple-400 ml-1">*</span>}
+      <label className="block text-sm font-medium text-secondary-600 mb-1.5">
+        {label}{" "}
+        {required && (
+          <span className="text-orange-500 ml-1 font-extrabold">*</span>
+        )}
       </label>
 
       <div
@@ -75,12 +78,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         onDrop={handleDrop}
         className={`
           ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
-          w-full h-32 rounded-lg border-2 border-dashed 
+          w-full h-32 rounded-lg border
           flex flex-col items-center justify-center
           transition-colors duration-200
-          ${isDragging ? "border-purple-500 bg-slate-800/50" : "border-slate-700 bg-slate-800"}
+          ${isDragging ? "border-orange-500 bg-white" : "border-secondary-300 bg-secondary-50"}
           ${error ? "border-red-500" : ""}
-          hover:bg-slate-700 hover:border-slate-600
+          hover:bg-secondary-50 hover:border-orange-500
         `}
       >
         <input
@@ -93,26 +96,26 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         />
 
         {currentFile ? (
-          <div className="flex items-center space-x-2 px-4 py-2 bg-slate-700 rounded-md">
-            <FileText size={18} className="text-purple-400" />
-            <span className="text-sm text-slate-200 truncate max-w-[200px]">
+          <div className="flex items-center space-x-2 px-4 py-2 bg-white rounded-md shadow-md border border-secondary-300">
+            <FileText size={18} className="text-orange-500" />
+            <span className="text-sm text-secondary-900 truncate max-w-[200px]">
               {currentFile.name}
             </span>
             <button
               type="button"
               onClick={handleRemoveFile}
-              className="text-slate-400 hover:text-red-400 transition-colors"
+              className="text-secondary-500 hover:text-red-500 transition-colors"
             >
               <X size={16} />
             </button>
           </div>
         ) : (
           <>
-            <Upload size={24} className="text-slate-400 mb-2" />
-            <p className="text-sm text-slate-400 mb-1">
+            <Upload size={24} className="text-secondary-500 mb-2" />
+            <p className="text-sm text-secondary-500 mb-1">
               Drag and drop your resume here
             </p>
-            <p className="text-xs text-slate-500">Supported formats: PDF</p>
+            <p className="text-xs text-secondary-500">Supported formats: PDF</p>
           </>
         )}
       </div>

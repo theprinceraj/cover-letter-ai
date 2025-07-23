@@ -18,6 +18,18 @@ import { CoverLetterPreview } from "../ui/CoverLetterPreview";
 import Turnstile, { useTurnstile } from "react-turnstile";
 import { toast } from "sonner";
 
+const handleDownload = (coverLetter: string): void => {
+  // Implementation for downloading the cover letter
+  const blob = new Blob([coverLetter], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cover-letter.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Cover letter downloaded successfully!");
+};
+
 const TurnstileWidget: React.FC<{
   setCaptchaToken: (token: string | null) => void;
   setError: (error: string | null) => void;
@@ -38,21 +50,9 @@ const TurnstileWidget: React.FC<{
       }}
       fixedSize={true}
       className="w-auto m-auto"
-      theme="dark"
+      theme="light"
     />
   );
-};
-
-const handleDownload = (coverLetter: string) => {
-  // Implementation for downloading the cover letter
-  const blob = new Blob([coverLetter], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "cover-letter.txt";
-  a.click();
-  URL.revokeObjectURL(url);
-  toast("Cover letter downloaded successfully!");
 };
 
 const statusToStep: Record<GenerationStatus, number> = {
@@ -135,7 +135,7 @@ export const CoverLetterForm: React.FC = () => {
       const currentUser = user || guest;
       if (currentUser && currentUser.exhaustedUses >= currentUser.useLimit)
         return setError(
-          "You have reached your usage limit. Please sign up with a new email or contact me on X for more use credits."
+          "You have reached your usage limit. Please purchase more credits."
         );
 
       // Validate form
@@ -190,22 +190,51 @@ export const CoverLetterForm: React.FC = () => {
         }
       }
     },
-    [fetchWithAuth, captchaToken, formValues, user, guest]
+    [
+      fetchWithAuth,
+      captchaToken,
+      formValues,
+      user,
+      guest,
+      incrementExhaustedUses,
+      isAuthenticated,
+    ]
   );
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
+        <div className="bg-white text-secondary-900 rounded-xl shadow-2xl overflow-hidden">
+          <div className="p-6 sm:p-10 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+            <p className="text-slate-900 mt-8 md:text-xl font-semibold text-balance">
+              Loading your{" "}
+              <span className="text-orange-500">wonderful magic</span> tool...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!isAuthenticated && !authLoading) {
     return (
       <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+        <div className="bg-white text-secondary-900 rounded-xl shadow-2xl overflow-hidden">
           <div className="p-6 sm:p-10 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
-              <AlertCircle className="mx-auto mb-4 text-yellow-500" size={48} />
-              <span className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-xl sm:text-2xl mb-6">
+              <AlertCircle className="mx-auto mb-4 text-orange-500" size={48} />
+              <span className="text-2xl font-semibold">
                 Authentication Required
               </span>
-              <p className="text-slate-300 mb-6">
+              <p className="my-6">
                 Please sign in to generate your cover letter. You can use a
-                guest account for {DEFAULT_USE_LIMIT_FOR_GUEST} free uses.
+                guest account for{" "}
+                <span className="font-semibold text-emerald-500">
+                  {DEFAULT_USE_LIMIT_FOR_GUEST} free uses
+                </span>
+                .
               </p>
               <Button variant="primary" size="lg" onClick={openSignInModal}>
                 Sign In to Continue
@@ -217,25 +246,11 @@ export const CoverLetterForm: React.FC = () => {
     );
   }
 
-  // Show loading state while checking authentication
-  if (authLoading) {
-    return (
-      <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-        <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
-          <div className="p-6 sm:p-10 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-            <p className="text-slate-300">Loading...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-      <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden">
+      <div className="bg-white text-secondary-900 rounded-xl shadow-2xl overflow-hidden">
         <div className="p-6 sm:p-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6">
             Generate Your Cover Letter
           </h2>
 
@@ -243,7 +258,7 @@ export const CoverLetterForm: React.FC = () => {
 
           {error && (
             <div
-              className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-md"
+              className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-md text-secondary-900"
               aria-live="polite"
             >
               <div className="flex items-center gap-2 text-red-300">
@@ -256,10 +271,10 @@ export const CoverLetterForm: React.FC = () => {
           {status === "complete" ? (
             <div className="mt-8 text-center">
               <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-white"
+                    className="size-8 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -274,10 +289,10 @@ export const CoverLetterForm: React.FC = () => {
                 </div>
               </div>
 
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-semibold mb-2">
                 Your Cover Letter is Ready!
               </h3>
-              <p className="text-slate-300 mb-8">
+              <p className="mb-8">
                 Tailored specifically to the job description you provided.
               </p>
 
@@ -368,7 +383,7 @@ export const CoverLetterForm: React.FC = () => {
                     setError={setError}
                   />
                   {status === "generating" && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/90">
+                    <div className="absolute -inset-1 z-10 flex items-center justify-center bg-white">
                       <Spinner
                         variant="default"
                         size="xl"

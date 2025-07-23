@@ -7,7 +7,7 @@ import { CreateOrderDto, VerifyCreditOrderPaymentDto } from './credits.dto';
 import { ConfigService } from '@nestjs/config';
 import { DbService } from 'src/db/db.service';
 import * as crypto from 'crypto';
-import { CREDIT_ORDER_STATUS } from 'src/db/schema/credit-order.schema';
+import { CREDIT_ORDER_STATUS } from '@cover-letter-ai/constants';
 
 @Injectable()
 export class CreditsService {
@@ -35,7 +35,7 @@ export class CreditsService {
       receipt: `order_${user.id}_${new Date().toISOString().split('T')[0]}`,
       notes: {
         user_id: user.id as string,
-        user_email: user.email as string,
+        user_email: user.email,
         package_id: dto.packageId as string,
       },
     };
