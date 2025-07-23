@@ -21,7 +21,7 @@ const steps = [
 
 export const CoverGeniusDemo: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isCopied, setIsCopied] = useState(false);
 
   const handlePlay = () => {
