@@ -18,6 +18,7 @@ import type {
   CREDIT_ORDER_STATUS,
   CREDIT_PACKAGE_TYPE,
 } from "@cover-letter-ai/constants";
+import { SEO } from "../components/seo/SEO";
 
 interface RazorpaySuccessfulPaymentResponse {
   razorpay_signature: string;
@@ -147,6 +148,12 @@ export const CreditsShop: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Buy Credits - CoverGenius AI"
+        description="Purchase credits to generate more AI-powered cover letters. Choose from a variety of credit packages to suit your needs."
+        name="CoverGenius AI"
+        type="website"
+      />
       <Header />
       <HeroTemplate>
         <>
