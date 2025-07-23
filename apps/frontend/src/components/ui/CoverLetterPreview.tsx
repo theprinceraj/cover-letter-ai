@@ -21,7 +21,6 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
   const cleanedSuggestions = suggestions.filter(
     (suggestion) => cleanMarkdownText(suggestion).trim() !== ""
   );
-
   const [copied, setCopied] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 

@@ -304,7 +304,6 @@ export const CoverLetterForm: React.FC = () => {
                 onDownload={() =>
                   handleDownload(cleanMarkdownText(apiResponse.coverLetter))
                 }
-              />
 
               {/* Action Buttons */}
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
