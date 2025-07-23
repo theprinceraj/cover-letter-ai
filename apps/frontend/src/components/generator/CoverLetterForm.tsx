@@ -17,6 +17,7 @@ import { Spinner } from "../ui/Spinner";
 import { CoverLetterPreview } from "../ui/CoverLetterPreview";
 import Turnstile, { useTurnstile } from "react-turnstile";
 import { toast } from "sonner";
+import { cleanMarkdownText } from "../../utils/text";
 
 const handleDownload = (coverLetter: string): void => {
   // Implementation for downloading the cover letter
@@ -300,15 +301,18 @@ export const CoverLetterForm: React.FC = () => {
               <CoverLetterPreview
                 coverLetter={apiResponse.coverLetter}
                 suggestions={apiResponse.suggestions}
-                onDownload={() => handleDownload(apiResponse.coverLetter)}
-              />
+                onDownload={() =>
+                  handleDownload(cleanMarkdownText(apiResponse.coverLetter))
+                }
 
               {/* Action Buttons */}
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
                   variant="primary"
                   size="lg"
-                  onClick={() => handleDownload(apiResponse.coverLetter)}
+                  onClick={() =>
+                    handleDownload(cleanMarkdownText(apiResponse.coverLetter))
+                  }
                 >
                   <Download size={18} className="mr-2" />
                   Download Cover Letter

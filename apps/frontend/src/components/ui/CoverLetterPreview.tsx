@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "./Button";
 import { Check, ChevronDown, ChevronUp, Copy, Download } from "lucide-react";
 import { toast } from "sonner";
+import { cleanMarkdownText } from "../../utils/text";
 
 interface CoverLetterPreviewProps {
   coverLetter: string;
@@ -16,7 +17,8 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
   onDownload,
   className = "",
 }) => {
-  suggestions = suggestions.filter(
+  const cleanedCoverLetter = cleanMarkdownText(coverLetter);
+  const cleanedSuggestions = suggestions.filter(
     (suggestion) => cleanMarkdownText(suggestion).trim() !== ""
   );
   const [copied, setCopied] = useState(false);
@@ -24,7 +26,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(coverLetter);
+      await navigator.clipboard.writeText(cleanedCoverLetter);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -63,13 +65,13 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
             </div>
           </div>
           <div className="whitespace-pre-line text-start text-wrap">
-            <span>{coverLetter}</span>
+            <span>{cleanedCoverLetter}</span>
           </div>
         </div>
       </div>
 
       {/* Suggestions */}
-      {suggestions && suggestions.length > 0 && (
+      {cleanedSuggestions && cleanedSuggestions.length > 0 && (
         <div className="text-secondary-900 rounded-lg">
           <button
             onClick={() => setShowSuggestions(!showSuggestions)}
@@ -78,7 +80,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-orange-500 text-white rounded-full hidden md:flex md:items-center md:justify-center">
                 <span className="font-medium text-sm">
-                  {suggestions.length}
+                  {cleanedSuggestions.length}
                 </span>
               </div>
               <div>
@@ -104,7 +106,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
           {showSuggestions && (
             <div className="px-2 md:px-6 pb-6">
               <div className="space-y-4">
-                {suggestions.map((suggestion, index) => (
+                {cleanedSuggestions.map((suggestion, index) => (
                   <div
                     key={index}
                     className="flex items-start gap-3 p-4 bg-white"
@@ -115,7 +117,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
                       </span>
                     </div>
                     <p className="text-start text-sm md:text-base">
-                      {suggestion}
+                      {cleanMarkdownText(suggestion)}
                     </p>
                   </div>
                 ))}
@@ -126,13 +128,4 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
       )}
     </div>
   );
-};
-
-const cleanMarkdownText = (text: string): string => {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold markdown
-    .replace(/\*(.*?)\*/g, "$1") // Remove italic markdown
-    .replace(/`(.*?)`/g, "$1") // Remove inline code
-    .replace(/\[(.*?)\]\(.*?\)/g, "$1") // Remove links, keep text
-    .trim();
 };

@@ -14,9 +14,9 @@ Standard Format:
 * Maintain an aesthetically appealing format with careful attention to spacing, and avoid cluttered layouts.
 
 Content Requirements:
-* **Opening:** Express enthusiasm for the specific role and company, briefly mention key qualifications. Clearly state the purpose for writing and the position being applied for.
-* **Body:** Connect student experiences (academic, work, extracurricular, projects) to job requirements. Ensure the cover letter *complements* the resume by providing more context and narrative around key experiences, rather than simply repeating resume bullet points in prose. The letter should summarize and encapsulate points expanded upon in the CV/resume.
-* **Closing:** Reiterate interest and request for interview opportunity. State a clear plan of action for follow-up, demonstrating initiative. **If specific contact information (e.g., phone number, direct email for follow-up) for the recipient is NOT provided or inferable from the job description, use a general statement like 'I look forward to hearing from you soon' or 'I will await your response.' Otherwise, if specific contact details are available, a more direct follow-up statement (e.g., 'I will be in touch by phone this week' or 'I will email you next week') may be used.** Thank the employer for their time and consideration.
+* Opening: Express enthusiasm for the specific role and company, briefly mention key qualifications. Clearly state the purpose for writing and the position being applied for.
+* Body: Connect student experiences (academic, work, extracurricular, projects) to job requirements. Ensure the cover letter *complements* the resume by providing more context and narrative around key experiences, rather than simply repeating resume bullet points in prose. The letter should summarize and encapsulate points expanded upon in the CV/resume.
+* Closing: Reiterate interest and request for interview opportunity. State a clear plan of action for follow-up, demonstrating initiative. **If specific contact information (e.g., phone number, direct email for follow-up) for the recipient is NOT provided or inferable from the job description, use a general statement like 'I look forward to hearing from you soon' or 'I will await your response.' Otherwise, if specific contact details are available, a more direct follow-up statement (e.g., 'I will be in touch by phone this week' or 'I will email you next week') may be used.** Thank the employer for their time and consideration.
 
 Writing Standards:
 * Professional yet approachable tone. While professional, the tone should allow the applicant's 'professional voice to shine through' to express sincere enthusiasm and confidence.
@@ -57,9 +57,10 @@ Leverage typical college student experiences:
 
 Key Guidelines:
 * Generate complete, professional cover letters without asking for additional input.
-* **Crucially, the primary output cover letter MUST NOT contain any bracketed placeholders (e.g., \`[Your Name]\`, \`[Company Name]\`) that require direct user editing within the letter itself.**
-* **When essential personal details (e.g., applicant's name, address, phone, email) are not provided, use generic but appropriately formatted defaults (e.g., 'Applicant Name', 'Applicant Address Line 1', 'City, State Zip Code', 'applicant.email@example.com', '555-555-5555', 'Current Date') in the main letter output. Then, in the 'Suggestions for Enhancement' section, explicitly instruct the user to replace these generic placeholders with their specific information.**
-* **When recipient details (e.g., specific Hiring Manager name, Company Address) are not provided in the job description, use standard defaults (e.g., 'Hiring Manager', 'Company Name', 'Company Address') in the main letter output. If applicable, suggest in the 'Suggestions for Enhancement' section that providing a specific name/address would personalize the letter.**
+* Crucially, the primary output cover letter MUST NOT contain any bracketed placeholders (e.g., \`[Your Name]\`, \`[Company Name]\`) that require direct user editing within the letter itself.
+* Do not use any markdown formatting (e.g., **, *, ---) in the output.
+* When essential personal details (e.g., applicant's name, address, phone, email) are not provided, use generic but appropriately formatted defaults (e.g., 'Applicant Name', 'Applicant Address Line 1', 'City, State Zip Code', 'applicant.email@example.com', '555-555-5555', 'Current Date') in the main letter output. Then, in the 'Suggestions for Enhancement' section, explicitly instruct the user to replace these generic placeholders with their specific information.
+* When recipient details (e.g., specific Hiring Manager name, Company Address) are not provided in the job description, use standard defaults (e.g., 'Hiring Manager', 'Company Name', 'Company Address') in the main letter output. If applicable, suggest in the 'Suggestions for Enhancement' section that providing a specific name/address would personalize the letter.
 * Make reasonable assumptions about typical college student backgrounds when resume is not provided.
 * When resume is provided, prioritize specific details from the resume over generic assumptions.
 * The model should implement any improvements it can make autonomously (e.g., rephrasing, structural adjustments, better word choice) without explicit suggestion to the user.
@@ -71,11 +72,11 @@ Additional Feedback (if applicable): If the generated cover letter would benefit
 Example Suggestions Format:
 If additional information would strengthen the cover letter, conclude your response with:
 Suggestions for Enhancement:
-* Specific experiences or skills that would strengthen the application.
-* Additional background information that could be highlighted.
-* Particular achievements or projects that would be relevant to mention.
-* **Please replace 'Applicant Name', 'Applicant Address Line 1', 'City, State Zip Code', 'applicant.email@example.com', '555-555-5555', and 'Current Date' with your actual details before submission.**
-* **Consider researching the specific hiring manager's name and company address to personalize the salutation and contact information.**
+A specific experience or skill that would strengthen the application.
+An additional background information that could be highlighted.
+A particular achievement or project that would be relevant to mention.
+Please replace 'Applicant Name', 'Applicant Address Line 1', 'City, State Zip Code', 'applicant.email@example.com', '555-555-5555', and 'Current Date' with your actual details before submission.
+Consider researching the specific hiring manager's name and company address to personalize the salutation and contact information.
 `;
 
 export const DATASET = [

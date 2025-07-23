@@ -90,11 +90,23 @@ export class EvalService {
     }
 
     const splitResponse = response.text?.split(GEMINI_RESPONSE_DELIMITER);
-    const coverLetter = splitResponse?.[0]?.trim().replace(/`/g, '');
-    const suggestions = splitResponse?.[1]
-      ?.trim()
-      .split('\n')
-      .map((s) => s.trim());
+    let coverLetter = splitResponse?.[0]?.trim();
+    if (coverLetter) {
+      coverLetter = coverLetter.replace(/(\s*---)?\s*\**\s*$/, '').trim();
+    }
+
+    const suggestionsText = splitResponse?.[1]?.trim();
+    const suggestions = suggestionsText
+      ? suggestionsText
+          .split('\n')
+          .map((line) =>
+            line
+              .trim()
+              .replace(/^[\*\-]\s*/, '')
+              .trim(),
+          )
+          .filter(Boolean)
+      : [];
 
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
       await this.db.user.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
