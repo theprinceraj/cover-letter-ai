@@ -40,7 +40,7 @@ export interface UseAuthReturn extends AuthState {
   logout: () => void;
   refreshAuth: () => Promise<void>;
   incrementExhaustedUses: () => void;
-  fetchWithAuth: <T = any>(
+  fetchWithAuth: <T = unknown>(
     config: AxiosRequestConfig
   ) => Promise<
     | T
@@ -54,7 +54,7 @@ export interface UseAuthReturn extends AuthState {
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 // Create axios instance with base configuration
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
@@ -91,6 +91,21 @@ export const useAuth = (): UseAuthReturn => {
     }
     setAuthState((prev) => ({ ...prev, token }));
   }, []);
+
+  const logout = useCallback(() => {
+    setToken(null);
+    setAuthState({
+      user: null,
+      guest: null,
+      token: null,
+      isLoading: false,
+      isAuthenticated: false,
+      isGuest: false,
+      isEmailVerified: false,
+      isEmailVerificationModalOpen: false,
+      setIsEmailVerificationModalOpen: () => {},
+    });
+  }, [setToken]);
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -133,7 +148,7 @@ export const useAuth = (): UseAuthReturn => {
         throw error;
       }
     },
-    [setToken]
+    [setToken, logout]
   );
 
   const signup = useCallback(
@@ -185,21 +200,6 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [setToken]);
 
-  const logout = useCallback(() => {
-    setToken(null);
-    setAuthState({
-      user: null,
-      guest: null,
-      token: null,
-      isLoading: false,
-      isAuthenticated: false,
-      isGuest: false,
-      isEmailVerified: false,
-      isEmailVerificationModalOpen: false,
-      setIsEmailVerificationModalOpen: () => {},
-    });
-  }, [setToken]);
-
   const refreshAuth = useCallback(async () => {
     const token = localStorage.getItem("auth_token");
     if (!token) {
@@ -248,8 +248,9 @@ export const useAuth = (): UseAuthReturn => {
   }, []);
 
   const fetchWithAuth = useCallback(
-    async <T = any>(
-      config: AxiosRequestConfig
+    async <T = unknown>(
+      config: AxiosRequestConfig,
+      auth: boolean = true
     ): Promise<
       | T
       | {
@@ -257,12 +258,14 @@ export const useAuth = (): UseAuthReturn => {
           message: string;
         }
     > => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        return {
-          error: true,
-          message: "You are not authenticated. Please sign in.",
-        };
+      if (auth) {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+          return {
+            error: true,
+            message: "You are not authenticated. Please sign in.",
+          };
+        }
       }
       try {
         const response = await api.request<T>(config);

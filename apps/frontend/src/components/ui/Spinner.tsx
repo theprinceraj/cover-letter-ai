@@ -25,19 +25,19 @@ export const Spinner: React.FC<SpinnerProps> = ({
       <div className="relative">
         {/* Outer ring */}
         <div
-          className={`${sizeClasses[size]} border-2 border-slate-600 rounded-full animate-pulse`}
+          className={`${sizeClasses[size]} border-2 border-secondary-600 rounded-full animate-pulse`}
         />
         {/* Spinning ring */}
         <div
-          className={`${sizeClasses[size]} border-2 border-transparent border-t-purple-500 rounded-full animate-spin absolute top-0 left-0`}
+          className={`${sizeClasses[size]} border-2 border-transparent border-t-orange-500 rounded-full animate-spin absolute top-0 left-0`}
         />
         {/* Inner glow */}
         <div
-          className={`${sizeClasses[size]} border-2 border-purple-500/20 rounded-full absolute top-0 left-0 animate-ping`}
+          className={`${sizeClasses[size]} border-2 border-orange-500/20 rounded-full absolute top-0 left-0 animate-ping`}
         />
       </div>
       {message && (
-        <p className="mt-4 text-slate-300 text-center font-medium animate-pulse">
+        <p className="mt-4 text-white text-center font-medium animate-pulse">
           {message}
         </p>
       )}
@@ -47,7 +47,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
   if (variant === "overlay") {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div className="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 p-8 max-w-sm mx-4">
+        <div className="bg-secondary-500 rounded-xl shadow-2xl border border-secondary-300 p-8 max-w-sm mx-4">
           {spinnerContent}
         </div>
       </div>
@@ -55,4 +55,4 @@ export const Spinner: React.FC<SpinnerProps> = ({
   }
 
   return spinnerContent;
-}; 
+};

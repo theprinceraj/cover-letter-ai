@@ -67,7 +67,7 @@ export class EvalService {
     else textualPrompt = `Job Description: ${jobDescription}\nMy Relevant Information: ${additionalInfo}`;
 
     const contentParts: any = [textualPrompt];
-    let resumeFileUri: string | null = null;
+    const resumeFileUri: string | null = null;
     if (resume) {
       // resumeFileUri = await this.uploadSingleFile(resume, 'resumes', `${currentUser.email.substring(0, 5)}-${resume.originalname}`);
       const resumeFileLocalTempName = `${currentUser.id.substring(0, 5)}-${resume.originalname}.pdf`;
@@ -80,7 +80,7 @@ export class EvalService {
     }
 
     const response = await this.ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash',
       contents: createUserContent(contentParts),
       config: { systemInstruction: SYSTEM_INSTRUCTION },
     });

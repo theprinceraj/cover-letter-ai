@@ -138,7 +138,7 @@ export const Modal: React.FC<ModalProps> = ({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ease-out"
+        className="absolute inset-0 bg-gray-900/10 backdrop-blur-xs transition-opacity duration-300 ease-out"
         aria-hidden="true"
       />
 
@@ -148,8 +148,7 @@ export const Modal: React.FC<ModalProps> = ({
         tabIndex={-1}
         className={`
           relative w-full ${sizeClasses[size]} max-h-[90vh] 
-          bg-slate-800 rounded-xl shadow-2xl border border-slate-700
-          transform transition-all duration-300 ease-out
+          card transform transition-all duration-300 ease-out
           animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4
           ${className}
         `}
@@ -157,10 +156,13 @@ export const Modal: React.FC<ModalProps> = ({
         {/* Header */}
         {(title || showCloseButton) && (
           <div
-            className={`flex items-center justify-between p-6 border-b border-slate-700 ${headerClassName}`}
+            className={`flex items-center justify-between p-6 border-b border-primary-600 ${headerClassName}`}
           >
             {title && (
-              <h2 id="modal-title" className="text-xl font-semibold text-white">
+              <h2
+                id="modal-title"
+                className="text-xl font-semibold text-primary-600"
+              >
                 {title}
               </h2>
             )}
@@ -168,7 +170,7 @@ export const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors duration-200"
+                className="p-2 btn-ghost transition-colors duration-200"
                 aria-label="Close modal"
               >
                 <X size={20} />

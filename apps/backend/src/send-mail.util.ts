@@ -270,9 +270,9 @@ const OTP_HTML_TEMPLATE = `
                 © {{year}} CoverGenius. All rights reserved.
             </div>
             <div class="social-links">
-                <a href="https://cl-writer.vercel.app/privacy-policy" class="social-link">Privacy Policy</a>
-                <a href="https://cl-writer.vercel.app/terms-of-service" class="social-link">Terms of Service</a>
-                <a href="https://cl-writer.vercel.app/contact-us" class="social-link">Contact Support</a>
+                <a href="https://covergenius.vercel.app/privacy-policy" class="social-link">Privacy Policy</a>
+                <a href="https://covergenius.vercel.app/terms-of-service" class="social-link">Terms of Service</a>
+                <a href="https://covergenius.vercel.app/contact-us" class="social-link">Contact Support</a>
             </div>
         </div>
     </div>

@@ -70,6 +70,12 @@ export enum ACCEPTED_CURRENCY_CODES {
   INR = "INR",
 }
 
+export enum CREDIT_ORDER_STATUS {
+  CREATED = "created",
+  ATTEMPTED = "attempted",
+  PAID = "paid",
+}
+
 export type CREDIT_PACKAGE_TYPE = (typeof CREDIT_PACKAGES)[number];
 
 export default {
@@ -94,5 +100,6 @@ export default {
 
   CREDIT_PACKAGES,
   CREDIT_PACKAGES_ID,
+  CREDIT_ORDER_STATUS,
   ACCEPTED_CURRENCY_CODES,
 };

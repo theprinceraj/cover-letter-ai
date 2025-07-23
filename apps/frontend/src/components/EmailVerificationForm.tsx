@@ -19,7 +19,6 @@ export const EmailVerificationForm = () => {
   const [resendCooldown, setResendCooldown] = useState(0);
   const { user, setIsEmailVerificationModalOpen, refreshAuth, fetchWithAuth } =
     useContext(AuthContext)!;
-  if (!user) return null;
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -30,60 +29,21 @@ export const EmailVerificationForm = () => {
     }
   }, [resendCooldown]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (otp.length !== OTP_CODE_LENGTH) {
-      setError("Please enter a complete 6-digit verification code");
-      return;
-    }
-
-    if (!/^\d{6}$/.test(otp)) {
-      setError("Please enter only numbers");
-      return;
-    }
-
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const response = await fetchWithAuth({
-        url: "/auth/verify-email",
-        method: "POST",
-        data: {
-          code: parseInt(otp),
-        },
-      });
-      if (response.error) {
-        setError(response.message);
-        return;
-      }
-      setIsEmailVerificationModalOpen(false);
-      refreshAuth();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Verification failed. Please try again."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleResendCode = useCallback(async () => {
     if (resendCooldown > 0) return;
-
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetchWithAuth({
+      const response = await fetchWithAuth<{
+        success: boolean;
+        message: string;
+      }>({
         url: "/auth/resend-verification",
         method: "POST",
       });
 
-      if (response.success) {
+      if ("success" in response && response.success) {
         setIsResent(true);
         setResendCooldown(60);
         setTimeout(() => setIsResent(false), 10000);
@@ -110,7 +70,53 @@ export const EmailVerificationForm = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [resendCooldown]);
+  }, [resendCooldown, fetchWithAuth]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (otp.length !== OTP_CODE_LENGTH) {
+      setError("Please enter a complete 6-digit verification code");
+      return;
+    }
+
+    if (!/^\d{6}$/.test(otp)) {
+      setError("Please enter only numbers");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetchWithAuth<{
+        success: boolean;
+        message: string;
+      }>({
+        url: "/auth/verify-email",
+        method: "POST",
+        data: {
+          code: parseInt(otp),
+        },
+      });
+      if ("error" in response) {
+        setError(response.message);
+        return;
+      }
+      setIsEmailVerificationModalOpen(false);
+      refreshAuth();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Verification failed. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!user) return null;
 
   return (
     <div className="max-w-md mx-auto p-8 bg-slate-900/50 backdrop-blur-sm border border-slate-700 rounded-xl shadow-2xl">

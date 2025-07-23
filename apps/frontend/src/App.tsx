@@ -1,15 +1,20 @@
 import "./App.css";
+import { FRONTEND_ENDPOINTS } from "./constants";
 import { AuthContext, ModalContext } from "./Contexts";
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Home } from "./pages/Home";
+import { Generator } from "./pages/Generator";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "./hooks/useAuth"; 
 import { CreditsShop } from "./pages/CreditsShop";
 import { ContactUs } from "./pages/ContactUs";
 import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy";
 import { Analytics } from "@vercel/analytics/react";
+import { Landing } from "./pages/Landing";
+import { SignInModal } from "./components/SignInModal";
+import { Toaster } from "sonner";
+import { HelmetProvider } from "react-helmet-async";
 
 export default function App() {
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
@@ -20,27 +25,51 @@ export default function App() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white">
+      <HelmetProvider>
         <AuthContext value={auth}>
           <ModalContext
             value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
           >
-            <Router>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/contact-us" element={<ContactUs />} />
-                <Route
-                  path="/cancellation-and-refund-policy"
-                  element={<CancellationAndRefundPolicy />}
-                />
-                <Route path="/terms-of-service" element={<TermsOfService />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/buy-credits" element={<CreditsShop />} />
-              </Routes>
-            </Router>
+            <div className="min-h-screen bg-white">
+              <Router>
+                <Routes>
+                  <Route
+                    path={FRONTEND_ENDPOINTS.LANDING}
+                    element={<Landing />}
+                  />
+
+                  <Route
+                    path={FRONTEND_ENDPOINTS.GENERATOR}
+                    element={<Generator />}
+                  />
+                  <Route
+                    path={FRONTEND_ENDPOINTS.CONTACT}
+                    element={<ContactUs />}
+                  />
+                  <Route
+                    path={FRONTEND_ENDPOINTS.CANCELLATION}
+                    element={<CancellationAndRefundPolicy />}
+                  />
+                  <Route
+                    path={FRONTEND_ENDPOINTS.TERMS}
+                    element={<TermsOfService />}
+                  />
+                  <Route
+                    path={FRONTEND_ENDPOINTS.PRIVACY}
+                    element={<PrivacyPolicy />}
+                  />
+                  <Route
+                    path={FRONTEND_ENDPOINTS.CREDITS_SHOP}
+                    element={<CreditsShop />}
+                  />
+                </Routes>
+              </Router>
+            </div>
+            <SignInModal />
+            <Toaster richColors />
           </ModalContext>
         </AuthContext>
-      </div>
+      </HelmetProvider>
       <Analytics />
     </>
   );

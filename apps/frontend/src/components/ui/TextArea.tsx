@@ -30,17 +30,19 @@ export const TextArea: React.FC<TextAreaProps> = ({
       <div className="flex justify-between items-baseline mb-1.5">
         <label
           htmlFor={uniqueId}
-          className="block text-sm font-medium text-slate-200"
+          className="block text-sm font-medium text-secondary-600"
         >
           {label}
-          {!optional && <span className="text-purple-400 ml-1">*</span>}
+          {!optional && (
+            <span className="text-orange-500 ml-1 font-extrabold">*</span>
+          )}
           {optional && (
-            <span className="text-slate-400 text-xs ml-1">(Optional)</span>
+            <span className="text-secondary-400 text-xs ml-1">(Optional)</span>
           )}
         </label>
 
         {showCount && (
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-secondary-900 ml-4">
             {currentCount} {maxCount && `/ ${maxCount}`}{" "}
             {maxCount ? "characters" : "words"}
           </div>
@@ -49,9 +51,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
 
       <textarea
         id={uniqueId}
-        className={`w-full px-4 py-3 bg-slate-800 border ${error ? "border-red-500" : "border-slate-700"} 
-                    rounded-lg shadow-sm text-slate-200 placeholder-slate-500 
-                    focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+        className={`w-full px-4 py-3 bg-white border ${error ? "border-red-500" : "border-secondary-300"} 
+                    rounded-lg shadow-sm text-secondary-900 placeholder-secondary-400 
+                    focus:outline-none focus:ring focus:ring-orange-500 focus:border-transparent
                     transition-colors duration-200 resize-y
                     ${disabled ? "cursor-not-allowed" : "cursor-text"}
                     ${className}`}
