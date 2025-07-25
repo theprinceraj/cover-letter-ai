@@ -1,5 +1,5 @@
 import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
-import { UserCheck2Icon, type LucideIcon } from "lucide-react";
+import { UserCheck2Icon } from "lucide-react";
 import GoogleIcon from "../assets/google-icon.svg?react";
 import { useContext, useState } from "react";
 import { Button, type ButtonProps } from "./ui/Button";
@@ -145,7 +145,7 @@ export const SignInModal = () => {
             isLoading={isLoading}
             onClick={handleGuestLogin}
             IconElement={<UserCheck2Icon className="size-5" />}
-            text="Guest Login"
+            text={`Guest Login (${DEFAULT_USE_LIMIT_FOR_GUEST} free credits)`}
           />
         </div>
       </Modal>
