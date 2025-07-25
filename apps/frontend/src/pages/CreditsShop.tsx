@@ -160,7 +160,7 @@ export const CreditsShop: React.FC = () => {
           <h1 className="text-3xl text-slate-950 font-bold mb-16 md:mb-24 text-center">
             Buy Credits Now
           </h1>
-          <div className="w-full">
+          <div className="w-full pb-16">
             {isLoading && creditPlans.length === 0 ? (
               <div className="flex justify-center items-center h-full">
                 <Spinner size="xl" />

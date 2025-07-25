@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Play, Pause, RefreshCw, Copy, Check } from "lucide-react";
 import { Button } from "../ui/Button";
+import { LandingSectionTemplate } from "../ui/LandingSectionTemplate";
 
 const steps = [
   {
@@ -52,122 +53,114 @@ export const CoverGeniusDemo: React.FC = () => {
   };
 
   return (
-    <section id="demo" className="py-20 bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            <span className="text-neutral-800">See </span>
-            <span className="text-orange-500">CoverGenius</span>
-            <span className="text-neutral-800"> in Action</span>
-          </h2>
-          <p className="text-xl text-secondary-600 max-w-3xl mx-auto">
-            Watch how our AI tool transforms a job posting into a personalized
-            cover letter
-          </p>
-        </div>
+    <LandingSectionTemplate
+      title={
+        <>
+          <span className="text-neutral-800">See </span>
+          <span className="text-orange-500">CoverGenius</span>
+          <span className="text-neutral-800"> in Action</span>
+        </>
+      }
+      description="Watch how our AI tool transforms a resume into a personalized cover letter"
+      id="demo"
+      bgClasses="bg-neutral-50"
+    >
+      <div className="max-w-4xl mx-auto">
+        <div className="card overflow-hidden">
+          {/* Demo Controls */}
+          <div className="bg-purple-500 p-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={handlePlay}
+                  disabled={isPlaying}
+                  className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg flex items-center space-x-2 transition-all disabled:opacity-50 focus:ring-2 focus:ring-white/50"
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="size-4" />
+                      <span>Playing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="size-4" />
+                      <span>Start Demo</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all focus:ring-2 focus:ring-white/50"
+                >
+                  <RefreshCw className="size-4" />
+                  <span>Reset</span>
+                </button>
+              </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="card overflow-hidden">
-            {/* Demo Controls */}
-            <div className="bg-purple-500 p-6">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={handlePlay}
-                    disabled={isPlaying}
-                    className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg flex items-center space-x-2 transition-all disabled:opacity-50 focus:ring-2 focus:ring-white/50"
-                  >
-                    {isPlaying ? (
-                      <>
-                        <Pause className="size-4" />
-                        <span>Playing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Play className="size-4" />
-                        <span>Start Demo</span>
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-all focus:ring-2 focus:ring-white/50"
-                  >
-                    <RefreshCw className="size-4" />
-                    <span>Reset</span>
-                  </button>
-                </div>
-
-                <div className="text-white text-sm">
-                  Step {currentStep + 1} of {steps.length}
-                </div>
+              <div className="text-white text-sm">
+                Step {currentStep + 1} of {steps.length}
               </div>
             </div>
+          </div>
 
-            {/* Progress Bar */}
-            <div className="bg-neutral-100 h-2">
-              <div
-                className="bg-green-500 h-full transition-all duration-500"
-                style={{
-                  width: `${((currentStep + 1) / steps.length) * 100}%`,
-                }}
-              />
+          {/* Progress Bar */}
+          <div className="bg-neutral-100 h-2">
+            <div
+              className="bg-green-500 h-full transition-all duration-500"
+              style={{
+                width: `${((currentStep + 1) / steps.length) * 100}%`,
+              }}
+            />
+          </div>
+
+          {/* Demo Content */}
+          <div className="p-5 md:p-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-semibold mb-2 text-neutral-800">
+                {steps[currentStep].title}
+              </h3>
             </div>
 
-            {/* Demo Content */}
-            <div className="p-5 md:p-8">
-              <div className="mb-6">
-                <h3 className="text-2xl font-semibold mb-2 text-neutral-800">
-                  {steps[currentStep].title}
-                </h3>
-              </div>
+            <div className="bg-neutral-50 rounded-lg p-6 min-h-[300px] relative">
+              {currentStep === 1 ? (
+                <div className="space-y-4">
+                  {steps[currentStep].content.split("\n").map((line, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                      <span className="text-secondary-700">{line}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="font-mono text-secondary-700 whitespace-pre-wrap">
+                  {steps[currentStep].content}
+                </div>
+              )}
 
-              <div className="bg-neutral-50 rounded-lg p-6 min-h-[300px] relative">
-                {currentStep === 1 ? (
-                  <div className="space-y-4">
-                    {steps[currentStep].content
-                      .split("\n")
-                      .map((line, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-3"
-                        >
-                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                          <span className="text-secondary-700">{line}</span>
-                        </div>
-                      ))}
-                  </div>
-                ) : (
-                  <div className="font-mono text-secondary-700 whitespace-pre-wrap">
-                    {steps[currentStep].content}
-                  </div>
-                )}
-
-                {currentStep === 2 && (
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="absolute top-4 right-4 flex items-center gap-2"
-                    onClick={handleCopy}
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="size-4" />
-                        <span className="hidden md:inline">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="size-4" />
-                        <span className="hidden md:inline">Copy</span>
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              {currentStep === 2 && (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="absolute top-4 right-4 flex items-center gap-2"
+                  onClick={handleCopy}
+                >
+                  {isCopied ? (
+                    <>
+                      <Check className="size-4" />
+                      <span className="hidden md:inline">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="size-4" />
+                      <span className="hidden md:inline">Copy</span>
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </LandingSectionTemplate>
   );
 };

@@ -2,12 +2,13 @@ import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
 import { UserCheck2Icon } from "lucide-react";
 import GoogleIcon from "../assets/google-icon.svg?react";
 import { useContext, useState } from "react";
-import { Button } from "./ui/Button";
+import { Button, type ButtonProps } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import { validateSignInForm } from "../utils/validation";
 import type { SignInFormErrors } from "../types";
 import { AuthContext, ModalContext } from "../Contexts";
 import { EmailVerificationForm } from "./EmailVerificationForm";
+import { toast } from "sonner";
 
 export const SignInModal = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -52,6 +53,7 @@ export const SignInModal = () => {
         setIsEmailVerificationModalOpen(true);
       } else {
         await login(email, password);
+        toast.success("Logged in successfully");
       }
       closeSignInModal();
     } catch (error) {
@@ -66,6 +68,7 @@ export const SignInModal = () => {
       setApiError(null);
       await loginGuest();
       closeSignInModal();
+      toast.success("Logged in as guest");
     } catch (error) {
       setApiError(
         error instanceof Error ? error.message : "Authentication failed"
@@ -104,16 +107,19 @@ export const SignInModal = () => {
               autoComplete="current-password"
               required
             />
-            <Button variant="primary" type="submit" disabled={isLoading}>
-              {isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
+            <SignInModalButton
+              type="submit"
+              isLoading={isLoading}
+              variant="primary"
+              text={isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
+            />
           </div>
         </form>
         <div className="mt-4 text-center">
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
-            className="cursor-pointer text-sm text-slate-500 hover:text-primary-500 transition-colors duration-200"
+            className="cursor-pointer text-sm text-slate-500 hover:text-primary-500 transition-colors duration-100"
           >
             {isSignUp
               ? "Already have an account? Sign In"
@@ -121,38 +127,27 @@ export const SignInModal = () => {
           </button>
         </div>
 
-        <hr className="my-5 text-slate-200/30" />
+        <hr className="my-5 text-slate-300/30" />
 
-        {/* Google Login */}
-        <Button
-          variant="outline"
-          fullWidth={true}
-          className="mb-2"
-          // disabled={isLoading}
-          disabled={true}
-        >
-          <div className="flex items-center gap-2 text-md">
-            <GoogleIcon className="size-5" />
-            <p>Sign In</p>
-            <p>(Coming Soon)</p>
-          </div>
-        </Button>
+        <div className="flex flex-col gap-2">
+          {/* Google Login */}
+          <SignInModalButton
+            variant="outline"
+            disabled={true}
+            onClick={() => {}}
+            IconElement={<GoogleIcon className="size-5" />}
+            text="Sign In (Coming Soon)"
+          />
 
-        {/* Guest Login */}
-        <Button
-          variant="secondary"
-          fullWidth={true}
-          onClick={handleGuestLogin}
-          disabled={isLoading}
-        >
-          <p className="flex items-center gap-2">
-            <span className="text-md">
-              Guest Login ({DEFAULT_USE_LIMIT_FOR_GUEST}{" "}
-              {DEFAULT_USE_LIMIT_FOR_GUEST > 1 ? "Uses" : "Use"})
-            </span>
-            <UserCheck2Icon className="size-5" />
-          </p>
-        </Button>
+          {/* Guest Login */}
+          <SignInModalButton
+            variant="secondary"
+            isLoading={isLoading}
+            onClick={handleGuestLogin}
+            IconElement={<UserCheck2Icon className="size-5" />}
+            text={`Guest Login (${DEFAULT_USE_LIMIT_FOR_GUEST} free credits)`}
+          />
+        </div>
       </Modal>
       {/* Email Verification Modal */}
       <Modal
@@ -165,5 +160,34 @@ export const SignInModal = () => {
         <EmailVerificationForm />
       </Modal>
     </>
+  );
+};
+
+interface SignInModalButtonProps extends Omit<ButtonProps, "children"> {
+  IconElement?: React.ReactNode;
+  text: string;
+}
+
+const SignInModalButton = ({
+  variant,
+  IconElement,
+  text,
+  isLoading,
+  disabled,
+  onClick,
+}: SignInModalButtonProps) => {
+  return (
+    <Button
+      variant={variant}
+      fullWidth={true}
+      disabled={disabled}
+      isLoading={isLoading}
+      onClick={onClick}
+    >
+      <p className="flex items-center justify-center gap-2">
+        {IconElement}
+        <span className="text-sm sm:text-md">{text}</span>
+      </p>
+    </Button>
   );
 };
