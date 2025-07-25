@@ -62,6 +62,7 @@ export const Header: React.FC = () => {
   const handleLogout = useCallback(async () => {
     logout();
     navigate("/");
+    toast.success("Logged out successfully");
   }, [logout, navigate]);
 
   const getUsesInfo = useCallback(() => {
@@ -329,16 +330,40 @@ const MobileNavigation = ({
     >
       {location.pathname === FRONTEND_ENDPOINTS.LANDING && (
         <nav className="flex flex-col space-y-4 border-b border-neutral-200 pb-2">
-          <a href="#features" className="btn-ghost text-left">
+          <a
+            href="#features"
+            className="btn-ghost text-left"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
             Features
           </a>
-          <a href="#demo" className="btn-ghost text-left">
+          <a
+            href="#demo"
+            className="btn-ghost text-left"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
             Demo
           </a>
-          <a href="#pricing" className="btn-ghost text-left">
+          <a
+            href="#pricing"
+            className="btn-ghost text-left"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
             Pricing
           </a>
-          <a href="#testimonials" className="btn-ghost text-left">
+          <a
+            href="#testimonials"
+            className="btn-ghost text-left"
+            onClick={() => {
+              setIsMenuOpen(false);
+            }}
+          >
             Reviews
           </a>
         </nav>
