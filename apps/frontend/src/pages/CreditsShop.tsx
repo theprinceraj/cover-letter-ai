@@ -73,7 +73,7 @@ const PayPalModal = memo(
                 ({
                     clientId,
                     currency,
-                    environment: environment === "development" ? environment : "sandbox",
+                    environment: environment === "development" ? "sandbox" : "production",
                 }) as ReactPayPalScriptOptions,
             [clientId, currency, environment]
         );
