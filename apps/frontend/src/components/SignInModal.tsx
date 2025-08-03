@@ -6,7 +6,7 @@ import { Button, type ButtonProps } from "./ui/Button";
 import { Modal } from "./ui/Modal";
 import { validateSignInForm } from "../utils/validation";
 import type { SignInFormErrors } from "../types";
-import { AuthContext, ModalContext } from "../Contexts";
+import { AuthContext, GlobalContext } from "../Contexts";
 import { EmailVerificationForm } from "./EmailVerificationForm";
 import { toast } from "sonner";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ export const SignInModal = () => {
     const [apiError, setApiError] = useState<string | null>(null);
     const { isLoading, login, signup, loginGuest, isEmailVerificationModalOpen, setIsEmailVerificationModalOpen } =
         useContext(AuthContext)!;
-    const { isSignInModalOpen, closeSignInModal } = useContext(ModalContext)!;
+    const { isSignInModalOpen, closeSignInModal } = useContext(GlobalContext)!;
 
     const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { errors, isValid } =

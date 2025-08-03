@@ -1,8 +1,9 @@
 import "./App.css";
-import { FRONTEND_ENDPOINTS } from "./constants";
-import { AuthContext, ModalContext } from "./Contexts";
-import { useEffect, useState } from "react";
+import { Toaster } from "sonner";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { FRONTEND_ENDPOINTS } from "./constants";
+import { AuthContext, GlobalContext } from "./Contexts";
+import { useEffect, useMemo, useState } from "react";
 import { Generator } from "./pages/Generator";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
@@ -13,8 +14,8 @@ import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy
 import { Analytics } from "@vercel/analytics/react";
 import { Landing } from "./pages/Landing";
 import { SignInModal } from "./components/SignInModal";
-import { Toaster } from "sonner";
 import { HelmetProvider } from "react-helmet-async";
+import { ACCEPTED_CURRENCY_CODES } from "@cover-letter-ai/constants";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -29,13 +30,25 @@ export default function App() {
     const openSignInModal = () => setIsSignInModalOpen(true);
     const closeSignInModal = () => setIsSignInModalOpen(false);
 
+    const [paymentCurrency, setPaymentCurrency] = useState<ACCEPTED_CURRENCY_CODES>(ACCEPTED_CURRENCY_CODES.INR);
     const auth = useAuth();
+
+    const globalContextValue = useMemo(
+        () => ({
+            isSignInModalOpen,
+            openSignInModal,
+            closeSignInModal,
+            paymentCurrency,
+            setPaymentCurrency,
+        }),
+        [isSignInModalOpen, paymentCurrency]
+    );
 
     return (
         <>
             <HelmetProvider>
                 <AuthContext value={auth}>
-                    <ModalContext value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}>
+                    <GlobalContext value={globalContextValue}>
                         <div className="min-h-screen bg-white">
                             <Router>
                                 <ScrollToTop />
@@ -56,7 +69,7 @@ export default function App() {
                             </Router>
                         </div>
                         <Toaster richColors />
-                    </ModalContext>
+                    </GlobalContext>
                 </AuthContext>
             </HelmetProvider>
             <Analytics />
