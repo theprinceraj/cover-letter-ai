@@ -1,13 +1,15 @@
 import Razorpay = require('razorpay');
 import { Orders } from 'razorpay/dist/types/orders';
-import { CREDIT_PACKAGES } from '@cover-letter-ai/constants';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { ACCEPTED_CURRENCY_CODES, CREDIT_PACKAGES, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { UserDocument } from 'src/db/schema';
-import { CreateOrderDto, VerifyCreditOrderPaymentDto } from './credits.dto';
+import { CreateOrderDto, VerifyRazorpayCreditOrderPaymentDto } from './credits.dto';
 import { ConfigService } from '@nestjs/config';
 import { DbService } from 'src/db/db.service';
 import * as crypto from 'crypto';
 import { CREDIT_ORDER_STATUS } from '@cover-letter-ai/constants';
+import { CheckoutPaymentIntent, OrderRequest, OrderStatus } from '@paypal/paypal-server-sdk';
+import { ordersController } from 'src/paypal.util';
 
 @Injectable()
 export class CreditsService {
@@ -21,7 +23,7 @@ export class CreditsService {
       key_secret: this.config.get('RAZORPAY_KEY_SECRET') as string,
     });
   }
-  async createOrder(user: UserDocument, dto: CreateOrderDto) {
+  async createOrderUsingRazorpay(user: UserDocument, dto: CreateOrderDto) {
     // Get package details
     const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
     if (!pkgDetails) {
@@ -51,6 +53,7 @@ export class CreditsService {
       receipt: order.receipt,
       notes: order.notes,
       orderCreatedAt: new Date(order.created_at * 1000),
+      gateway: PAYMENT_GATEWAYS.RAZORPAY,
     });
 
     return {
@@ -65,7 +68,70 @@ export class CreditsService {
     };
   }
 
-  async verifyCreditOrderPayment(orderId: string, dto: VerifyCreditOrderPaymentDto) {
+  async createOrderUsingPayPal(user: UserDocument, dto: CreateOrderDto) {
+    // Get package details
+    const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
+    if (!pkgDetails) {
+      throw new NotFoundException(`Package with ID '${dto.packageId}' not found`);
+    }
+
+    const collect = {
+      body: {
+        intent: CheckoutPaymentIntent.Capture,
+        payer: {
+          emailAddress: user.email,
+        },
+        purchaseUnits: [
+          {
+            amount: {
+              currencyCode: dto.currencyCodeInISOFormat,
+              value: String(pkgDetails.priceInUSD_Cents / 100),
+            },
+            description: `You are going to buy '${pkgDetails.name} package on CoverGenius'`,
+            softDescriptor: `CoverGenius '${pkgDetails.name}' Package Order`,
+          },
+        ],
+      } as OrderRequest,
+      prefer: 'return=minimal',
+    };
+
+    try {
+      const { result, ...httpResponse } = await ordersController.createOrder(collect);
+      if (!httpResponse.statusCode.toString().startsWith('20') || result.status !== OrderStatus.Created)
+        throw new InternalServerErrorException('Failed to create order using Paypal');
+
+      const creditOrder = await this.db.creditOrder.create({
+        id: result.id,
+        userId: user.id,
+        amountToBePaidInMinorUnits: pkgDetails.priceInUSD_Cents,
+        currency: ACCEPTED_CURRENCY_CODES.USD,
+        status: CREDIT_ORDER_STATUS.CREATED,
+        notes: {
+          user_id: user.id as string,
+          user_email: user.email,
+          package_id: dto.packageId as string,
+        },
+        orderCreatedAt: new Date(Date.now()),
+        gateway: PAYMENT_GATEWAYS.PAYPAL,
+      });
+
+      return {
+        order: {
+          id: creditOrder.id,
+          amountToBePaidInMinorUnits: pkgDetails.priceInUSD_Cents,
+          currency: ACCEPTED_CURRENCY_CODES.USD,
+          status: creditOrder.status,
+          orderCreatedAt: creditOrder.orderCreatedAt,
+        },
+        pkg: pkgDetails,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async verifyRazorpayCreditOrderPayment(orderId: string, dto: VerifyRazorpayCreditOrderPaymentDto) {
     // Verify payment
     const order = await this.razorpay.orders.fetch(orderId);
     if (!order || order.status !== 'paid') {
@@ -79,6 +145,21 @@ export class CreditsService {
       throw new BadRequestException('Invalid signature');
     }
 
+    const creditsAdded = this.processOrderByID(orderId, dto.razorpay_payment_id);
+
+    return { success: true, creditsAdded: creditsAdded };
+  }
+
+  async verifyPayPalCreditOrderPayment(orderId: string) {
+    const res = await ordersController.captureOrder({ id: orderId });
+    if (res.result.status !== OrderStatus.Completed) throw new BadRequestException('Payment failed');
+
+    const creditsAdded = await this.processOrderByID(orderId);
+
+    return { success: true, creditsAdded: creditsAdded };
+  }
+
+  private async processOrderByID(orderId: string, razorpay_payment_id?: string) {
     // Check if order exists and is not already processed
     const creditOrder = await this.db.creditOrder.findOne({ id: orderId });
     if (!creditOrder) {
@@ -98,7 +179,7 @@ export class CreditsService {
       { id: orderId },
       {
         status: CREDIT_ORDER_STATUS.PAID,
-        paymentId: dto.razorpay_payment_id,
+        paymentId: razorpay_payment_id || null,
         paymentVerifiedAt: new Date(),
       },
     );
@@ -113,6 +194,6 @@ export class CreditsService {
       },
     );
 
-    return { success: true, creditsAdded: pkgDetails.credits };
+    return pkgDetails.credits;
   }
 }

@@ -1,13 +1,9 @@
 import "./App.css";
+import { Toaster } from "sonner";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { FRONTEND_ENDPOINTS } from "./constants";
-import { AuthContext, ModalContext } from "./Contexts";
-import { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { AuthContext, GlobalContext } from "./Contexts";
+import { useEffect, useMemo, useState } from "react";
 import { Generator } from "./pages/Generator";
 import { TermsOfService } from "./pages/TermsOfService";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
@@ -18,73 +14,65 @@ import { CancellationAndRefundPolicy } from "./pages/CancellationAndRefundPolicy
 import { Analytics } from "@vercel/analytics/react";
 import { Landing } from "./pages/Landing";
 import { SignInModal } from "./components/SignInModal";
-import { Toaster } from "sonner";
 import { HelmetProvider } from "react-helmet-async";
+import { ACCEPTED_CURRENCY_CODES } from "@cover-letter-ai/constants";
 
 const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
+    const { pathname } = useLocation();
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+    return null;
 };
 
 export default function App() {
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
-  const openSignInModal = () => setIsSignInModalOpen(true);
-  const closeSignInModal = () => setIsSignInModalOpen(false);
+    const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
+    const openSignInModal = () => setIsSignInModalOpen(true);
+    const closeSignInModal = () => setIsSignInModalOpen(false);
 
-  const auth = useAuth();
+    const [paymentCurrency, setPaymentCurrency] = useState<ACCEPTED_CURRENCY_CODES>(ACCEPTED_CURRENCY_CODES.INR);
+    const auth = useAuth();
 
-  return (
-    <>
-      <HelmetProvider>
-        <AuthContext value={auth}>
-          <ModalContext
-            value={{ isSignInModalOpen, openSignInModal, closeSignInModal }}
-          >
-            <div className="min-h-screen bg-white">
-              <Router>
-                <ScrollToTop />
-                <Routes>
-                  <Route
-                    path={FRONTEND_ENDPOINTS.LANDING}
-                    element={<Landing />}
-                  />
+    const globalContextValue = useMemo(
+        () => ({
+            isSignInModalOpen,
+            openSignInModal,
+            closeSignInModal,
+            paymentCurrency,
+            setPaymentCurrency,
+        }),
+        [isSignInModalOpen, paymentCurrency]
+    );
 
-                  <Route
-                    path={FRONTEND_ENDPOINTS.GENERATOR}
-                    element={<Generator />}
-                  />
-                  <Route
-                    path={FRONTEND_ENDPOINTS.CONTACT}
-                    element={<ContactUs />}
-                  />
-                  <Route
-                    path={FRONTEND_ENDPOINTS.CANCELLATION}
-                    element={<CancellationAndRefundPolicy />}
-                  />
-                  <Route
-                    path={FRONTEND_ENDPOINTS.TERMS}
-                    element={<TermsOfService />}
-                  />
-                  <Route
-                    path={FRONTEND_ENDPOINTS.PRIVACY}
-                    element={<PrivacyPolicy />}
-                  />
-                  <Route
-                    path={FRONTEND_ENDPOINTS.CREDITS_SHOP}
-                    element={<CreditsShop />}
-                  />
-                </Routes>
-              </Router>
-            </div>
-            <SignInModal />
-            <Toaster richColors />
-          </ModalContext>
-        </AuthContext>
-      </HelmetProvider>
-      <Analytics />
-    </>
-  );
+    return (
+        <>
+            <HelmetProvider>
+                <AuthContext value={auth}>
+                    <GlobalContext value={globalContextValue}>
+                        <div className="min-h-screen bg-white">
+                            <Router>
+                                <ScrollToTop />
+                                <Routes>
+                                    <Route path={FRONTEND_ENDPOINTS.LANDING} element={<Landing />} />
+
+                                    <Route path={FRONTEND_ENDPOINTS.GENERATOR} element={<Generator />} />
+                                    <Route path={FRONTEND_ENDPOINTS.CONTACT} element={<ContactUs />} />
+                                    <Route
+                                        path={FRONTEND_ENDPOINTS.CANCELLATION}
+                                        element={<CancellationAndRefundPolicy />}
+                                    />
+                                    <Route path={FRONTEND_ENDPOINTS.TERMS} element={<TermsOfService />} />
+                                    <Route path={FRONTEND_ENDPOINTS.PRIVACY} element={<PrivacyPolicy />} />
+                                    <Route path={FRONTEND_ENDPOINTS.CREDITS_SHOP} element={<CreditsShop />} />
+                                </Routes>
+                                <SignInModal />
+                            </Router>
+                        </div>
+                        <Toaster richColors />
+                    </GlobalContext>
+                </AuthContext>
+            </HelmetProvider>
+            <Analytics />
+        </>
+    );
 }

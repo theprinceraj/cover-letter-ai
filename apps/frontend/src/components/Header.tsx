@@ -22,7 +22,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { FRONTEND_ENDPOINTS } from "../constants";
-import { AuthContext, ModalContext } from "../Contexts";
+import { AuthContext, GlobalContext } from "../Contexts";
 import { toast } from "sonner";
 
 export const Header: React.FC = () => {
@@ -31,7 +31,7 @@ export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, logout, user, guest } = useContext(AuthContext)!;
-  const { openSignInModal } = useContext(ModalContext)!;
+  const { openSignInModal } = useContext(GlobalContext)!;
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 

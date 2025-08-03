@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { UserModelName } from './user.schema';
-import { ACCEPTED_CURRENCY_CODES, CREDIT_ORDER_STATUS } from '@cover-letter-ai/constants';
+import { ACCEPTED_CURRENCY_CODES, CREDIT_ORDER_STATUS, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
 
 export type CreditOrderDocument = HydratedDocument<CreditOrder>;
 export const CreditOrderModelName = 'credit_orders';
@@ -32,14 +32,17 @@ export class CreditOrder {
   @Prop({ type: SchemaTypes.Date, required: false, default: null })
   paymentVerifiedAt?: Date | null;
 
-  @Prop({ type: SchemaTypes.String, required: true })
-  receipt!: string;
+  @Prop({ type: SchemaTypes.String, required: false })
+  receipt?: string;
 
   @Prop({ type: SchemaTypes.Mixed, required: true, default: {} })
   notes!: Record<string, string>;
 
   @Prop({ type: SchemaTypes.Date, required: true })
   orderCreatedAt!: Date;
+
+  @Prop({ type: SchemaTypes.String, required: true, enum: PAYMENT_GATEWAYS })
+  gateway!: PAYMENT_GATEWAYS;
 }
 
 export const CreditOrderSchema = SchemaFactory.createForClass(CreditOrder);

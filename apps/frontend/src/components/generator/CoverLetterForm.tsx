@@ -12,7 +12,7 @@ import {
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
   type APIResponse,
 } from "@cover-letter-ai/constants";
-import { AuthContext, ModalContext } from "../../Contexts";
+import { AuthContext, GlobalContext } from "../../Contexts";
 import { Spinner } from "../ui/Spinner";
 import { CoverLetterPreview } from "../ui/CoverLetterPreview";
 import Turnstile, { useTurnstile } from "react-turnstile";
@@ -86,7 +86,7 @@ export const CoverLetterForm: React.FC = () => {
     suggestions: [],
   });
   const [error, setError] = useState<string | null>(null);
-  const { openSignInModal } = useContext(ModalContext)!;
+  const { openSignInModal } = useContext(GlobalContext)!;
 
   const currentStep = statusToStep[status];
 

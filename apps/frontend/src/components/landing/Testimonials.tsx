@@ -1,7 +1,7 @@
 import { MessageCircle, Star, User } from "lucide-react";
 import { useContext } from "react";
 import { toast } from "sonner";
-import { ModalContext } from "../../Contexts";
+import { GlobalContext } from "../../Contexts";
 import { Button } from "../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { LandingSectionTemplate } from "../ui/LandingSectionTemplate";
@@ -38,7 +38,7 @@ const emptyTestimonials = [
 
 export const Testimonials: React.FC = () => {
   const navigate = useNavigate();
-  const { openSignInModal } = useContext(ModalContext)!;
+  const { openSignInModal } = useContext(GlobalContext)!;
   return (
     <LandingSectionTemplate
       title={
