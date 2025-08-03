@@ -20,7 +20,7 @@ import { Header } from "../components/Header";
 import { HeroTemplate } from "../components/ui/HeroTemplate";
 import { PricingCardsList } from "../components/ui/PricingCardsList";
 import { SEO } from "../components/seo/SEO";
-import { type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
+import { type PayPalButtonsComponentProps, type ReactPayPalScriptOptions } from "@paypal/react-paypal-js";
 
 // Lazy load PayPal components to reduce initial bundle size
 const PayPalScriptProvider = lazy(() =>
@@ -50,6 +50,7 @@ const PayPalModal = memo(
         onClose,
         currency,
         clientId,
+        environment,
         onCreateOrder,
         onApprove,
         onError,
@@ -58,6 +59,7 @@ const PayPalModal = memo(
         onClose: () => void;
         currency: string;
         clientId: string;
+        environment: "development" | "sandbox" | undefined;
         onCreateOrder: PayPalButtonsComponentProps["createOrder"];
         onApprove: PayPalButtonsComponentProps["onApprove"];
         onError: PayPalButtonsComponentProps["onError"];
@@ -67,11 +69,13 @@ const PayPalModal = memo(
         };
 
         const paypalOptions = useMemo(
-            () => ({
-                clientId,
-                currency,
-            }),
-            [clientId, currency]
+            () =>
+                ({
+                    clientId,
+                    currency,
+                    environment: environment ? environment : "sandbox",
+                }) as ReactPayPalScriptOptions,
+            [clientId, currency, environment]
         );
 
         if (!isVisible) return null;
@@ -176,10 +180,10 @@ export const CreditsShop: React.FC = memo(() => {
         () => ({
             razorpayKeyId: import.meta.env.VITE_RAZORPAY_KEY_ID,
             paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
+            environment: import.meta.env.VITE_ENVIRONMENT,
         }),
         []
     );
-    console.log(envVars.paypalClientId);
 
     const canPurchase = useMemo(
         () => ({
@@ -467,6 +471,7 @@ export const CreditsShop: React.FC = memo(() => {
                         onClose={handleClosePaypalModal}
                         currency={paymentCurrency}
                         clientId={envVars.paypalClientId}
+                        environment={envVars.environment}
                         onCreateOrder={handlePaypalCreateOrder}
                         onApprove={handlePaypalPaymentSuccess}
                         onError={handlePaymentFailure}
