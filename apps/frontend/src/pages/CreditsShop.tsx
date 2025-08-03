@@ -179,6 +179,7 @@ export const CreditsShop: React.FC = memo(() => {
         }),
         []
     );
+    console.log(envVars.paypalClientId);
 
     const canPurchase = useMemo(
         () => ({
