@@ -7,9 +7,7 @@ import {
 import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
 import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
 import { toast } from "sonner";
-import SadCryGif from "../assets/sad-cry.gif";
-import HappyDanceGif from "../assets/happy-dance.gif";
-import { useCallback, useContext, useState, useMemo, memo, lazy, Suspense } from "react";
+import { useCallback, useContext, useState, useMemo, memo } from "react";
 import { AuthContext, GlobalContext } from "../Contexts";
 import { useCreditPlans, type CreditPlan } from "../hooks/useCreditPlans";
 import { Footer } from "../components/Footer";
@@ -20,20 +18,9 @@ import { Header } from "../components/Header";
 import { HeroTemplate } from "../components/ui/HeroTemplate";
 import { PricingCardsList } from "../components/ui/PricingCardsList";
 import { SEO } from "../components/seo/SEO";
-import { type PayPalButtonsComponentProps, type ReactPayPalScriptOptions } from "@paypal/react-paypal-js";
-
-// Lazy load PayPal components to reduce initial bundle size
-const PayPalScriptProvider = lazy(() =>
-    import("@paypal/react-paypal-js").then((module) => ({
-        default: module.PayPalScriptProvider,
-    }))
-);
-
-const PayPalButtons = lazy(() =>
-    import("@paypal/react-paypal-js").then((module) => ({
-        default: module.PayPalButtons,
-    }))
-);
+import { type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
+import { PayPalModal } from "../components/credits-shop/PayPalModal";
+import { PaymentStatusModal } from "../components/credits-shop/PaymentStatusModal";
 
 type CreateOrderFn = NonNullable<PayPalButtonsComponentProps["createOrder"]>;
 type onApprovedPaymentFn = NonNullable<PayPalButtonsComponentProps["onApprove"]>;
@@ -43,124 +30,6 @@ interface RazorpaySuccessfulPaymentResponse {
     razorpay_order_id: string;
     razorpay_payment_id: string;
 }
-
-const PayPalModal = memo(
-    ({
-        isVisible,
-        onClose,
-        currency,
-        clientId,
-        environment,
-        onCreateOrder,
-        onApprove,
-        onError,
-    }: {
-        isVisible: boolean;
-        onClose: () => void;
-        currency: string;
-        clientId: string;
-        environment: "development" | "sandbox" | undefined;
-        onCreateOrder: PayPalButtonsComponentProps["createOrder"];
-        onApprove: PayPalButtonsComponentProps["onApprove"];
-        onError: PayPalButtonsComponentProps["onError"];
-    }) => {
-        const onCancel = () => {
-            toast.error("Payment was cancelled by the user");
-        };
-
-        const paypalOptions = useMemo(
-            () =>
-                ({
-                    clientId,
-                    currency,
-                    environment: environment === "development" ? "sandbox" : "production",
-                }) as ReactPayPalScriptOptions,
-            [clientId, currency, environment]
-        );
-
-        if (!isVisible) return null;
-
-        return (
-            <Suspense
-                fallback={
-                    <Modal isOpen={true} onClose={onClose}>
-                        <Spinner size="xl" />
-                    </Modal>
-                }>
-                <PayPalScriptProvider options={paypalOptions}>
-                    <Modal isOpen={isVisible} onClose={onClose}>
-                        <PayPalButtons
-                            createOrder={onCreateOrder}
-                            onApprove={onApprove}
-                            onError={onError}
-                            onCancel={onCancel}
-                        />
-                    </Modal>
-                </PayPalScriptProvider>
-            </Suspense>
-        );
-    }
-);
-
-PayPalModal.displayName = "PayPalModal";
-
-const PaymentStatusModal = memo(
-    ({
-        isOpen,
-        onClose,
-        isSuccess,
-        onButtonClick,
-    }: {
-        isOpen: boolean;
-        onClose: () => void;
-        isSuccess: boolean | null;
-        onButtonClick: () => void;
-    }) => {
-        const modalContent = useMemo(() => {
-            if (isSuccess === true) {
-                return {
-                    gif: HappyDanceGif,
-                    alt: "Happy Dance",
-                    message: "Payment successful. Enjoy your newly added credits!",
-                    messageClass: "text-green-500",
-                    buttonText: "Close",
-                    gifClass: "h-full w-auto -ml-1 md:-ml-2 lg:-ml-3 xl:-ml-4",
-                };
-            } else {
-                return {
-                    gif: SadCryGif,
-                    alt: "Sad Cry",
-                    message: "Payment failed.",
-                    messageClass: "text-red-500",
-                    buttonText: "Try Again",
-                    gifClass: "h-full w-auto",
-                };
-            }
-        }, [isSuccess]);
-
-        if (!isOpen) return null;
-
-        return (
-            <Modal
-                isOpen={isOpen}
-                onClose={onClose}
-                title="Payment Status"
-                contentClassName="flex flex-col items-center gap-4">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="h-36 md:h-48 overflow-clip">
-                        <img src={modalContent.gif} alt={modalContent.alt} className={modalContent.gifClass} />
-                    </div>
-                    <div className={`text-center text-base ${modalContent.messageClass}`}>{modalContent.message}</div>
-                </div>
-                <Button variant="primary" size="md" onClick={onButtonClick}>
-                    {modalContent.buttonText}
-                </Button>
-            </Modal>
-        );
-    }
-);
-
-PaymentStatusModal.displayName = "PaymentStatusModal";
 
 export const CreditsShop: React.FC = memo(() => {
     const { isAuthenticated, isGuest, isEmailVerified, fetchWithAuth, refreshAuth } = useContext(AuthContext)!;
@@ -185,10 +54,10 @@ export const CreditsShop: React.FC = memo(() => {
         []
     );
 
-    const canPurchase = useMemo(
+    const purchaseInfo = useMemo(
         () => ({
             isAuthenticated,
-            isNotGuest: !isGuest,
+            isGuest,
             isEmailVerified,
             canBuy: isAuthenticated && !isGuest && isEmailVerified,
         }),
@@ -295,34 +164,34 @@ export const CreditsShop: React.FC = memo(() => {
 
     const handleRazorpayBuyBtnClick = useCallback(
         (plan: CreditPlan) => {
-            if (!canPurchase.isAuthenticated) {
+            if (!purchaseInfo.isAuthenticated) {
                 openSignInModal();
                 toast.error("Please sign in using your email to buy credits");
                 return;
             }
-            if (!canPurchase.isNotGuest) {
+            if (!purchaseInfo.isGuest) {
                 toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
                 return;
             }
-            if (!canPurchase.isEmailVerified) {
+            if (!purchaseInfo.isEmailVerified) {
                 toast.error("Please verify your email before buying credits.");
                 return;
             }
             handleRazorpayPurchase(plan, ACCEPTED_CURRENCY_CODES.INR);
         },
-        [canPurchase, openSignInModal, handleRazorpayPurchase]
+        [purchaseInfo, openSignInModal, handleRazorpayPurchase]
     );
 
     // PayPal Related Functions
     const handlePaypalBuyBtnClick = useCallback(
         (plan: CreditPlan) => {
-            if (!canPurchase.canBuy) {
-                if (!canPurchase.isAuthenticated) {
+            if (!purchaseInfo.canBuy) {
+                if (!purchaseInfo.isAuthenticated) {
                     openSignInModal();
                     toast.error("Please sign in using your email to buy credits");
-                } else if (!canPurchase.isNotGuest) {
+                } else if (!purchaseInfo.isGuest) {
                     toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
-                } else if (!canPurchase.isEmailVerified) {
+                } else if (!purchaseInfo.isEmailVerified) {
                     toast.error("Please verify your email before buying credits.");
                 }
                 return;
@@ -330,7 +199,7 @@ export const CreditsShop: React.FC = memo(() => {
             setSelectedPlan(plan);
             setIsPaypalBtnsVisible(true);
         },
-        [canPurchase, openSignInModal]
+        [purchaseInfo, openSignInModal]
     );
 
     const handlePaypalCreateOrder: CreateOrderFn = useCallback(async () => {
