@@ -24,9 +24,66 @@ export const PASSWORD_MIN_SPECIAL_CHARACTERS = 1;
 export const PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX = /[!@#$%^&*]/;
 export const PASSWORD_TEST_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,20}$/;
 
-export interface APIResponse {
+export interface EvalService_Eval_Response {
     coverLetter: string;
     suggestions: string[];
+}
+
+export interface AuthService_LoginLocal_Response {
+    access_token: string;
+    user: {
+        emailVerified: boolean;
+    };
+}
+
+export interface AuthService_LoginGuest_Response {
+    access_token: string;
+    guest: {
+        id: string;
+        ipAddress: string;
+        exhaustedUses: number;
+        useLimit: number;
+    };
+}
+
+export interface AuthService_VerificationEmail_Response {
+    success: boolean;
+    message: string;
+}
+
+export type CreditsService_GetPackagesList_Response = CREDIT_PACKAGE_TYPE[];
+
+export interface CreditsService_OrderUsingRazorpay_Response {
+    order: {
+        id: any;
+        amountToBePaidInMinorUnits: number;
+        currency: ACCEPTED_CURRENCY_CODES;
+        status: CREDIT_ORDER_STATUS;
+        orderCreatedAt: Date;
+    };
+    pkg: {
+        id: CREDIT_PACKAGES_ID;
+        name: string;
+        credits: number;
+        priceInINR: number;
+        priceInUSD_Cents: number;
+    };
+}
+
+export interface CreditsService_OrderUsingPayPal_Response {
+    order: {
+        id: string;
+        amountToBePaidInMinorUnits: number;
+        currency: ACCEPTED_CURRENCY_CODES;
+        status: CREDIT_ORDER_STATUS;
+        orderCreatedAt: Date;
+    };
+    pkg: CREDIT_PACKAGE_TYPE;
+}
+
+export interface CreditsService_OrderVerification_Response {
+    success: boolean;
+    creditsAdded: number;
 }
 
 export enum AUTH_PROVIDERS {
