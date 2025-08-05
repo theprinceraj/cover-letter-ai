@@ -3,7 +3,7 @@ import { GeminiService } from '../gemini.service.js';
 import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai';
 import { SYSTEM_INSTRUCTION } from './constants.js';
 import { AUTH_PROVIDERS, GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
-import type { APIResponse } from '@cover-letter-ai/constants';
+import type { EvalService_Eval_Response } from '@cover-letter-ai/constants';
 import { DbService } from 'src/db/db.service';
 import { EvalClDto } from './eval-cl.dto.js';
 import { UserDocument } from 'src/db/schema/user.schema.js';
@@ -127,7 +127,7 @@ export class EvalService {
       type: currentUser.provider === AUTH_PROVIDERS.GUEST ? 'GUEST' : 'USER',
     });
 
-    return { coverLetter, suggestions } as APIResponse;
+    return { coverLetter, suggestions } as EvalService_Eval_Response;
   }
 
   private async verifyCaptchaToken(token: string, ip: string | null | undefined): Promise<boolean> {

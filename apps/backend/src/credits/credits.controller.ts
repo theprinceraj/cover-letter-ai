@@ -1,4 +1,4 @@
-import { CREDIT_PACKAGES, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
+import { CREDIT_PACKAGES, CreditsService_GetPackagesList_Response, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
 import { BadRequestException, Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreditsService } from './credits.service';
 import { JwtAuthGuard } from 'src/auth/guards';
@@ -10,7 +10,7 @@ import { CreateOrderDto, VerifyRazorpayCreditOrderPaymentDto } from './credits.d
 export class CreditsController {
   constructor(private readonly creditsService: CreditsService) {}
   @Get('packages-list')
-  getPackagesList() {
+  getPackagesList(): CreditsService_GetPackagesList_Response {
     return CREDIT_PACKAGES;
   }
 

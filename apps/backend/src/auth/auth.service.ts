@@ -3,6 +3,9 @@ import { DbService } from 'src/db/db.service';
 import { LocalDto, VerifyEmailDto } from './dto';
 import {
   AUTH_PROVIDERS,
+  AuthService_LoginGuest_Response,
+  AuthService_LoginLocal_Response,
+  AuthService_VerificationEmail_Response,
   DEFAULT_USE_LIMIT_FOR_GUEST,
   DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
   OTP_CODE_MAX,
@@ -36,7 +39,7 @@ export class AuthService {
     return this.db.deleteConfidentialData(user); // interceptor implement to replace this
   }
 
-  async loginLocal(user: any): Promise<{ access_token: string; user: { emailVerified: boolean } }> {
+  async loginLocal(user: UserDocument): Promise<AuthService_LoginLocal_Response> {
     await this.db.user.updateOne({ id: user.id }, { $push: { lastLogin: new Date() } });
     if (!user.emailVerified) {
       await this.sendOtpMail(user.email);
@@ -46,10 +49,10 @@ export class AuthService {
       user: {
         emailVerified: user.emailVerified,
       },
-    };
+    } as AuthService_LoginLocal_Response;
   }
 
-  async loginGuest(ip: string): Promise<{ access_token: string; guest: any }> {
+  async loginGuest(ip: string): Promise<AuthService_LoginGuest_Response> {
     // Check if guest already exists for this IP
     let guest = await this.db.guest.findOne({ ipAddress: ip });
 
@@ -101,7 +104,7 @@ export class AuthService {
     return this.db.deleteConfidentialData(user);
   }
 
-  async verifyEmail(dto: VerifyEmailDto, user: UserDocument) {
+  async verifyEmail(dto: VerifyEmailDto, user: UserDocument): Promise<AuthService_VerificationEmail_Response> {
     const otp = await this.db.otp.findOne({ email: user.email, code: dto.code });
     if (!otp) throw new BadRequestException('OTP incorrect or expired. Please request a new one.');
     await this.db.otp.deleteOne({ id: otp.id });
@@ -112,7 +115,7 @@ export class AuthService {
     };
   }
 
-  async resendVerification(user: UserDocument): Promise<{ success: boolean; message: string }> {
+  async resendVerification(user: UserDocument): Promise<AuthService_VerificationEmail_Response> {
     // Check if user is already verified
     if (user.emailVerified) {
       throw new BadRequestException('Email is already verified');

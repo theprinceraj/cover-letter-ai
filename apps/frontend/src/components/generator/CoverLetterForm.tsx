@@ -10,7 +10,7 @@ import {
   DEFAULT_USE_LIMIT_FOR_GUEST,
   MAX_JOB_DESCRIPTION_LENGTH,
   MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
-  type APIResponse,
+  type EvalService_Eval_Response,
 } from "@cover-letter-ai/constants";
 import { AuthContext, GlobalContext } from "../../Contexts";
 import { Spinner } from "../ui/Spinner";
@@ -81,7 +81,7 @@ export const CoverLetterForm: React.FC = () => {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<GenerationStatus>("idle");
-  const [apiResponse, setApiResponse] = useState<APIResponse>({
+  const [apiResponse, setApiResponse] = useState<EvalService_Eval_Response>({
     coverLetter: "",
     suggestions: [],
   });
@@ -163,7 +163,7 @@ export const CoverLetterForm: React.FC = () => {
           formData.append("resume", formValues.resume as Blob);
 
           const response = await fetchWithAuth<
-            APIResponse | { error: true; message: string }
+            EvalService_Eval_Response | { error: true; message: string }
           >({
             url: "/eval/cl",
             method: "POST",

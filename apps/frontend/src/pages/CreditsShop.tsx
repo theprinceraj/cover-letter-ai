@@ -1,8 +1,9 @@
 import {
     ACCEPTED_CURRENCY_CODES,
     PAYMENT_GATEWAYS,
-    type CREDIT_ORDER_STATUS,
-    type CREDIT_PACKAGE_TYPE,
+    type CreditsService_OrderUsingPayPal_Response,
+    type CreditsService_OrderUsingRazorpay_Response,
+    type CreditsService_OrderVerification_Response,
 } from "@cover-letter-ai/constants";
 import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
 import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
@@ -68,7 +69,7 @@ export const CreditsShop: React.FC = memo(() => {
         async (razorpayResponse: RazorpaySuccessfulPaymentResponse) => {
             try {
                 const response = await fetchWithAuth<
-                    { success: boolean; creditsAdded: number } | { error: true; message: string }
+                    CreditsService_OrderVerification_Response | { error: true; message: string }
                 >({
                     url: `/credits/orders/verify-payment/razorpay/${razorpayResponse.razorpay_order_id}`,
                     method: "POST",
@@ -123,17 +124,7 @@ export const CreditsShop: React.FC = memo(() => {
         async (pkg: CreditPlan, currency: CurrencyCode) => {
             try {
                 const response = await fetchWithAuth<
-                    | {
-                          order: {
-                              id: string;
-                              amountToBePaidInMinorUnits: number;
-                              currency: ACCEPTED_CURRENCY_CODES;
-                              status: CREDIT_ORDER_STATUS;
-                              orderCreatedAt: Date;
-                          };
-                          pkg: CREDIT_PACKAGE_TYPE;
-                      }
-                    | { error: true; message: string }
+                    CreditsService_OrderUsingRazorpay_Response | { error: true; message: string }
                 >({
                     url: `/credits/orders`,
                     method: "POST",
@@ -204,17 +195,7 @@ export const CreditsShop: React.FC = memo(() => {
 
     const handlePaypalCreateOrder: CreateOrderFn = useCallback(async () => {
         const response = await fetchWithAuth<
-            | {
-                  order: {
-                      id: string;
-                      amountToBePaidInMinorUnits: number;
-                      currency: ACCEPTED_CURRENCY_CODES;
-                      status: CREDIT_ORDER_STATUS;
-                      orderCreatedAt: Date;
-                  };
-                  pkg: CREDIT_PACKAGE_TYPE;
-              }
-            | { error: true; message: string }
+            CreditsService_OrderUsingPayPal_Response | { error: true; message: string }
         >({
             url: `/credits/orders`,
             method: "POST",
@@ -241,7 +222,7 @@ export const CreditsShop: React.FC = memo(() => {
         async (data) => {
             try {
                 const response = await fetchWithAuth<
-                    { success: boolean; creditsAdded: number } | { error: true; message: string }
+                    CreditsService_OrderVerification_Response | { error: true; message: string }
                 >({
                     url: `/credits/orders/verify-payment/paypal/${data.orderID}`,
                     method: "POST",
