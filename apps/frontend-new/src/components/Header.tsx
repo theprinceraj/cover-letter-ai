@@ -6,11 +6,9 @@ export const Header: React.FC = () => {
             <h2 className="font-extrabold text-xl italic">
                 Cover<span className="text-primary underline underline-offset-4">Genius</span>
             </h2>
-            <div>
-                <button className="cursor-pointer">
-                    <MenuIcon />
-                </button>
-            </div>
+            <button className="cursor-pointer">
+                <MenuIcon />
+            </button>
         </header>
     );
 };
