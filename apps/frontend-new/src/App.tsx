@@ -9,12 +9,11 @@ import { useMemo, useState } from "react";
 import { ACCEPTED_CURRENCY_CODES } from "@cover-letter-ai/constants";
 import { Toaster } from "sonner";
 import { OnboardModal } from "./components/OnboardModal";
+import { useModal } from "./hooks/useModal";
 
 function App() {
     const auth = useAuth();
-    const [isOnboardModalOpen, setIsOnboardModalOpen] = useState(false);
-    const openOnboardModal = () => setIsOnboardModalOpen(true);
-    const closeOnboardModal = () => setIsOnboardModalOpen(false);
+    const { isOpen: isOnboardModalOpen, closeModal: closeOnboardModal, openModal: openOnboardModal } = useModal(false);
 
     const [paymentCurrency, setPaymentCurrency] = useState<ACCEPTED_CURRENCY_CODES>(ACCEPTED_CURRENCY_CODES.INR);
 
@@ -26,7 +25,7 @@ function App() {
             paymentCurrency,
             setPaymentCurrency,
         }),
-        [isOnboardModalOpen, paymentCurrency]
+        [isOnboardModalOpen, closeOnboardModal, openOnboardModal, paymentCurrency]
     );
     return (
         <GlobalContext value={globalCtx}>

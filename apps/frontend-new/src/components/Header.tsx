@@ -3,7 +3,7 @@ import Button from "./ui/Button";
 import { useCallback, useContext, useState } from "react";
 import { FRONTEND_ENDPOINTS } from "../constants";
 import { toast } from "sonner";
-import { useLocation, useNavigate, type Location, type NavigateFunction } from "react-router";
+import { Link, useLocation, useNavigate, type Location, type NavigateFunction } from "react-router";
 import { AuthContext, GlobalContext } from "../Contexts";
 import type { UseAuthReturn } from "../hooks/useAuth";
 
@@ -15,9 +15,11 @@ export const Header: React.FC = () => {
 
     return (
         <header className="sticky top-6 left-0 right-0 mx-auto w-11/12 py-5 px-10 flex items-center justify-between bg-white rounded-full shadow-md">
-            <h2 className="font-extrabold text-xl italic">
-                Cover<span className="text-primary underline underline-offset-4">Genius</span>
-            </h2>
+            <Link to={auth.user || auth.guest ? FRONTEND_ENDPOINTS.GENERATOR : FRONTEND_ENDPOINTS.LANDING}>
+                <h2 className="font-extrabold text-xl italic">
+                    Cover<span className="text-primary underline underline-offset-4">Genius</span>
+                </h2>
+            </Link>
             {auth.isAuthenticated ? (
                 <MenuButton navigate={navigate} location={location} auth={auth} />
             ) : (

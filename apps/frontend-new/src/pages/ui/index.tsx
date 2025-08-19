@@ -4,7 +4,7 @@ import { Box } from "../../components/ui/Box";
 import Button from "../../components/ui/Button";
 import { Faq } from "../../components/ui/Faq";
 import HeroTemplate from "../../components/ui/HeroTemplate";
-import { Pill } from "../../components/ui/Pills";
+import { Pill } from "../../components/ui/Pill";
 import { TestimonialsContainer } from "../../components/ui/TestimonialsContainer";
 
 const sectionStyle = "flex gap-10 flex-wrap p-10 my-10 bg-gray-900";
