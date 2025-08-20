@@ -1,4 +1,3 @@
-import JoinImg from "../../assets/join.png";
 import DummyImg from "../../assets/dummy-pic.png";
 import { Box } from "../../components/ui/Box";
 import Button from "../../components/ui/Button";
@@ -6,6 +5,7 @@ import { Faq } from "../../components/ui/Faq";
 import HeroTemplate from "../../components/ui/HeroTemplate";
 import { Pill } from "../../components/ui/Pill";
 import { TestimonialsContainer } from "../../components/ui/TestimonialsContainer";
+import { MapPinIcon } from "lucide-react";
 
 const sectionStyle = "flex gap-10 flex-wrap p-10 my-10 bg-gray-900";
 
@@ -19,22 +19,8 @@ export const UI: React.FC = () => {
                     <Button variant="yellow">Hello</Button>
                 </div>
                 <div className={sectionStyle}>
-                    <Box
-                        variant="white"
-                        icon={JoinImg}
-                        order={1}
-                        heading="Phasellus Vitae"
-                        sh1="Quisque"
-                        sh2="Porttitor Vitae Vel Amet"
-                    />
-                    <Box
-                        variant="dark"
-                        icon={JoinImg}
-                        order={1}
-                        heading="Phasellus Vitae"
-                        sh1="Quisque"
-                        sh2="Porttitor Vitae Vel Amet"
-                    />
+                    <Box variant="white" IconLucide={MapPinIcon} order={1} heading="Phasellus Vitae" sh="Quisque" />
+                    <Box variant="dark" IconLucide={MapPinIcon} order={1} heading="Phasellus Vitae" sh="Quisque" />
                 </div>
                 <div className={sectionStyle}>
                     <Pill variant="white" text="Cursus Integer" />

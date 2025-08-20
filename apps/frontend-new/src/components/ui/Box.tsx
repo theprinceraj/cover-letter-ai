@@ -1,16 +1,17 @@
+import type { LucideIcon } from "lucide-react";
+
 interface BoxProps {
     variant: "white" | "dark";
-    icon: string;
+    IconLucide: LucideIcon;
     order: number;
     heading: string;
-    sh1: string;
-    sh2: string;
+    sh: string;
 }
 
 const baseStyle =
-    "group hover:bg-dark text-dark hover:text-white rounded-4xl py-8 pl-12 pr-24 flex flex-col gap-4 duration-200";
+    "group hover:bg-dark text-dark hover:text-white hover:outline-2 hover:outline-primary hover:shadow-lg hover:shadow-primary rounded-4xl py-8 pl-12 pr-24 flex flex-col gap-4 duration-150 lg:max-w-md";
 
-export const Box: React.FC<BoxProps> = ({ variant, icon, order, heading, sh1, sh2 }) => {
+export const Box: React.FC<BoxProps> = ({ variant, IconLucide, order, heading, sh }) => {
     const isWhite = variant == "white";
     const variantStyle = isWhite ? `bg-white` : `bg-primary`;
     const dotStyle = isWhite ? "text-primary" : "text-white group-hover:text-primary";
@@ -18,7 +19,7 @@ export const Box: React.FC<BoxProps> = ({ variant, icon, order, heading, sh1, sh
     return (
         <div className={styles}>
             <div className="size-16">
-                <img src={icon} alt="Icon" />
+                <IconLucide className="size-16" />
             </div>
             <div>
                 <h3 className="text-7xl font-extrabold">
@@ -28,8 +29,7 @@ export const Box: React.FC<BoxProps> = ({ variant, icon, order, heading, sh1, sh
             </div>
             <h4 className="text-2xl font-extrabold my-5">{heading}</h4>
             <div>
-                <h4 className="font-bold text-xl">{sh1}</h4>
-                <p className="font-light text-base">{sh2}</p>
+                <h4 className="font-bold text-xl">{sh}</h4>
             </div>
         </div>
     );

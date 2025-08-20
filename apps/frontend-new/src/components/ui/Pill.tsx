@@ -7,7 +7,7 @@ interface PillProps {
 }
 
 export const Pill: React.FC<PillProps> = ({ variant, text, className }) => {
-    const baseStyle = "bg-white rounded-4xl font-medium overflow-clip w-fit shadow-sm blur-2xl my-1 ";
+    const baseStyle = "bg-white rounded-4xl font-medium overflow-clip w-fit shadow-sm my-1 ";
     const isWhite = variant == "white";
     const variantStyle = isWhite ? `bg-primary/10` : ``;
     const styles = `${baseStyle} ${variantStyle} ${className}`;

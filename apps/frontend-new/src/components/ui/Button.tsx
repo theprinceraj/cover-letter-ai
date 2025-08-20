@@ -1,4 +1,4 @@
-import { MoveRightIcon } from "lucide-react";
+import { MoveRightIcon, type LucideIcon } from "lucide-react";
 import type { PropsWithChildren } from "react";
 
 const ButtonVariants = {
@@ -21,6 +21,7 @@ export interface ButtonProps {
     isLoading?: boolean;
     className?: string;
     disabled?: boolean;
+    IconLucide?: LucideIcon;
 }
 
 const baseStyles = "group font-bold flex justify-between gap-2 items-center rounded-full duration-200";
@@ -38,12 +39,16 @@ const Button: React.FC<PropsWithChildren<ButtonProps & React.ButtonHTMLAttribute
     disabled = false,
     onClick = () => {},
     className = "",
+    IconLucide,
     ...props
 }) => {
     const styles = [baseStyles, ButtonSizes[size], variantStyles[variant], className].join(" ");
     const loaderStyles = `animate-spin size-4 ${"text-" + variant === ButtonVariants.yellow ? `primary` : variant}`;
     const cursorStyle = disabled || isLoading ? "hover:cursor-not-allowed" : "hover:cursor-pointer";
     const disabledStyles = disabled || isLoading ? "cursor-not-allowed opacity-50" : "";
+    const iconStyles = `transition-transform group-hover:rotate-90 ${
+        size === "sm" ? "size-4" : size === "md" ? "size-5" : "size-7"
+    }`;
 
     return (
         <button
@@ -69,12 +74,8 @@ const Button: React.FC<PropsWithChildren<ButtonProps & React.ButtonHTMLAttribute
                 </div>
             ) : (
                 <>
-                    <span>{children}</span>
-                    <MoveRightIcon
-                        className={`transition-transform group-hover:rotate-90 ${
-                            size === "sm" ? "size-4" : size === "md" ? "size-5" : "size-7"
-                        }`}
-                    />
+                    {children && <span>{children}</span>}
+                    {IconLucide ? <IconLucide /> : <MoveRightIcon className={iconStyles} />}
                 </>
             )}
         </button>
