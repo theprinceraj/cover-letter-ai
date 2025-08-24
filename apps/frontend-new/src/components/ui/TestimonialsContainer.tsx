@@ -15,13 +15,13 @@ interface TestimonialProps {
 export const TestimonialsContainer: React.FC<TestimonialProps> = ({ variant = "white", testimonials }) => {
     const [current, setCurrent] = useState<number>(0);
 
-    console.log(variant);
-
     const onLeftClick = () => {
         if (current > 0) setCurrent(current - 1);
+        else setCurrent(testimonials.length - 1);
     };
     const onRightClick = () => {
         if (current < testimonials.length - 1) setCurrent(current + 1);
+        else setCurrent(0);
     };
 
     const testOnState = testimonials[current];
@@ -33,6 +33,7 @@ export const TestimonialsContainer: React.FC<TestimonialProps> = ({ variant = "w
             author={testOnState.author}
             handleLeftClick={onLeftClick}
             handleRightClick={onRightClick}
+            variant={variant}
         />
     );
 };
@@ -41,11 +42,14 @@ const TestimonialCard: React.FC<
     TestimonialProps["testimonials"][number] & {
         handleLeftClick: () => void;
         handleRightClick: () => void;
+        variant?: TestimonialProps["variant"];
     }
-> = ({ img, text, author, handleLeftClick, handleRightClick }) => {
+> = ({ img, text, author, variant = "white", handleLeftClick, handleRightClick }) => {
     const truncatedText = text.substring(0, 150) + (text.length > 100 ? "..." : "");
+    const baseStyle = `px-4 py-10 lg:px-14 lg:py-20 rounded-4xl flex flex-col justify-center items-center space-y-10 lg:flex-row`;
+
     return (
-        <div className="bg-white px-4 py-10 lg:px-14 lg:py-20 rounded-4xl flex flex-col justify-center items-center space-y-10 lg:flex-row">
+        <div className={`${baseStyle} bg-white shadow-md shadow-dark`}>
             <div className="rounded-full px-4 lg:">
                 <img src={img} alt="Testimonial Author Picture" />
             </div>

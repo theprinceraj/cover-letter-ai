@@ -24,7 +24,7 @@ export const Faq: React.FC<FaqProps> = ({ head, info }) => {
                 <h3 className="font-extrabold text-lg md:text-2xl">{head}</h3>
                 <p className={infoStyle}>{info}</p>
             </div>
-            <button onClick={handleClick}>
+            <button onClick={handleClick} className="hover:cursor-pointer">
                 {isOpen ? <MinusIcon className={btnStyle} /> : <PlusIcon className={btnStyle} />}
             </button>
         </div>

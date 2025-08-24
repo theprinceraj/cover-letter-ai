@@ -27,7 +27,7 @@ export interface ButtonProps {
 const baseStyles = "group font-bold flex justify-between gap-2 items-center rounded-full duration-200";
 const variantStyles = {
     yellow: "bg-primary",
-    white: "bg-white outline-2 outline-primary hover:shadow-[8px_8px_0_0_theme('colors.primary')]",
+    white: "bg-white text-dark outline-2 outline-primary hover:shadow-[8px_8px_0_0_theme('colors.primary')]",
     dark: "text-white bg-dark outline-2 outline-white hover:shadow-[8px_8px_0_0_#fff]",
 };
 
@@ -45,7 +45,7 @@ const Button: React.FC<PropsWithChildren<ButtonProps & React.ButtonHTMLAttribute
     const styles = [baseStyles, ButtonSizes[size], variantStyles[variant], className].join(" ");
     const loaderStyles = `animate-spin size-4 ${"text-" + variant === ButtonVariants.yellow ? `primary` : variant}`;
     const cursorStyle = disabled || isLoading ? "hover:cursor-not-allowed" : "hover:cursor-pointer";
-    const disabledStyles = disabled || isLoading ? "cursor-not-allowed opacity-50" : "";
+    const disabledStyles = disabled || isLoading ? "hover:cursor-not-allowed opacity-50" : "";
     const iconStyles = `transition-transform group-hover:rotate-90 ${
         size === "sm" ? "size-4" : size === "md" ? "size-5" : "size-7"
     }`;

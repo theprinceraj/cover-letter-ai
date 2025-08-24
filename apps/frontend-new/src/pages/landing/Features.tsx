@@ -1,6 +1,7 @@
-import { Brain, CreditCard, FileText, Lightbulb, ShieldCheck, Zap } from "lucide-react";
+import { Brain, CreditCard, FileText, Lightbulb, PlusIcon, ShieldCheck, Zap } from "lucide-react";
 import { Layout } from "../../Layout";
 import { Box } from "../../components/ui/Box";
+import Button from "../../components/ui/Button";
 
 const features = [
     {
@@ -56,6 +57,9 @@ export const Features: React.FC = () => {
                     <h2 className="font-extrabold text-4xl">Compelling Cover Letters &rarr; Interviews</h2>
                 </div>
             </div>
+            <Button className="mt-10" size="lg" variant="white" IconLucide={PlusIcon}>
+                Join Now
+            </Button>
             <div className="my-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {features.map((feat, index) => (
                     <Box
