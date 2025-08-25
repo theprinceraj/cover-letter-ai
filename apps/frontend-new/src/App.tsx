@@ -16,6 +16,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfService } from "./pages/TermsOfService";
 import { Generator } from "./pages/generator";
+import { BuyCredits } from "./pages/buy-credits";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -50,6 +51,7 @@ function App() {
                         <Route path="/ui" element={<UI />} />
                         <Route path={FRONTEND_ENDPOINTS.LANDING} element={<Landing />} />
                         <Route path={FRONTEND_ENDPOINTS.GENERATOR} element={<Generator />} />
+                        <Route path={FRONTEND_ENDPOINTS.CREDITS_SHOP} element={<BuyCredits />} />
                         <Route path={FRONTEND_ENDPOINTS.CANCELLATION} element={<CancellationAndRefundPolicy />} />
                         <Route path={FRONTEND_ENDPOINTS.CONTACT} element={<ContactUs />} />
                         <Route path={FRONTEND_ENDPOINTS.PRIVACY} element={<PrivacyPolicy />} />

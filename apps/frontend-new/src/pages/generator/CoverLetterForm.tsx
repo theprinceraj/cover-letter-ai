@@ -80,21 +80,10 @@ export const CoverLetterForm: React.FC = () => {
     });
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const [formErrors, setFormErrors] = useState<GeneratorFormErrors>({});
-    const [status, setStatus] = useState<GenerationStatus>("complete");
+    const [status, setStatus] = useState<GenerationStatus>("idle");
     const [apiResponse, setApiResponse] = useState<EvalService_Eval_Response>({
-        coverLetter: `Dear Hiring Manager,
-
-I am excited to apply for the [Job Title] position at [Company Name]. With a strong foundation in software development and hands-on experience in building web applications, I am confident in my ability to contribute effectively to your team.
-
-In my recent projects, I have worked with modern technologies like React, TypeScript, and Node.js to deliver efficient and user-friendly solutions. I enjoy collaborating in fast-paced environments and approaching challenges with creativity and problem-solving skills.
-
-I am eager to bring my passion for learning and building impactful products to [Company Name]. I believe my technical skills and enthusiasm for innovation make me a strong fit for this role.
-
-Thank you for considering my application. I look forward to the opportunity to discuss how I can contribute to your team.
-
-Sincerely,
-[Your Name]`,
-        suggestions: ["testing"],
+        coverLetter: "",
+        suggestions: [],
     });
     const [error, setError] = useState<string | null>(null);
     const { openOnboardModal } = useContext(GlobalContext)!;

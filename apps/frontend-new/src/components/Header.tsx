@@ -67,12 +67,12 @@ const MobileMenu: React.FC<{
 
     const getUsesInfo = useCallback(() => {
         if (auth.user) {
-            return `${auth.user.exhaustedUses}/${auth.user.useLimit} credits`;
+            return `${auth.user.exhaustedUses}/${auth.user.useLimit}`;
         }
         if (auth.guest) {
-            return `${auth.guest.exhaustedUses}/${auth.guest.useLimit} credits`;
+            return `${auth.guest.exhaustedUses}/${auth.guest.useLimit}`;
         }
-        return "0/0 uses";
+        return "0/0";
     }, [auth]);
 
     const handleBuyCreditsButtonClick = useCallback(

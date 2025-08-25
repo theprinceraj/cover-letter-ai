@@ -143,112 +143,107 @@ const PricingCard = memo(
         );
     }
 );
-
 PricingCard.displayName = "PricingCard";
 
-export const PricingCardsList = memo(
-    ({
-        plans,
-        paymentCurrency,
-        setPaymentCurrency,
-        isPaymentMethodsVisible = false,
-        handleCtaBtnClick = () => {},
-        handleRazorpayBuyBtnClick,
-        handlePaypalBuyBtnClick,
-    }: {
-        plans: CreditPlan[];
-        paymentCurrency: ACCEPTED_CURRENCY_CODES;
-        setPaymentCurrency: (arg: ACCEPTED_CURRENCY_CODES) => void;
-        isPaymentMethodsVisible: boolean;
-        handleCtaBtnClick?: () => void;
-        handleRazorpayBuyBtnClick?: (plan: CreditPlan) => void;
-        handlePaypalBuyBtnClick?: (plan: CreditPlan) => void;
-    }) => {
-        const location = useLocation();
+export const PricingCardsList = ({
+    plans,
+    paymentCurrency,
+    setPaymentCurrency,
+    isPaymentMethodsVisible = false,
+    handleCtaBtnClick = () => {},
+    handleRazorpayBuyBtnClick,
+    handlePaypalBuyBtnClick,
+}: {
+    plans: CreditPlan[];
+    paymentCurrency: ACCEPTED_CURRENCY_CODES;
+    setPaymentCurrency: (arg: ACCEPTED_CURRENCY_CODES) => void;
+    isPaymentMethodsVisible: boolean;
+    handleCtaBtnClick?: () => void;
+    handleRazorpayBuyBtnClick?: (plan: CreditPlan) => void;
+    handlePaypalBuyBtnClick?: (plan: CreditPlan) => void;
+}) => {
+    const location = useLocation();
 
-        const isINR = useMemo(() => paymentCurrency === ACCEPTED_CURRENCY_CODES.INR, [paymentCurrency]);
+    const isINR = useMemo(() => paymentCurrency === ACCEPTED_CURRENCY_CODES.INR, [paymentCurrency]);
 
-        const buttonText = useMemo(
-            () => (location.pathname === FRONTEND_ENDPOINTS.CREDITS_SHOP ? "Buy Now" : "Get Started"),
-            [location.pathname]
-        );
+    const buttonText = useMemo(
+        () => (location.pathname === FRONTEND_ENDPOINTS.CREDITS_SHOP ? "Buy Now" : "Get Started"),
+        [location.pathname]
+    );
 
-        const handleCurrencyToggle = useCallback(() => {
-            setPaymentCurrency(isINR ? ACCEPTED_CURRENCY_CODES.USD : ACCEPTED_CURRENCY_CODES.INR);
-        }, [isINR, setPaymentCurrency]);
+    const handleCurrencyToggle = useCallback(() => {
+        setPaymentCurrency(isINR ? ACCEPTED_CURRENCY_CODES.USD : ACCEPTED_CURRENCY_CODES.INR);
+    }, [isINR, setPaymentCurrency]);
 
-        const toggleClasses = useMemo(
-            () => `relative w-12 h-6 rounded-full transition-colors ${isINR ? "bg-orange-500" : "bg-neutral-400"}`,
-            [isINR]
-        );
+    const toggleClasses = useMemo(
+        () => `relative w-12 h-6 rounded-full transition-colors ${isINR ? "bg-orange-500" : "bg-neutral-400"}`,
+        [isINR]
+    );
 
-        const toggleButtonClasses = useMemo(
-            () =>
-                `absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                    isINR ? "translate-x-1" : "translate-x-7"
-                }`,
-            [isINR]
-        );
+    const toggleButtonClasses = useMemo(
+        () =>
+            `absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                isINR ? "translate-x-1" : "translate-x-7"
+            }`,
+        [isINR]
+    );
 
-        const createHandlers = useCallback(
-            (plan: CreditPlan) => ({
-                onCtaClick: () => handleCtaBtnClick(),
-                onRazorpayClick: () => handleRazorpayBuyBtnClick?.(plan),
-                onPaypalClick: () => handlePaypalBuyBtnClick?.(plan),
-            }),
-            [handleCtaBtnClick, handleRazorpayBuyBtnClick, handlePaypalBuyBtnClick]
-        );
+    const createHandlers = useCallback(
+        (plan: CreditPlan) => ({
+            onCtaClick: () => handleCtaBtnClick(),
+            onRazorpayClick: () => handleRazorpayBuyBtnClick?.(plan),
+            onPaypalClick: () => handlePaypalBuyBtnClick?.(plan),
+        }),
+        [handleCtaBtnClick, handleRazorpayBuyBtnClick, handlePaypalBuyBtnClick]
+    );
 
-        return (
-            <>
-                {/* Currency Toggle */}
-                <div className="flex items-center justify-center space-x-4 mb-16">
-                    <span className={`text-sm font-medium ${isINR ? "text-orange-500" : "text-neutral-500"}`}>
-                        INR (&#8377;)
-                    </span>
-                    <button
-                        onClick={handleCurrencyToggle}
-                        className={toggleClasses}
-                        aria-label={`Switch to ${isINR ? "USD" : "INR"} currency`}>
-                        <div className={toggleButtonClasses} />
-                    </button>
-                    <span className={`text-sm font-medium ${!isINR ? "text-orange-500" : "text-neutral-500"}`}>
-                        USD (&#36;)
-                    </span>
-                </div>
+    return (
+        <>
+            {/* Currency Toggle */}
+            <div className="flex items-center justify-center space-x-4 mb-16">
+                <span className={`text-sm font-medium ${isINR ? "text-orange-500" : "text-neutral-500"}`}>
+                    INR (&#8377;)
+                </span>
+                <button
+                    onClick={handleCurrencyToggle}
+                    className={toggleClasses}
+                    aria-label={`Switch to ${isINR ? "USD" : "INR"} currency`}>
+                    <div className={toggleButtonClasses} />
+                </button>
+                <span className={`text-sm font-medium ${!isINR ? "text-orange-500" : "text-neutral-500"}`}>
+                    USD (&#36;)
+                </span>
+            </div>
 
-                <div className="grid md:grid-cols-3 gap-8 md:gap-4 lg:gap-8 max-w-5xl mx-auto">
-                    {plans.map((plan) => {
-                        const handlers = createHandlers(plan);
-                        return (
-                            <PricingCard
-                                key={plan.id}
-                                plan={plan}
-                                isINR={isINR}
-                                isPaymentMethodsVisible={isPaymentMethodsVisible}
-                                buttonText={buttonText}
-                                onCtaClick={handlers.onCtaClick}
-                                onRazorpayClick={handlers.onRazorpayClick}
-                                onPaypalClick={handlers.onPaypalClick}
-                            />
-                        );
-                    })}
-                </div>
+            <div className="grid md:grid-cols-3 gap-8 md:gap-4 lg:gap-8 max-w-5xl mx-auto">
+                {plans.map((plan) => {
+                    const handlers = createHandlers(plan);
+                    return (
+                        <PricingCard
+                            key={plan.id}
+                            plan={plan}
+                            isINR={isINR}
+                            isPaymentMethodsVisible={isPaymentMethodsVisible}
+                            buttonText={buttonText}
+                            onCtaClick={handlers.onCtaClick}
+                            onRazorpayClick={handlers.onRazorpayClick}
+                            onPaypalClick={handlers.onPaypalClick}
+                        />
+                    );
+                })}
+            </div>
 
-                <div className="text-center mt-12">
-                    <p className="text-secondary-600">
-                        Need more credits?{" "}
-                        <Link
-                            to={FRONTEND_ENDPOINTS.CONTACT}
-                            className="text-orange-500 hover:underline focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
-                            Contact us
-                        </Link>{" "}
-                        for custom pricing.
-                    </p>
-                </div>
-            </>
-        );
-    }
-);
-
-PricingCardsList.displayName = "PricingCardsList";
+            <div className="text-center mt-12">
+                <p className="text-secondary-600">
+                    Need more credits?{" "}
+                    <Link
+                        to={FRONTEND_ENDPOINTS.CONTACT}
+                        className="text-orange-500 hover:underline focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded">
+                        Contact us
+                    </Link>{" "}
+                    for custom pricing.
+                </p>
+            </div>
+        </>
+    );
+};

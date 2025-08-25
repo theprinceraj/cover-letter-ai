@@ -16,7 +16,6 @@ export interface CreditPlan {
     priceInUSD_Cents: number;
     popular?: boolean;
     icon: LucideIcon;
-    color: string;
     features: string[];
 }
 
@@ -42,7 +41,6 @@ export const useCreditPlans = () => {
                         data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.BASIC)
                             ?.priceInUSD_Cents ?? 0,
                     icon: Star,
-                    color: "bg-green-500",
                     features: [
                         "10 AI-generated cover letters",
                         "Industry-specific customization",
@@ -61,7 +59,6 @@ export const useCreditPlans = () => {
                         data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.STANDARD)
                             ?.priceInUSD_Cents ?? 0,
                     icon: Zap,
-                    color: "bg-primary-500",
                     popular: true,
                     features: [
                         "30 AI-generated cover letters",
@@ -80,7 +77,6 @@ export const useCreditPlans = () => {
                         data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.PREMIUM)
                             ?.priceInUSD_Cents ?? 0,
                     icon: Crown,
-                    color: "bg-orange-500",
                     features: [
                         "50 AI-generated cover letters",
                         "Industry-specific customization",
