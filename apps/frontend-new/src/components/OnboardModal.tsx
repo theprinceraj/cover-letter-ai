@@ -65,6 +65,7 @@ export const OnboardModal: React.FC = () => {
             toast.success("Logged in as a guest");
             if (location.pathname === FRONTEND_ENDPOINTS.LANDING) navigate(FRONTEND_ENDPOINTS.GENERATOR);
         } catch (error) {
+            console.error(error);
             setApiError(error instanceof Error ? error.message : "Authentication failed");
         }
     };
@@ -117,7 +118,6 @@ export const OnboardModal: React.FC = () => {
                     <SignInModalButton
                         variant="white"
                         disabled={true}
-                        onClick={() => {}}
                         IconElement={<GoogleIcon className="size-5" />}
                         text="Sign In (Coming Soon)"
                     />
@@ -149,6 +149,7 @@ interface SignInModalButtonProps extends Omit<ButtonProps, "children"> {
     type?: "submit" | "reset" | "button" | undefined;
     IconElement?: React.ReactNode;
     text: string;
+    onClick?: () => Promise<void>;
 }
 
 const SignInModalButton = ({

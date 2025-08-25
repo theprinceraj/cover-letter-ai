@@ -88,7 +88,7 @@ const MobileMenu: React.FC<{
 
     return (
         <div
-            className={`absolute top-20 right-[50%] translate-x-[50%] md:right-[5%] md:-translate-x-0 lg:right-[2%] bg-white w-[80vw] md:w-[33vw] lg:w-[25vw] rounded-xl p-6 flex flex-col space-y-4 items-center justify-center transition-all duration-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
+            className={`absolute z-50 top-20 right-[50%] translate-x-[50%] md:right-[5%] md:-translate-x-0 lg:right-[2%] bg-white w-[80vw] md:w-[33vw] lg:w-[25vw] rounded-xl p-6 flex flex-col space-y-4 items-center justify-center transition-all duration-200 ${isOpen ? "opacity-100" : "opacity-0"}`}>
             <div className="flex justify-center items-center space-x-5 md:space-x-3">
                 <div className="bg-primary/30 rounded-full p-4 md:p-2">
                     <UserIcon className="size-6 md:size-7" />

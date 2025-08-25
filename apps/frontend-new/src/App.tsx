@@ -15,7 +15,7 @@ import { ContactUs } from "./pages/ContactUs";
 import { HelmetProvider } from "react-helmet-async";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfService } from "./pages/TermsOfService";
-import { EmailVerifyModal } from "./components/EmailVerifyModal";
+import { Generator } from "./pages/generator";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -49,12 +49,12 @@ function App() {
                     <Routes>
                         <Route path="/ui" element={<UI />} />
                         <Route path={FRONTEND_ENDPOINTS.LANDING} element={<Landing />} />
+                        <Route path={FRONTEND_ENDPOINTS.GENERATOR} element={<Generator />} />
                         <Route path={FRONTEND_ENDPOINTS.CANCELLATION} element={<CancellationAndRefundPolicy />} />
                         <Route path={FRONTEND_ENDPOINTS.CONTACT} element={<ContactUs />} />
                         <Route path={FRONTEND_ENDPOINTS.PRIVACY} element={<PrivacyPolicy />} />
                         <Route path={FRONTEND_ENDPOINTS.TERMS} element={<TermsOfService />} />
                     </Routes>
-                    <EmailVerifyModal />
                     <OnboardModal />
                     <Toaster richColors />
                 </AuthContext>
