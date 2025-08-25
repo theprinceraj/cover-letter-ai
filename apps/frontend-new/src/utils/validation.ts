@@ -1,9 +1,11 @@
 import {
+    MAX_JOB_DESCRIPTION_LENGTH,
+    MIN_JOB_DESCRIPTION_LENGTH,
     PASSWORD_MAX_LENGTH,
     PASSWORD_MIN_LENGTH,
     PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX,
 } from "@cover-letter-ai/constants";
-import type { SignInFormErrors } from "../types";
+import type { GeneratorFormErrors, GeneratorFormValues, SignInFormErrors } from "../types";
 
 export const validateSignInForm = (email: string | null, password: string | null): SignInFormErrors => {
     const errors: SignInFormErrors["errors"] = { email: [], password: [] };
@@ -50,4 +52,29 @@ export const validateSignInForm = (email: string | null, password: string | null
         },
         isValid: errors.password.length === 0 && errors.email.length === 0,
     };
+};
+
+export const validateGeneratorForm = (values: GeneratorFormValues): GeneratorFormErrors => {
+    const errors: GeneratorFormErrors = {};
+
+    // Job description validation
+    if (!values.jobDescription) {
+        errors.jobDescription = "Job description is required";
+    } else if (values.jobDescription.length < MIN_JOB_DESCRIPTION_LENGTH) {
+        errors.jobDescription = `Job description must be at least ${MIN_JOB_DESCRIPTION_LENGTH} characters`;
+    } else if (values.jobDescription.length > MAX_JOB_DESCRIPTION_LENGTH) {
+        errors.jobDescription = `Job description must be less than ${MAX_JOB_DESCRIPTION_LENGTH} characters`;
+    }
+
+    // Resume validation
+    if (values.resume) {
+        const fileType = values.resume.type;
+        const validTypes = ["application/pdf"];
+
+        if (!validTypes.includes(fileType)) {
+            errors.resume = "Please upload a PDF file";
+        }
+    }
+
+    return errors;
 };

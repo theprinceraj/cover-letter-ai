@@ -45,7 +45,9 @@ const MenuButton: React.FC<{ navigate: NavigateFunction; location: Location; aut
         <button onClick={toggleMenuVisibility}>
             <button className="cursor-pointer">{isOpen ? <XIcon /> : <MenuIcon />}</button>
 
-            <MobileMenu navigate={navigate} isOpen={isOpen} setIsOpen={setIsOpen} location={location} auth={auth} />
+            {isOpen && (
+                <MobileMenu navigate={navigate} isOpen={isOpen} setIsOpen={setIsOpen} location={location} auth={auth} />
+            )}
         </button>
     );
 };

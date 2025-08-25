@@ -178,7 +178,6 @@ export const useAuth = (): UseAuthReturn => {
     const loginGuest = useCallback(async () => {
         try {
             setAuthState((prev) => ({ ...prev, isLoading: true }));
-
             const response = await api.post("/auth/login/guest");
             const { access_token, guest } = response.data as AuthService_LoginGuest_Response;
 
@@ -193,6 +192,7 @@ export const useAuth = (): UseAuthReturn => {
                 isLoading: false,
             }));
         } catch (error) {
+            console.error(error);
             setAuthState((prev) => ({ ...prev, isLoading: false }));
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data?.message || "Guest login failed");
