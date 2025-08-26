@@ -1,38 +1,38 @@
 {
-  "name": "frontend",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@cover-letter-ai/constants": "*",
-    "@cover-letter-ai/eslint-config": "*",
-    "@cover-letter-ai/ts-config": "*",
-    "@paypal/react-paypal-js": "^8.8.3",
-    "@tailwindcss/vite": "^4.1.8",
-    "@vercel/analytics": "^1.5.0",
-    "axios": "^1.9.0",
-    "lucide-react": "^0.511.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-helmet-async": "^2.0.5",
-    "react-razorpay": "^3.0.1",
-    "react-router-dom": "^7.6.3",
-    "react-turnstile": "^1.1.4",
-    "sonner": "^2.0.6",
-    "tailwindcss": "^4.1.8"
-  },
-  "devDependencies": {
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
-    "@vitejs/plugin-react-swc": "^3.9.0",
-    "typescript": "~5.8.3",
-    "vite": "^6.3.5",
-    "vite-plugin-svgr": "^4.3.0"
-  }
+    "name": "frontend",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@cover-letter-ai/constants": "*",
+        "@cover-letter-ai/eslint-config": "*",
+        "@cover-letter-ai/ts-config": "*",
+        "@paypal/react-paypal-js": "^8.8.3",
+        "@tailwindcss/vite": "^4.1.8",
+        "@vercel/analytics": "^1.5.0",
+        "axios": "^1.9.0",
+        "lucide-react": "^0.511.0",
+        "react": "^19.1.0",
+        "react-dom": "^19.1.0",
+        "react-helmet-async": "^2.0.5",
+        "react-razorpay": "^3.0.1",
+        "react-router-dom": "^7.6.3",
+        "react-turnstile": "^1.1.4",
+        "sonner": "^2.0.6",
+        "tailwindcss": "^4.1.8"
+    },
+    "devDependencies": {
+        "@types/react": "^19.1.2",
+        "@types/react-dom": "^19.1.2",
+        "@vitejs/plugin-react-swc": "^3.9.0",
+        "typescript": "~5.8.3",
+        "vite": "^6.3.5",
+        "vite-plugin-svgr": "^4.3.0"
+    }
 }

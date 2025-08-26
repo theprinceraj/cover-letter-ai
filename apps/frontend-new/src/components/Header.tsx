@@ -42,13 +42,13 @@ const MenuButton: React.FC<{ navigate: NavigateFunction; location: Location; aut
     }, [setIsOpen, isOpen]);
 
     return (
-        <button onClick={toggleMenuVisibility}>
-            <button className="cursor-pointer">{isOpen ? <XIcon /> : <MenuIcon />}</button>
+        <div onClick={toggleMenuVisibility}>
+            <span className="cursor-pointer">{isOpen ? <XIcon /> : <MenuIcon />}</span>
 
             {isOpen && (
                 <MobileMenu navigate={navigate} isOpen={isOpen} setIsOpen={setIsOpen} location={location} auth={auth} />
             )}
-        </button>
+        </div>
     );
 };
 
