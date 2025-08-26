@@ -44,7 +44,7 @@ const TestimonialCard: React.FC<
         handleRightClick: () => void;
         variant?: TestimonialProps["variant"];
     }
-> = ({ img, text, author, variant = "white", handleLeftClick, handleRightClick }) => {
+> = ({ img, text, author, handleLeftClick, handleRightClick }) => {
     const truncatedText = text.substring(0, 150) + (text.length > 100 ? "..." : "");
     const baseStyle = `px-4 py-10 lg:px-14 lg:py-20 rounded-4xl flex flex-col justify-center items-center space-y-10 lg:flex-row`;
 
