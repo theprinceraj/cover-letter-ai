@@ -1,11 +1,11 @@
 import { createContext } from "react";
 import type { UseAuthReturn } from "./hooks/useAuth";
-import { ACCEPTED_CURRENCY_CODES } from "@cover-letter-ai/constants";
+import type { ACCEPTED_CURRENCY_CODES } from "@cover-letter-ai/constants";
 
 interface GlobalContextType {
-    isSignInModalOpen: boolean;
-    openSignInModal: () => void;
-    closeSignInModal: () => void;
+    isOnboardModalOpen: boolean;
+    openOnboardModal: () => void;
+    closeOnboardModal: () => void;
     paymentCurrency: ACCEPTED_CURRENCY_CODES;
     setPaymentCurrency: (arg: ACCEPTED_CURRENCY_CODES) => void;
 }

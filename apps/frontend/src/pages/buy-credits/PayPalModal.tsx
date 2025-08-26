@@ -1,8 +1,8 @@
 import { type PayPalButtonsComponentProps, type ReactPayPalScriptOptions } from "@paypal/react-paypal-js";
 import { lazy, memo, Suspense, useMemo } from "react";
 import { toast } from "sonner";
-import { Modal } from "../ui/Modal";
-import { Spinner } from "../ui/Spinner";
+import { Modal } from "../../components/ui/Modal";
+import { Spinner } from "../../components/ui/Spinner";
 
 // Lazy load PayPal components to reduce initial bundle size
 const PayPalScriptProvider = lazy(() =>

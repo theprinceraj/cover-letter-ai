@@ -1,25 +1,26 @@
-import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
-import { UserCheck2Icon } from "lucide-react";
-import GoogleIcon from "../assets/google-icon.svg?react";
 import { useContext, useState } from "react";
-import { Button, type ButtonProps } from "./ui/Button";
-import { Modal } from "./ui/Modal";
-import { validateSignInForm } from "../utils/validation";
-import type { SignInFormErrors } from "../types";
+import GoogleIcon from "../assets/google-icon.svg?react";
 import { AuthContext, GlobalContext } from "../Contexts";
-import { EmailVerificationForm } from "./EmailVerificationForm";
-import { toast } from "sonner";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Modal } from "./ui/Modal";
+import { useLocation, useNavigate } from "react-router";
+import type { SignInFormErrors } from "../types";
+import { validateSignInForm } from "../utils/validation";
 import { FRONTEND_ENDPOINTS } from "../constants";
+import { toast } from "sonner";
+import Button, { type ButtonProps } from "./ui/Button";
+import { UserCheck2Icon } from "lucide-react";
+import { DEFAULT_USE_LIMIT_FOR_GUEST } from "@cover-letter-ai/constants";
+import { EmailVerificationForm } from "./EmailVerificationForm";
 
-export const SignInModal = () => {
+export const OnboardModal: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSignUp, setIsSignUp] = useState(false);
     const [apiError, setApiError] = useState<string | null>(null);
+
     const { isLoading, login, signup, loginGuest, isEmailVerificationModalOpen, setIsEmailVerificationModalOpen } =
         useContext(AuthContext)!;
-    const { isSignInModalOpen, closeSignInModal } = useContext(GlobalContext)!;
+    const { isOnboardModalOpen, closeOnboardModal } = useContext(GlobalContext)!;
 
     const handleInputOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { errors, isValid } =
@@ -50,7 +51,7 @@ export const SignInModal = () => {
                 toast.success("Logged in successfully");
                 if (location.pathname === FRONTEND_ENDPOINTS.LANDING) navigate(FRONTEND_ENDPOINTS.GENERATOR);
             }
-            closeSignInModal();
+            closeOnboardModal();
         } catch (error) {
             setApiError(error instanceof Error ? error.message : "Authentication failed");
         }
@@ -60,18 +61,18 @@ export const SignInModal = () => {
         try {
             setApiError(null);
             await loginGuest();
-            closeSignInModal();
+            closeOnboardModal();
             toast.success("Logged in as a guest");
             if (location.pathname === FRONTEND_ENDPOINTS.LANDING) navigate(FRONTEND_ENDPOINTS.GENERATOR);
         } catch (error) {
+            console.error(error);
             setApiError(error instanceof Error ? error.message : "Authentication failed");
         }
     };
 
     return (
         <>
-            {/* Sign In Modal */}
-            <Modal isOpen={isSignInModalOpen} onClose={closeSignInModal} title={isSignUp ? "Sign Up" : "Sign In"}>
+            <Modal isOpen={isOnboardModalOpen} onClose={closeOnboardModal} title={isSignUp ? "Sign Up" : "Sign In"}>
                 <form className="text-slate-900" onSubmit={handleSignInFormSubmit}>
                     <div className="flex flex-col gap-4">
                         {apiError && <div className="text-red-500 text-sm text-center">{apiError}</div>}
@@ -96,7 +97,7 @@ export const SignInModal = () => {
                         <SignInModalButton
                             type="submit"
                             isLoading={isLoading}
-                            variant="primary"
+                            variant="yellow"
                             text={isLoading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
                         />
                     </div>
@@ -112,19 +113,18 @@ export const SignInModal = () => {
 
                 <hr className="my-5 text-slate-300/30" />
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col space-y-4">
                     {/* Google Login */}
                     <SignInModalButton
-                        variant="outline"
+                        variant="white"
                         disabled={true}
-                        onClick={() => {}}
                         IconElement={<GoogleIcon className="size-5" />}
                         text="Sign In (Coming Soon)"
                     />
 
                     {/* Guest Login */}
                     <SignInModalButton
-                        variant="secondary"
+                        variant="white"
                         isLoading={isLoading}
                         onClick={handleGuestLogin}
                         IconElement={<UserCheck2Icon className="size-5" />}
@@ -146,13 +146,23 @@ export const SignInModal = () => {
 };
 
 interface SignInModalButtonProps extends Omit<ButtonProps, "children"> {
+    type?: "submit" | "reset" | "button" | undefined;
     IconElement?: React.ReactNode;
     text: string;
+    onClick?: () => Promise<void>;
 }
 
-const SignInModalButton = ({ variant, IconElement, text, isLoading, disabled, onClick }: SignInModalButtonProps) => {
+const SignInModalButton = ({
+    variant,
+    IconElement,
+    text,
+    isLoading,
+    disabled,
+    onClick,
+    type,
+}: SignInModalButtonProps) => {
     return (
-        <Button variant={variant} fullWidth={true} disabled={disabled} isLoading={isLoading} onClick={onClick}>
+        <Button variant={variant} disabled={disabled} isLoading={isLoading} onClick={onClick} type={type}>
             <p className="flex items-center justify-center gap-2">
                 {IconElement}
                 <span className="text-sm sm:text-md">{text}</span>

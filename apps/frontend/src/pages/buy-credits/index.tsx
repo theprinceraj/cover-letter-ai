@@ -9,19 +9,17 @@ import { useRazorpay, type RazorpayOrderOptions } from "react-razorpay";
 import type { CurrencyCode } from "react-razorpay/dist/constants/currency";
 import { toast } from "sonner";
 import { useCallback, useContext, useState, useMemo, memo } from "react";
-import { AuthContext, GlobalContext } from "../Contexts";
-import { useCreditPlans, type CreditPlan } from "../hooks/useCreditPlans";
-import { Footer } from "../components/Footer";
-import { Button } from "../components/ui/Button";
-import { Modal } from "../components/ui/Modal";
-import { Spinner } from "../components/ui/Spinner";
-import { Header } from "../components/Header";
-import { HeroTemplate } from "../components/ui/HeroTemplate";
-import { PricingCardsList } from "../components/ui/PricingCardsList";
-import { SEO } from "../components/seo/SEO";
+import { AuthContext, GlobalContext } from "../../Contexts";
+import { useCreditPlans, type CreditPlan } from "../../hooks/useCreditPlans";
+import Button from "../../components/ui/Button";
+import { Modal } from "../../components/ui/Modal";
+import { Spinner } from "../../components/ui/Spinner";
+import { PricingCardsList } from "../../components/ui/PricingCardsList";
+import { SEO } from "../../components/ui/seo";
 import { type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
-import { PayPalModal } from "../components/credits-shop/PayPalModal";
-import { PaymentStatusModal } from "../components/credits-shop/PaymentStatusModal";
+import { PayPalModal } from "./PayPalModal";
+import { PaymentStatusModal } from "./PaymentStatusModal";
+import { Layout } from "../../Layout";
 
 type CreateOrderFn = NonNullable<PayPalButtonsComponentProps["createOrder"]>;
 type onApprovedPaymentFn = NonNullable<PayPalButtonsComponentProps["onApprove"]>;
@@ -32,14 +30,11 @@ interface RazorpaySuccessfulPaymentResponse {
     razorpay_payment_id: string;
 }
 
-export const CreditsShop: React.FC = memo(() => {
+export const BuyCredits: React.FC = memo(() => {
     const { isAuthenticated, isGuest, isEmailVerified, fetchWithAuth, refreshAuth } = useContext(AuthContext)!;
-
-    const { openSignInModal, paymentCurrency, setPaymentCurrency } = useContext(GlobalContext)!;
-
+    const { openOnboardModal, paymentCurrency, setPaymentCurrency } = useContext(GlobalContext)!;
     const { creditPlans } = useCreditPlans();
     const { error, isLoading, Razorpay } = useRazorpay();
-
     const [isPaymentMethodsVisible, setIsPaymentMethodsVisible] = useState<boolean>(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
     const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | null>(null);
@@ -155,13 +150,14 @@ export const CreditsShop: React.FC = memo(() => {
 
     const handleRazorpayBuyBtnClick = useCallback(
         (plan: CreditPlan) => {
-            if (!purchaseInfo.isAuthenticated) {
-                openSignInModal();
-                toast.error("Please sign in using your email to buy credits");
+            console.log(purchaseInfo);
+            if (purchaseInfo.isGuest) {
+                toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
                 return;
             }
-            if (!purchaseInfo.isGuest) {
-                toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
+            if (!purchaseInfo.isAuthenticated) {
+                openOnboardModal();
+                toast.error("Please sign in using your email to buy credits");
                 return;
             }
             if (!purchaseInfo.isEmailVerified) {
@@ -170,7 +166,7 @@ export const CreditsShop: React.FC = memo(() => {
             }
             handleRazorpayPurchase(plan, ACCEPTED_CURRENCY_CODES.INR);
         },
-        [purchaseInfo, openSignInModal, handleRazorpayPurchase]
+        [purchaseInfo, openOnboardModal, handleRazorpayPurchase]
     );
 
     // PayPal Related Functions
@@ -178,7 +174,7 @@ export const CreditsShop: React.FC = memo(() => {
         (plan: CreditPlan) => {
             if (!purchaseInfo.canBuy) {
                 if (!purchaseInfo.isAuthenticated) {
-                    openSignInModal();
+                    openOnboardModal();
                     toast.error("Please sign in using your email to buy credits");
                 } else if (!purchaseInfo.isGuest) {
                     toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
@@ -190,7 +186,7 @@ export const CreditsShop: React.FC = memo(() => {
             setSelectedPlan(plan);
             setIsPaypalBtnsVisible(true);
         },
-        [purchaseInfo, openSignInModal]
+        [purchaseInfo, openOnboardModal]
     );
 
     const handlePaypalCreateOrder: CreateOrderFn = useCallback(async () => {
@@ -245,18 +241,14 @@ export const CreditsShop: React.FC = memo(() => {
         [fetchWithAuth]
     );
 
-    const handlePaymentMethodsToggle = useCallback(() => {
-        setIsPaymentMethodsVisible((prev) => !prev);
-    }, []);
+    const handlePaymentMethodsToggle = useCallback(() => setIsPaymentMethodsVisible((prev) => !prev), []);
 
-    const handleClosePaypalModal = useCallback(() => {
+    const handleClosePaypalModal = () => {
         setIsPaypalBtnsVisible(false);
         setSelectedPlan(null);
-    }, []);
+    };
 
-    const handleCloseErrorModal = useCallback(() => {
-        setIsErrorModalOpen(false);
-    }, []);
+    const handleCloseErrorModal = () => setIsErrorModalOpen(false);
 
     const handlePaymentStatusButtonClick = useCallback(() => {
         setIsPaymentStatusModalOpen(false);
@@ -266,9 +258,7 @@ export const CreditsShop: React.FC = memo(() => {
         }
     }, [isPaymentSuccess, refreshAuth]);
 
-    const handleClosePaymentStatusModal = useCallback(() => {
-        setIsPaymentStatusModalOpen(false);
-    }, []);
+    const handleClosePaymentStatusModal = () => setIsPaymentStatusModalOpen(false);
 
     const isLoadingState = useMemo(() => isLoading && creditPlans.length === 0, [isLoading, creditPlans.length]);
 
@@ -301,54 +291,50 @@ export const CreditsShop: React.FC = memo(() => {
                 name="CoverGenius AI"
                 type="website"
             />
-            <Header />
-            <HeroTemplate>
-                <>
-                    <h1 className="text-3xl text-slate-950 font-bold mb-16 md:mb-24 text-center">Buy Credits Now</h1>
-                    <div className="w-full pb-16">
-                        {isLoadingState ? (
-                            <div className="flex justify-center items-center h-full">
-                                <Spinner size="xl" />
-                            </div>
-                        ) : (
-                            creditPlans && <PricingCardsList {...pricingCardsProps} />
-                        )}
-                    </div>
-
-                    {/* PayPal Modal */}
-                    <PayPalModal
-                        isVisible={isPaypalBtnsVisible}
-                        onClose={handleClosePaypalModal}
-                        currency={paymentCurrency}
-                        clientId={envVars.paypalClientId}
-                        environment={envVars.environment}
-                        onCreateOrder={handlePaypalCreateOrder}
-                        onApprove={handlePaypalPaymentSuccess}
-                        onError={handlePaymentFailure}
-                    />
-
-                    {/* Payment Status Modal */}
-                    <PaymentStatusModal
-                        isOpen={isPaymentStatusModalOpen}
-                        onClose={handleClosePaymentStatusModal}
-                        isSuccess={isPaymentSuccess}
-                        onButtonClick={handlePaymentStatusButtonClick}
-                    />
-
-                    {/* Razorpay Error Modal */}
-                    {error && (
-                        <Modal isOpen={isErrorModalOpen} onClose={handleCloseErrorModal} title="Error Occurred">
-                            <div className="text-red-500">Failed to load Razorpay. Please try again later.</div>
-                            <Button variant="primary" onClick={handleCloseErrorModal}>
-                                Close
-                            </Button>
-                        </Modal>
+            <Layout hasHeader hasFooter className="bg-primary" containerClassName="md:px-0">
+                <h1 className="text-3xl text-dark font-bold my-16 lg:-mt-5 lg:mb-10 text-center">Buy Credits Now</h1>
+                <div className="w-full pb-16 lg:pb-0">
+                    {isLoadingState ? (
+                        <div className="flex justify-center items-center h-full">
+                            <Spinner size="xl" />
+                        </div>
+                    ) : (
+                        creditPlans && <PricingCardsList {...pricingCardsProps} />
                     )}
-                </>
-            </HeroTemplate>
-            <Footer />
+                </div>
+
+                {/* PayPal Modal */}
+                <PayPalModal
+                    isVisible={isPaypalBtnsVisible}
+                    onClose={handleClosePaypalModal}
+                    currency={paymentCurrency}
+                    clientId={envVars.paypalClientId}
+                    environment={envVars.environment}
+                    onCreateOrder={handlePaypalCreateOrder}
+                    onApprove={handlePaypalPaymentSuccess}
+                    onError={handlePaymentFailure}
+                />
+
+                {/* Payment Status Modal */}
+                <PaymentStatusModal
+                    isOpen={isPaymentStatusModalOpen}
+                    onClose={handleClosePaymentStatusModal}
+                    isSuccess={isPaymentSuccess}
+                    onButtonClick={handlePaymentStatusButtonClick}
+                />
+
+                {/* Razorpay Error Modal */}
+                {error && (
+                    <Modal isOpen={isErrorModalOpen} onClose={handleCloseErrorModal} title="Error Occurred">
+                        <div className="text-red-500">Failed to load Razorpay. Please try again later.</div>
+                        <Button variant="yellow" onClick={handleCloseErrorModal}>
+                            Close
+                        </Button>
+                    </Modal>
+                )}
+            </Layout>
         </>
     );
 });
 
-CreditsShop.displayName = "CreditsShop";
+BuyCredits.displayName = "BuyCredits";

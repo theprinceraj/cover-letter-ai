@@ -1,81 +1,85 @@
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline";
-  size?: "sm" | "md" | "lg";
-  isLoading?: boolean;
-  fullWidth?: boolean;
-  ref?: React.RefObject<HTMLButtonElement>;
-  children: React.ReactNode;
+import { MoveRightIcon, type LucideIcon } from "lucide-react";
+import type { PropsWithChildren } from "react";
+
+const ButtonVariants = {
+    white: "white",
+    dark: "dark",
+    yellow: "yellow",
+} as const;
+type ButtonVariants = (typeof ButtonVariants)[keyof typeof ButtonVariants];
+
+const ButtonSizes = {
+    sm: "py-1.5 px-4 text-sm",
+    md: "py-2 md:py-3 px-5 md:px-7 text-base md:text-lg",
+    lg: "py-3 md:py-4 lg:py-6 px-6 md:px-9 lg:px-10 text-lg md:text-xl lg:text-2xl",
+} as const;
+type ButtonSize = keyof typeof ButtonSizes;
+
+export interface ButtonProps {
+    variant?: ButtonVariants;
+    size?: ButtonSize;
+    isLoading?: boolean;
+    className?: string;
+    disabled?: boolean;
+    IconLucide?: LucideIcon;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  size = "md",
-  isLoading = false,
-  fullWidth = false,
-  ref,
-  children,
-  className = "",
-  disabled = false,
-  ...props
-}) => {
-  const baseStyles =
-    "inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
-
-  const variantStyles = {
-    primary:
-      "bg-primary-500 text-white shadow-soft hover:bg-primary-600 hover:shadow-medium focus:ring-primary-500 focus:ring-offset-primary-500",
-    secondary:
-      "bg-orange-500 text-white shadow-soft hover:bg-orange-600 hover:shadow-medium focus:ring-orange-500 focus:ring-offset-orange-500",
-    outline:
-      "border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white hover:shadow-medium focus:ring-purple-500 focus:ring-offset-purple-500",
-  };
-
-  const sizeStyles = {
-    sm: "text-sm py-2 px-3",
-    md: "text-base py-2.5 px-5",
-    lg: "text-lg py-3 px-6",
-  };
-
-  const cursorStyle =
-    disabled || isLoading ? "cursor-not-allowed" : "cursor-pointer";
-  const widthStyle = fullWidth ? "w-full" : "";
-  const disabledStyle = disabled || isLoading ? "opacity-50" : "";
-
-  return (
-    <button
-      className={`${baseStyles} ${cursorStyle} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${disabledStyle} ${className}`}
-      disabled={disabled || isLoading}
-      ref={ref}
-      {...props}
-    >
-      {isLoading ? (
-        <div className="flex items-center">
-          <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
-          Processing...
-        </div>
-      ) : (
-        children
-      )}
-    </button>
-  );
+const baseStyles = "group font-bold flex justify-between gap-2 items-center rounded-full duration-200";
+const variantStyles = {
+    yellow: "bg-primary",
+    white: "bg-white text-dark outline-2 outline-primary hover:shadow-[8px_8px_0_0_theme('colors.primary')]",
+    dark: "text-white bg-dark outline-2 outline-white hover:shadow-[8px_8px_0_0_#fff]",
 };
+
+const Button: React.FC<PropsWithChildren<ButtonProps & React.ButtonHTMLAttributes<HTMLButtonElement>>> = ({
+    children,
+    variant = ButtonVariants.yellow,
+    size = "md",
+    isLoading = false,
+    disabled = false,
+    onClick = () => {},
+    className = "",
+    IconLucide,
+    ...props
+}) => {
+    const styles = [baseStyles, ButtonSizes[size], variantStyles[variant], className].join(" ");
+    const loaderStyles = `animate-spin size-4 ${"text-" + variant === ButtonVariants.yellow ? `primary` : variant}`;
+    const cursorStyle = disabled || isLoading ? "hover:cursor-not-allowed" : "hover:cursor-pointer";
+    const disabledStyles = disabled || isLoading ? "hover:cursor-not-allowed opacity-50" : "";
+    const iconStyles = `transition-transform group-hover:rotate-90 ${
+        size === "sm" ? "size-4" : size === "md" ? "size-5" : "size-7"
+    }`;
+
+    return (
+        <button
+            className={`${styles} ${cursorStyle} ${disabledStyles}`}
+            onClick={onClick}
+            disabled={disabled}
+            {...props}>
+            {isLoading ? (
+                <div className="flex items-center">
+                    <svg className={loaderStyles} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"></circle>
+                        <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
+            ) : (
+                <>
+                    {children && <span>{children}</span>}
+                    {IconLucide ? <IconLucide /> : <MoveRightIcon className={iconStyles} />}
+                </>
+            )}
+        </button>
+    );
+};
+
+export default Button;
