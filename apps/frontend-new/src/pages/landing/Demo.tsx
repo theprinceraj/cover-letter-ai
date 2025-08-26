@@ -88,7 +88,7 @@ export const Demo: React.FC = () => {
 
     return (
         <Layout className="bg-primary">
-            <div className="max-w-4xl mx-auto py-8">
+            <section id="demo" className="max-w-4xl mx-auto py-8">
                 <div>
                     <h5 className="text-dark text-xl font-extrabold">AI-powered Cover Letter Assistant</h5>
                     <div className="my-2">
@@ -160,7 +160,7 @@ export const Demo: React.FC = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </Layout>
     );
 };

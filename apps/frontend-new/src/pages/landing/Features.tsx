@@ -51,27 +51,29 @@ const features = [
 export const Features: React.FC = () => {
     return (
         <Layout className="bg-dark text-white">
-            <div className="mt-10">
-                <h5 className="text-primary text-xl font-extrabold">POWERFUL FEATURES THAT GET RESULTS.</h5>
-                <div className="my-2">
-                    <h2 className="font-extrabold text-4xl">Compelling Cover Letters &rarr; Interviews</h2>
+            <section id="features" className="pt-10">
+                <div>
+                    <h5 className="text-primary text-xl font-extrabold">POWERFUL FEATURES THAT GET RESULTS.</h5>
+                    <div className="my-2">
+                        <h2 className="font-extrabold text-4xl">Compelling Cover Letters &rarr; Interviews</h2>
+                    </div>
                 </div>
-            </div>
-            <Button className="mt-10" size="lg" variant="white" IconLucide={PlusIcon}>
-                Join Now
-            </Button>
-            <div className="my-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {features.map((feat, index) => (
-                    <Box
-                        heading={feat.title}
-                        IconLucide={feat.icon}
-                        sh={feat.description}
-                        order={index + 1}
-                        key={index + 1}
-                        variant={index % 2 == 0 ? "dark" : "white"}
-                    />
-                ))}
-            </div>
+                <Button className="mt-10" size="lg" variant="white" IconLucide={PlusIcon}>
+                    Join Now
+                </Button>
+                <div className="my-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {features.map((feat, index) => (
+                        <Box
+                            heading={feat.title}
+                            IconLucide={feat.icon}
+                            sh={feat.description}
+                            order={index + 1}
+                            key={index + 1}
+                            variant={index % 2 == 0 ? "dark" : "white"}
+                        />
+                    ))}
+                </div>
+            </section>
         </Layout>
     );
 };

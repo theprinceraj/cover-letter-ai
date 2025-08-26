@@ -31,16 +31,18 @@ const FAQs = [
 export const FaqPage: React.FC = () => {
     return (
         <Layout className="bg-dark" hasFooter>
-            <div className="mt-10">
-                <h5 className="text-white text-xl font-extrabold">Have Questions About Us?</h5>
-                <div className="my-2">
-                    <h2 className="font-extrabold text-4xl text-primary">Cover Genius.</h2>
-                    <h3 className="text-white text-3xl font-extrabold">We Might Have Already Answered.</h3>
+            <section id="faq" className="pt-10">
+                <div>
+                    <h5 className="text-white text-xl font-extrabold">Have Questions About Us?</h5>
+                    <div className="my-2">
+                        <h2 className="font-extrabold text-4xl text-primary">Cover Genius.</h2>
+                        <h3 className="text-white text-3xl font-extrabold">We Might Have Already Answered.</h3>
+                    </div>
                 </div>
-            </div>
-            <div className="mt-15 mb-10 md:mb-20 lg:mb-10 flex flex-col space-y-5">
-                {FAQs && FAQs.map((faq, index) => <Faq head={faq.head} info={faq.info} key={index} />)}
-            </div>
+                <div className="mt-15 mb-10 md:mb-20 lg:mb-10 flex flex-col space-y-5">
+                    {FAQs && FAQs.map((faq, index) => <Faq head={faq.head} info={faq.info} key={index} />)}
+                </div>
+            </section>
         </Layout>
     );
 };

@@ -219,8 +219,8 @@ export const CoverLetterForm: React.FC = () => {
     }
 
     return (
-        <section id="generator" className="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-            <div className="text-white md:p-10">
+        <section id="generator" className="py-16 lg:-mt-24 max-w-4xl mx-auto px-4 sm:px-6">
+            <div className="text-white md:px-10">
                 <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-primary">Generate Your Cover Letter</h2>
 
                 <ProgressIndicator steps={steps} currentStep={currentStep} />

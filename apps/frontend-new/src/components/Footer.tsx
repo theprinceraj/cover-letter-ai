@@ -15,12 +15,16 @@ const PRODUCT_LINKS: Link[] = [
         label: "Features",
     },
     {
-        href: "#pricing",
-        label: "Pricing",
-    },
-    {
         href: "#demo",
         label: "Demo",
+    },
+    {
+        href: FRONTEND_ENDPOINTS.CREDITS_SHOP,
+        label: "Pricing Information",
+    },
+    {
+        href: "#faq",
+        label: "Frequently Asked Questions",
     },
 ];
 
@@ -112,7 +116,7 @@ export const Footer = () => {
                                     <Link
                                         to={FRONTEND_ENDPOINTS.CREDITS_SHOP}
                                         className="text-neutral-400 hover:text-primary transition-colors focus:ring-2 focus:ring-primary rounded">
-                                        Pricing
+                                        Buy Credits Now
                                     </Link>
                                 </li>
                             </>
