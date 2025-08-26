@@ -6,7 +6,7 @@ import { useContext } from "react";
 import { GlobalContext } from "../../Contexts";
 import { Layout } from "../../Layout";
 
-const pills = ["Cursus Integer", "Integer Consequat", "Aliquot Tristique", "Mauris Fermentum Prasaent"];
+const pills = ["AI-Powered Writing", "Personalized Content", "Job-Matched Content", "Quick & Professional"];
 
 export const HeroSection: React.FC = () => {
     const { openOnboardModal } = useContext(GlobalContext)!;
@@ -19,10 +19,10 @@ export const HeroSection: React.FC = () => {
                     </div>
                     <div className="lg:w-2/3">
                         <div>
-                            <h5 className="text-primary text-xl font-extrabold">RISUS PRAESENT VULPUTATE.</h5>
+                            <h5 className="text-primary text-xl font-extrabold">AI-POWERED CAREER TOOL</h5>
                             <div className="my-2">
-                                <h2 className="font-extrabold text-4xl">Cursus Integer</h2>
-                                <h3 className="text-3xl font-extrabold">Consequat Tristique.</h3>
+                                <h2 className="font-extrabold text-4xl">Create Perfect</h2>
+                                <h3 className="text-3xl font-extrabold">Cover Letters in Minutes</h3>
                             </div>
                         </div>
                         <div className="flex flex-col md:flex-row flex-wrap space-x-2 space-y-4 mt-8">
