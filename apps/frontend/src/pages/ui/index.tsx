@@ -1,4 +1,4 @@
-import DummyImg from "../../assets/dummy-pic.png";
+import DummyImg from "../../assets/dummy-pic.webp";
 import { Box } from "../../components/ui/Box";
 import Button from "../../components/ui/Button";
 import { Faq } from "../../components/ui/Faq";

@@ -1,5 +1,5 @@
 import HeroTemplate from "../../components/ui/HeroTemplate";
-import HeroVectorImg from "../../assets/hero-vector.png";
+import HeroVectorImg from "../../assets/hero-vector.webp";
 import { Pill } from "../../components/ui/Pill";
 import Button from "../../components/ui/Button";
 import { useContext } from "react";
