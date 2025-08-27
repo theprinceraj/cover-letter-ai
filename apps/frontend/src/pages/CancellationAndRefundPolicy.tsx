@@ -21,7 +21,8 @@ export const CancellationAndRefundPolicy: React.FC = () => {
                     <div className="mb-8">
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4">
+                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4"
+                            aria-label="Goto previous page">
                             <ArrowLeftIcon size={20} className="mr-2" />
                             Back
                         </button>
@@ -119,7 +120,10 @@ export const CancellationAndRefundPolicy: React.FC = () => {
                                 </h4>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Mail size={20} className="text-slate-400" />
-                                    <a href={`mailto:${EMAIL_ADDRESS}`} className="text-sky-400 hover:underline">
+                                    <a
+                                        href={`mailto:${EMAIL_ADDRESS}`}
+                                        className="text-sky-400 hover:underline"
+                                        aria-label="Email Address for Help Related to CoverGenius">
                                         {EMAIL_ADDRESS}
                                     </a>
                                 </div>
@@ -209,7 +213,10 @@ export const CancellationAndRefundPolicy: React.FC = () => {
                                 <div className="flex items-center gap-3">
                                     <MailIcon size={20} className="text-slate-400" />
                                     <span className="text-white font-medium">Email:</span>
-                                    <a href={`mailto:${EMAIL_ADDRESS}`} className="text-sky-400 hover:underline">
+                                    <a
+                                        href={`mailto:${EMAIL_ADDRESS}`}
+                                        className="text-sky-400 hover:underline"
+                                        aria-label="Email Address for Help Related to CoverGenius">
                                         {EMAIL_ADDRESS}
                                     </a>
                                 </div>

@@ -106,7 +106,8 @@ export const OnboardModal: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setIsSignUp(!isSignUp)}
-                        className="cursor-pointer text-sm text-slate-500 hover:text-primary-500 transition-colors duration-100">
+                        className="cursor-pointer text-sm text-slate-500 hover:text-primary-500 transition-colors duration-100"
+                        aria-label={isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}>
                         {isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up"}
                     </button>
                 </div>

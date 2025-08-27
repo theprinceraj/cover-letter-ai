@@ -65,10 +65,16 @@ const TestimonialCard: React.FC<
                     <h4 className="text-xl font-extrabold">{author}</h4>
                 </div>
                 <div className="flex space-x-4">
-                    <button onClick={handleLeftClick} className="cursor-pointer">
+                    <button
+                        onClick={handleLeftClick}
+                        className="cursor-pointer"
+                        aria-label="Switch to previous testimonial">
                         <ArrowLeftCircleIcon className="size-10 md:size-14" />
                     </button>
-                    <button onClick={handleRightClick} className="cursor-pointer">
+                    <button
+                        onClick={handleRightClick}
+                        className="cursor-pointer"
+                        aria-label="Switch to next testimonial">
                         <ArrowRightCircleIcon className="text-primary size-10 md:size-14" />
                     </button>
                 </div>

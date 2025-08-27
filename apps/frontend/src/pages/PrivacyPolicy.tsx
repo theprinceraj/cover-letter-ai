@@ -22,7 +22,8 @@ export const PrivacyPolicy: React.FC = () => {
                     <div className="mb-8">
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4">
+                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4"
+                            aria-label="Goto previous page">
                             <ArrowLeft size={20} className="mr-2" />
                             Back
                         </button>
@@ -224,7 +225,11 @@ export const PrivacyPolicy: React.FC = () => {
                             <ul className="list-disc list-inside text-slate-300 space-y-2">
                                 <li>
                                     X (Twitter):{" "}
-                                    <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer">
+                                    <a
+                                        href={TWITTER_URL}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Twitter Handle of Prince Raj">
                                         @theprinceraj
                                     </a>
                                 </li>

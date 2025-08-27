@@ -66,7 +66,8 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
                 <div className="rounded-lg outline outline-primary">
                     <button
                         onClick={() => setShowSuggestions(!showSuggestions)}
-                        className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-primary-100 hover:rounded-lg transition-colors">
+                        className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-primary-100 hover:rounded-lg transition-colors"
+                        aria-label="Expand Suggestions">
                         <div className="flex items-center gap-3">
                             <div className="size-8 bg-primary text-dark font-extrabold rounded-full hidden md:flex md:items-center md:justify-center">
                                 <span className="font-medium text-sm">{cleanedSuggestions.length}</span>

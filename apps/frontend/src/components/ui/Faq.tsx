@@ -24,7 +24,9 @@ export const Faq: React.FC<FaqProps> = ({ head, info }) => {
                 <h3 className="font-extrabold text-lg md:text-2xl">{head}</h3>
                 <p className={infoStyle}>{info}</p>
             </div>
-            <button>{isOpen ? <MinusIcon className={btnStyle} /> : <PlusIcon className={btnStyle} />}</button>
+            <button aria-label="Expand this FAQ">
+                {isOpen ? <MinusIcon className={btnStyle} /> : <PlusIcon className={btnStyle} />}
+            </button>
         </div>
     );
 };

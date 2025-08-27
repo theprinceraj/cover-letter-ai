@@ -21,7 +21,8 @@ export const ContactUs: React.FC = () => {
                     <div className="mb-8">
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4">
+                            className="flex items-center text-slate-400 hover:text-slate-200 transition-colors mb-4"
+                            aria-label="Goto previous page">
                             <ArrowLeftIcon size={20} className="mr-2" />
                             Back
                         </button>
