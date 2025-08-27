@@ -59,7 +59,9 @@ const TestimonialCard: React.FC<
                         What our <br className="md:hidden" />
                         customers thought?
                     </h3>
-                    <p className="text-sm md:text-lg lg:text-2xl px-2 italic min-h-[70px]">{truncatedText}</p>
+                    <p className="text-sm md:text-lg lg:text-2xl px-2 italic min-h-[70px] lg:min-h-[120px]">
+                        {truncatedText}
+                    </p>
                     <h4 className="text-xl font-extrabold">{author}</h4>
                 </div>
                 <div className="flex space-x-4">

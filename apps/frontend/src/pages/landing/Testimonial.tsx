@@ -26,7 +26,7 @@ export const Testimonial: React.FC = () => {
                 <h5 className="text-dark text-xl font-extrabold">AI-powered Cover Letter Assistant</h5>
                 <div className="my-2">
                     <h2 className="font-extrabold text-4xl text-white">Cover Genius</h2>
-                    <h3 className="text-3xl font-extrabold">Experience How This Tool Works</h3>
+                    <h3 className="text-3xl font-extrabold">Know What Our Users Say</h3>
                 </div>
             </div>
             <div className="my-20 w-full lg:w-2/3 mx-auto">
