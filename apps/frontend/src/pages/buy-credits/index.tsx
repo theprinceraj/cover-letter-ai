@@ -14,12 +14,13 @@ import { useCreditPlans, type CreditPlan } from "../../hooks/useCreditPlans";
 import Button from "../../components/ui/Button";
 import { Modal } from "../../components/ui/Modal";
 import { Spinner } from "../../components/ui/Spinner";
-import { PricingCardsList } from "../../components/ui/PricingCardsList";
+import { PricingCardsList, type PricingCardListProps } from "../../components/ui/PricingCardsList";
 import { SEO } from "../../components/ui/seo";
 import { type PayPalButtonsComponentProps } from "@paypal/react-paypal-js";
 import { PayPalModal } from "./PayPalModal";
 import { PaymentStatusModal } from "./PaymentStatusModal";
 import { Layout } from "../../Layout";
+import { validateBuyBtnClick } from "../../utils/validation";
 
 type CreateOrderFn = NonNullable<PayPalButtonsComponentProps["createOrder"]>;
 type onApprovedPaymentFn = NonNullable<PayPalButtonsComponentProps["onApprove"]>;
@@ -35,7 +36,6 @@ export const BuyCredits: React.FC = memo(() => {
     const { openOnboardModal, paymentCurrency, setPaymentCurrency } = useContext(GlobalContext)!;
     const { creditPlans } = useCreditPlans();
     const { error, isLoading, Razorpay } = useRazorpay();
-    const [isPaymentMethodsVisible, setIsPaymentMethodsVisible] = useState<boolean>(false);
     const [isErrorModalOpen, setIsErrorModalOpen] = useState<boolean>(false);
     const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean | null>(null);
     const [isPaymentStatusModalOpen, setIsPaymentStatusModalOpen] = useState<boolean>(false);
@@ -148,45 +148,20 @@ export const BuyCredits: React.FC = memo(() => {
         [fetchWithAuth, initiateRazorpayDialog]
     );
 
-    const handleRazorpayBuyBtnClick = useCallback(
-        (plan: CreditPlan) => {
-            console.log(purchaseInfo);
-            if (purchaseInfo.isGuest) {
-                toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
+    const handleBuyBtnClick = useCallback(
+        (provider: "razorpay" | "paypal", plan: CreditPlan) => {
+            const res = validateBuyBtnClick({ openOnboardModal, purchaseInfo });
+            if (res !== 1) {
                 return;
             }
-            if (!purchaseInfo.isAuthenticated) {
-                openOnboardModal();
-                toast.error("Please sign in using your email to buy credits");
-                return;
+            if (provider === "razorpay") {
+                handleRazorpayPurchase(plan, ACCEPTED_CURRENCY_CODES.INR);
+            } else if (provider === "paypal") {
+                setSelectedPlan(plan);
+                setIsPaypalBtnsVisible(true);
             }
-            if (!purchaseInfo.isEmailVerified) {
-                toast.error("Please verify your email before buying credits.");
-                return;
-            }
-            handleRazorpayPurchase(plan, ACCEPTED_CURRENCY_CODES.INR);
         },
-        [purchaseInfo, openOnboardModal, handleRazorpayPurchase]
-    );
-
-    // PayPal Related Functions
-    const handlePaypalBuyBtnClick = useCallback(
-        (plan: CreditPlan) => {
-            if (!purchaseInfo.canBuy) {
-                if (!purchaseInfo.isAuthenticated) {
-                    openOnboardModal();
-                    toast.error("Please sign in using your email to buy credits");
-                } else if (!purchaseInfo.isGuest) {
-                    toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
-                } else if (!purchaseInfo.isEmailVerified) {
-                    toast.error("Please verify your email before buying credits.");
-                }
-                return;
-            }
-            setSelectedPlan(plan);
-            setIsPaypalBtnsVisible(true);
-        },
-        [purchaseInfo, openOnboardModal]
+        [handleRazorpayPurchase, openOnboardModal, purchaseInfo]
     );
 
     const handlePaypalCreateOrder: CreateOrderFn = useCallback(async () => {
@@ -241,8 +216,6 @@ export const BuyCredits: React.FC = memo(() => {
         [fetchWithAuth]
     );
 
-    const handlePaymentMethodsToggle = useCallback(() => setIsPaymentMethodsVisible((prev) => !prev), []);
-
     const handleClosePaypalModal = () => {
         setIsPaypalBtnsVisible(false);
         setSelectedPlan(null);
@@ -262,25 +235,14 @@ export const BuyCredits: React.FC = memo(() => {
 
     const isLoadingState = useMemo(() => isLoading && creditPlans.length === 0, [isLoading, creditPlans.length]);
 
-    const pricingCardsProps = useMemo(
+    const pricingCardsProps: PricingCardListProps = useMemo(
         () => ({
             plans: creditPlans,
             paymentCurrency,
             setPaymentCurrency,
-            isPaymentMethodsVisible,
-            handleCtaBtnClick: handlePaymentMethodsToggle,
-            handleRazorpayBuyBtnClick,
-            handlePaypalBuyBtnClick,
+            handleBuyBtnClick,
         }),
-        [
-            creditPlans,
-            paymentCurrency,
-            setPaymentCurrency,
-            isPaymentMethodsVisible,
-            handlePaymentMethodsToggle,
-            handleRazorpayBuyBtnClick,
-            handlePaypalBuyBtnClick,
-        ]
+        [creditPlans, paymentCurrency, setPaymentCurrency, handleBuyBtnClick]
     );
 
     return (

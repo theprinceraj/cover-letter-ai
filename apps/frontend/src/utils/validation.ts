@@ -6,6 +6,7 @@ import {
     PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX,
 } from "@cover-letter-ai/constants";
 import type { GeneratorFormErrors, GeneratorFormValues, SignInFormErrors } from "../types";
+import { toast } from "sonner";
 
 export const validateSignInForm = (email: string | null, password: string | null): SignInFormErrors => {
     const errors: SignInFormErrors["errors"] = { email: [], password: [] };
@@ -77,4 +78,34 @@ export const validateGeneratorForm = (values: GeneratorFormValues): GeneratorFor
     }
 
     return errors;
+};
+
+interface ValidateBuyBtnClickProps {
+    purchaseInfo: {
+        isAuthenticated: boolean;
+        isGuest: boolean;
+        isEmailVerified: boolean;
+        canBuy: boolean;
+    };
+    openOnboardModal: () => void;
+}
+
+export const validateBuyBtnClick = (props: ValidateBuyBtnClickProps) => {
+    const { purchaseInfo, openOnboardModal } = props;
+
+    if (purchaseInfo.isGuest) {
+        toast.error("Guest users cannot buy credits. Please sign in with a registered account.");
+        return 0;
+    }
+    if (!purchaseInfo.isAuthenticated) {
+        openOnboardModal();
+        toast.error("Please sign in using your email to buy credits");
+        return 0;
+    }
+    if (!purchaseInfo.isEmailVerified) {
+        toast.error("Please verify your email before buying credits.");
+        return 0;
+    }
+
+    return 1;
 };
