@@ -32,7 +32,7 @@ export const NotFound: React.FC = () => {
                                 Home
                             </Button>
                         </Link>
-                        <Link to={FRONTEND_ENDPOINTS.LANDING}>
+                        <Link to={FRONTEND_ENDPOINTS.GENERATOR}>
                             <Button variant="white" size="md" IconLucide={StarsIcon}>
                                 Generator
                             </Button>
