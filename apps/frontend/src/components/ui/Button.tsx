@@ -24,7 +24,7 @@ export interface ButtonProps {
     IconLucide?: LucideIcon;
 }
 
-const baseStyles = "group font-bold flex justify-between gap-2 items-center rounded-full duration-200";
+const baseStyles = "group font-bold flex justify-between gap-2 items-center rounded-full duration-200 shadow-md";
 const variantStyles = {
     yellow: "bg-primary",
     white: "bg-white text-dark outline-2 outline-primary hover:shadow-[8px_8px_0_0_theme('colors.primary')]",
