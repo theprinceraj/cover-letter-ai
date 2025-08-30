@@ -17,6 +17,7 @@ import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { TermsOfService } from "./pages/TermsOfService";
 import { Generator } from "./pages/generator";
 import { BuyCredits } from "./pages/buy-credits";
+import { NotFound } from "./pages/NotFound";
 
 const ScrollToTop = () => {
     const { pathname } = useLocation();
@@ -56,6 +57,9 @@ function App() {
                         <Route path={FRONTEND_ENDPOINTS.CONTACT} element={<ContactUs />} />
                         <Route path={FRONTEND_ENDPOINTS.PRIVACY} element={<PrivacyPolicy />} />
                         <Route path={FRONTEND_ENDPOINTS.TERMS} element={<TermsOfService />} />
+
+                        {/* Catch unknown routes */}
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
                     <OnboardModal />
                     <Toaster richColors />
