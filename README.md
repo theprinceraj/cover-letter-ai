@@ -115,7 +115,7 @@ cover-letter-ai/
 - **Frontend Hosting**: Vercel with automatic deployments
 - **Backend Hosting**: Render with environment management
 - **Database**: MongoDB Atlas (cloud-hosted)
-- **File Storage**: Cloudinary for resume uploads
+- **File Storage**: Cloudinary for resume uploads // Future Plans
 - **Email Service**: Brevo (formerly Sendinblue) for SMTP
 
 ## 🚀 Getting Started
@@ -126,7 +126,7 @@ cover-letter-ai/
 - **Bun** >= 1.2.12 (recommended) or npm/yarn
 - **MongoDB** instance (local or Atlas)
 - **Google Gemini API** key
-- **Cloudinary** account for file uploads
+- **Cloudinary** account for file uploads // Future Plans
 - **Razorpay** account for payments (optional for development)
 - **Brevo** account for email services (optional for development)
 
@@ -160,7 +160,7 @@ cover-letter-ai/
    # Google Gemini AI
    GEMINI_API_KEY=your-gemini-api-key
 
-   # Cloudinary (for file uploads)
+   # Cloudinary (for file uploads) // Future Plans
    CLOUDINARY_CLOUD_NAME=your-cloud-name
    CLOUDINARY_API_KEY=your-api-key
    CLOUDINARY_API_SECRET=your-api-secret
