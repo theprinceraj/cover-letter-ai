@@ -2,7 +2,7 @@
 
 **AI-Powered Cover Letter Generator**
 
-CoverGenius AI is a sophisticated full-stack application that leverages Google's Gemini 2.0 Flash AI model to generate professional, personalized cover letters tailored to specific job descriptions and candidate resumes. Built with modern technologies and designed for scalability, it offers both registered user accounts and guest access with a flexible credit-based system.
+CoverGenius AI is a sophisticated full-stack application that leverages Google's Gemini 2.5 Flash AI model to generate professional, personalized cover letters tailored to specific job descriptions and candidate resumes. Built with modern technologies and designed for scalability, it offers both registered user accounts and guest access with a flexible credit-based system.
 
 ![AI-Powered](https://img.shields.io/badge/AI-Powered-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white) ![React](https://img.shields.io/badge/React-19.1.0-20232A?logo=react&logoColor=61DAFB) ![NestJS](https://img.shields.io/badge/NestJS-11.0.1-E0234E?logo=nestjs&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?logo=mongodb&logoColor=white) ![Turbo](https://img.shields.io/badge/Turbo-2.5.4-FF6B6B?logo=turbo&logoColor=white)
 
@@ -10,7 +10,7 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 
 ### 🎯 Core Functionality
 
-- **AI-Powered Generation**: Uses Google Gemini 2.0 Flash for intelligent cover letter creation
+- **AI-Powered Generation**: Uses Google Gemini 2.5 Flash for intelligent cover letter creation
 - **Resume Analysis**: Uploads and analyzes PDF resumes to extract relevant information
 - **Job Matching**: Tailors cover letters to specific job descriptions and requirements
 - **Professional Templates**: Generates properly formatted, business-standard cover letters
@@ -20,8 +20,8 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 ### 🔐 Authentication & Access
 
 - **Dual Access Modes**:
-  - Registered users with email/password authentication
-  - Guest access with IP-based tracking
+    - Registered users with email/password authentication
+    - Guest access with IP-based tracking
 - **JWT Security**: Secure token-based authentication with 24-hour expiration
 - **Usage Limits**: Built-in credit system to manage access
 - **Email Verification**: Optional email verification for registered users
@@ -100,7 +100,6 @@ cover-letter-ai/
 - **Framework**: NestJS 11.0.1 with TypeScript 5.7.3
 - **Database**: MongoDB 8.15.1 with Mongoose ODM
 - **Authentication**: Passport.js with JWT and local strategies
-- **File Upload**: Cloudinary 2.6.1 for resume storage
 - **AI Integration**: Google Gemini API (@google/genai 1.4.0)
 - **Payment Processing**: Razorpay SDK 2.9.6
 - **Security**: bcryptjs 3.0.2 for password hashing, rate limiting
@@ -115,7 +114,6 @@ cover-letter-ai/
 - **Frontend Hosting**: Vercel with automatic deployments
 - **Backend Hosting**: Render with environment management
 - **Database**: MongoDB Atlas (cloud-hosted)
-- **File Storage**: Cloudinary for resume uploads // Future Plans
 - **Email Service**: Brevo (formerly Sendinblue) for SMTP
 
 ## 🚀 Getting Started
@@ -126,7 +124,6 @@ cover-letter-ai/
 - **Bun** >= 1.2.12 (recommended) or npm/yarn
 - **MongoDB** instance (local or Atlas)
 - **Google Gemini API** key
-- **Cloudinary** account for file uploads // Future Plans
 - **Razorpay** account for payments (optional for development)
 - **Brevo** account for email services (optional for development)
 
@@ -134,52 +131,47 @@ cover-letter-ai/
 
 1. **Clone the repository**
 
-   ```bash
-   git clone <repository-url>
-   cd cover-letter-ai
-   ```
+    ```bash
+    git clone <repository-url>
+    cd cover-letter-ai
+    ```
 
 2. **Install dependencies**
 
-   ```bash
-   bun install
-   ```
+    ```bash
+    bun install
+    ```
 
 3. **Environment Configuration**
 
-   Create a `.env` file in the root directory:
+    Create a `.env` file in the root directory:
 
-   ```env
-   # Database
-   DB_URI=mongodb://localhost:27017/cover-letter-ai
-   # or use MongoDB Atlas: mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
+    ```env
+    # Database
+    DB_URI=mongodb://localhost:27017/cover-letter-ai
+    # or use MongoDB Atlas: mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 
-   # Authentication
-   JWT_SECRET=your-super-secret-jwt-key-here
+    # Authentication
+    JWT_SECRET=your-super-secret-jwt-key-here
 
-   # Google Gemini AI
-   GEMINI_API_KEY=your-gemini-api-key
+    # Google Gemini AI
+    GEMINI_API_KEY=your-gemini-api-key
 
-   # Cloudinary (for file uploads) // Future Plans
-   CLOUDINARY_CLOUD_NAME=your-cloud-name
-   CLOUDINARY_API_KEY=your-api-key
-   CLOUDINARY_API_SECRET=your-api-secret
+    # Razorpay (for payments)
+    RAZORPAY_KEY_ID=your-razorpay-key-id
+    RAZORPAY_KEY_SECRET=your-razorpay-secret
 
-   # Razorpay (for payments)
-   RAZORPAY_KEY_ID=your-razorpay-key-id
-   RAZORPAY_KEY_SECRET=your-razorpay-secret
+    # Brevo SMTP (for email notifications)
+    BREVO_SMTP_HOST=smtp-relay.brevo.com
+    BREVO_SMTP_PORT=587
+    BREVO_SMTP_USER=your-brevo-username
+    BREVO_SMTP_KEY=your-brevo-api-key
 
-   # Brevo SMTP (for email notifications)
-   BREVO_SMTP_HOST=smtp-relay.brevo.com
-   BREVO_SMTP_PORT=587
-   BREVO_SMTP_USER=your-brevo-username
-   BREVO_SMTP_KEY=your-brevo-api-key
-
-   # URLs (adjust for production)
-   BACKEND_URL=http://localhost:3000
-   FRONTEND_URL=http://localhost:5173
-   VITE_API_URL=http://localhost:3000
-   ```
+    # URLs (adjust for production)
+    BACKEND_URL=http://localhost:3000
+    FRONTEND_URL=http://localhost:5173
+    VITE_API_URL=http://localhost:3000
+    ```
 
 ### 🏃‍♂️ Development
 
@@ -192,15 +184,6 @@ bun dev
 # Or start individually
 bun dev --filter=frontend    # Frontend only (http://localhost:5173)
 bun dev --filter=backend     # Backend only (http://localhost:3000)
-```
-
-**Other useful commands:**
-
-```bash
-bun build                    # Build all packages
-bun lint                     # Lint all packages
-bun format                   # Format code with Prettier
-bun check-types             # Type checking
 ```
 
 ### 🧪 Testing the Application
@@ -216,28 +199,25 @@ bun check-types             # Type checking
 ### For End Users
 
 1. **Choose Access Method**:
-
-   - **Guest Mode**: 3 free generations, no registration required
-   - **Registered User**: 10 free generations, account required
+    - **Guest Mode**: 3 free generations, no registration required
+    - **Registered User**: 10 free generations, account required
 
 2. **Prepare Your Materials**:
-
-   - Job description (copy/paste from job posting)
-   - Resume in PDF format
-   - Optional: Additional relevant information
+    - Job description (copy/paste from job posting)
+    - Resume in PDF format
+    - Optional: Additional relevant information
 
 3. **Generate Cover Letter**:
-
-   - Fill in the job description (max 4,499 characters)
-   - Upload your PDF resume
-   - Add any additional information (max 500 characters)
-   - Click "Generate Cover Letter"
+    - Fill in the job description (max 4,499 characters)
+    - Upload your PDF resume
+    - Add any additional information (max 500 characters)
+    - Click "Generate Cover Letter"
 
 4. **Review and Download**:
-   - Preview the generated cover letter
-   - Review AI suggestions for enhancement
-   - Download as text file
-   - Generate additional letters as needed
+    - Preview the generated cover letter
+    - Review AI suggestions for enhancement
+    - Download as text file
+    - Generate additional letters as needed
 
 ### Credit System
 
@@ -280,7 +260,7 @@ The frontend is configured for automatic deployment on Vercel:
 
 1. Connect your GitHub repository to Vercel
 2. Set environment variables in Vercel dashboard:
-   - `VITE_API_URL`: Your backend URL
+    - `VITE_API_URL`: Your backend URL
 3. Deploy automatically on push to main branch
 
 ### Backend (Render)
@@ -335,13 +315,6 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 - **Error Handling**: Sanitized error messages
 - **Bot Protection**: Cloudflare Turnstile integration
 
-## 📊 Monitoring & Analytics
-
-- **Usage Tracking**: All generations logged with user attribution
-- **Error Logging**: Comprehensive error tracking and reporting
-- **Performance Metrics**: Request timing and success rates
-- **User Analytics**: Registration, usage patterns, and conversion tracking
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -349,19 +322,6 @@ DB_URI=mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript strict mode
-- Use existing ESLint and Prettier configurations
-- Write descriptive commit messages
-- Add proper error handling
-- Update documentation for new features
-- Test thoroughly before submitting PRs
-
-## 📄 License
-
-This project is private and proprietary. All rights reserved.
 
 ## 🆘 Support
 
