@@ -8,30 +8,8 @@ import { DbService } from 'src/db/db.service';
 import { EvalClDto } from './eval-cl.dto.js';
 import { UserDocument } from 'src/db/schema/user.schema.js';
 import { ConfigService } from '@nestjs/config';
-// import { v2 as cloudinary, type ConfigOptions } from 'cloudinary';
 import { unlinkSync, writeFileSync } from 'fs';
 import { GuestDocument } from 'src/db/schema/guest.schema.js';
-
-// async function uploadSingleFile(file: Express.Multer.File | Buffer, folderPath: string, fileName: string): Promise<string> {
-//   const fileBuffer = file instanceof Buffer ? file : (file as Express.Multer.File).buffer;
-//   return new Promise<string>((resolve, reject) => {
-//     cloudinary.uploader
-//       .upload_stream(
-//         {
-//           folder: folderPath,
-//           public_id: fileName,
-//           use_filename: true,
-//           unique_filename: false,
-//           resource_type: 'raw',
-//         },
-//         (err, result) => {
-//           if (err) reject(err);
-//           resolve(result?.secure_url || '');
-//         },
-//       )
-//       .end(fileBuffer);
-//   });
-// }
 
 @Injectable()
 export class EvalService {
@@ -43,14 +21,6 @@ export class EvalService {
     readonly config: ConfigService,
   ) {
     this.ai = this.gemini.ai;
-
-    // const options: ConfigOptions = {
-    //   cloud_name: config.get('CLOUDINARY_CLOUD_NAME') as string,
-    //   api_key: config.get('CLOUDINARY_API_KEY') as string,
-    //   api_secret: config.get('CLOUDINARY_API_SECRET') as string,
-    //   secure: true,
-    // };
-    // cloudinary.config(options);
   }
 
   async eval(
@@ -69,7 +39,6 @@ export class EvalService {
     const contentParts: any = [textualPrompt];
     const resumeFileUri: string | null = null;
     if (resume) {
-      // resumeFileUri = await this.uploadSingleFile(resume, 'resumes', `${currentUser.email.substring(0, 5)}-${resume.originalname}`);
       const resumeFileLocalTempName = `${currentUser.id.substring(0, 5)}-${resume.originalname}.pdf`;
       writeFileSync(resumeFileLocalTempName, resume.buffer);
       const resumeFile = await this.ai.files.upload({
