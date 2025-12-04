@@ -13,7 +13,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: [FRONTEND_URL, 'https://covergenius.is-a.software'],
+    origin: [FRONTEND_URL, 'https://covergenius.is-a.software', 'https://cv.theprinceraj.tech'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
