@@ -133,7 +133,7 @@ export const Demo: React.FC = () => {
                             <h4 className="text-xl font-medium text-neutral-800">{currentStepData.title}</h4>
                         </div>
 
-                        <div className="bg-neutral-50 rounded-lg p-6 min-h-[300px] relative">
+                        <div className="bg-neutral-50 rounded-lg p-6 min-h-75 relative">
                             {isAnalysisStep ? (
                                 <div className="space-y-4">
                                     {currentStepData.content.split("\n").map((line, index) => (
