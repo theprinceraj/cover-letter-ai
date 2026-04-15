@@ -14,8 +14,30 @@ import {
 } from '@cover-letter-ai/constants';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { UserDocument } from 'src/db/schema';
+import { GuestDocument, UserDocument } from 'src/db/schema';
 import { sendMail } from 'src/send-mail.util';
+
+type GuestMeResponse = {
+  id: string;
+  ipAddress: string;
+  exhaustedUses: number;
+  useLimit: number;
+  type: AUTH_PROVIDERS.GUEST;
+};
+
+type JwtUserInput = {
+  email: string;
+  _id: unknown;
+};
+
+type JwtGuestInput = {
+  id: string;
+  _id: unknown;
+};
+
+type OtpLike = {
+  createdAt?: unknown;
+};
 
 @Injectable()
 export class AuthService {
@@ -24,7 +46,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signupLocal(dto: LocalDto, ip: string): Promise<any> {
+  async signupLocal(dto: LocalDto, ip: string): Promise<Record<string, unknown>> {
     const existingUser = await this.db.user.findOne({ email: dto.email });
     if (existingUser) throw new ConflictException('Email already in use');
 
@@ -36,7 +58,7 @@ export class AuthService {
       useLimit: DEFAULT_USE_LIMIT_FOR_REGISTERED_USER,
     });
     await this.sendOtpMail(dto.email);
-    return this.db.deleteConfidentialData(user); // interceptor implement to replace this
+    return this.db.deleteConfidentialData(user);
   }
 
   async loginLocal(user: UserDocument): Promise<AuthService_LoginLocal_Response> {
@@ -54,23 +76,27 @@ export class AuthService {
 
   async loginGuest(ip: string): Promise<AuthService_LoginGuest_Response> {
     // Check if guest already exists for this IP
-    let guest = await this.db.guest.findOne({ ipAddress: ip });
+    const guestLookupResult: unknown = await this.db.guest.findOne({ ipAddress: ip });
+    let guest = guestLookupResult as GuestDocument | null;
 
     if (!guest) {
       // Create new guest user
-      guest = await this.db.guest.create({
+      const newGuestResult: unknown = await this.db.guest.create({
         ipAddress: ip,
         useLimit: DEFAULT_USE_LIMIT_FOR_GUEST,
       });
+      guest = newGuestResult as GuestDocument;
     }
 
+    const guestId = String(guest.id);
+
     // Generate JWT token for guest
-    const token = await this.genGuestJwtToken(guest);
+    const token = this.genGuestJwtToken(guest);
 
     return {
       access_token: token.access_token,
       guest: {
-        id: guest.id,
+        id: guestId,
         ipAddress: guest.ipAddress,
         exhaustedUses: guest.exhaustedUses,
         useLimit: guest.useLimit,
@@ -78,20 +104,22 @@ export class AuthService {
     };
   }
 
-  private genJwtToken(user: any): string {
+  private genJwtToken(user: JwtUserInput): string {
     const payload = { email: user.email, sub: user._id };
     return this.jwtService.sign(payload);
   }
 
-  private async genGuestJwtToken(guest: any): Promise<{ access_token: string }> {
+  private genGuestJwtToken(guest: JwtGuestInput): { access_token: string } {
     const payload = { guestId: guest.id, sub: guest._id, type: AUTH_PROVIDERS.GUEST };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
-  async getMe(user: any): Promise<any> {
-    if (user.ipAddress && !user.email) {
+  getMe(
+    user: UserDocument | { id: string; ipAddress: string; exhaustedUses: number; useLimit: number },
+  ): GuestMeResponse | Record<string, unknown> {
+    if ('ipAddress' in user && !('email' in user)) {
       return {
         id: user.id,
         ipAddress: user.ipAddress,
@@ -125,7 +153,8 @@ export class AuthService {
     const existingOtp = await this.db.otp.findOne({ email: user.email });
 
     if (existingOtp) {
-      const timeSinceCreation = Date.now() - new Date(existingOtp['createdAt']).getTime();
+      const createdAt = this.getDateFromUnknown(existingOtp as OtpLike);
+      const timeSinceCreation = Date.now() - createdAt.getTime();
       const cooldownPeriod = 60 * 1000; // 1 minute cooldown
 
       if (timeSinceCreation < cooldownPeriod) {
@@ -148,7 +177,8 @@ export class AuthService {
 
     if (existingOtp) {
       // Check if OTP is still valid (not expired)
-      const timeSinceCreation = Date.now() - new Date(existingOtp['createdAt']).getTime();
+      const createdAt = this.getDateFromUnknown(existingOtp as OtpLike);
+      const timeSinceCreation = Date.now() - createdAt.getTime();
       const otpExpirationMs = OTP_EXPIRATION_TIME_IN_SECONDS * 1000;
 
       if (timeSinceCreation < otpExpirationMs) {
@@ -171,5 +201,16 @@ export class AuthService {
     const otp = Math.floor(OTP_CODE_MIN + Math.random() * (OTP_CODE_MAX - OTP_CODE_MIN));
     await this.db.otp.create({ email, code: otp });
     await sendMail(email, `Your Cover Genius Verification Code is ${otp}`, otp, OTP_EXPIRATION_TIME_IN_SECONDS / 60);
+  }
+
+  private getDateFromUnknown(input: OtpLike): Date {
+    const createdAt = input.createdAt;
+    if (createdAt instanceof Date) {
+      return createdAt;
+    }
+    if (typeof createdAt === 'number' || typeof createdAt === 'string') {
+      return new Date(createdAt);
+    }
+    return new Date(0);
   }
 }

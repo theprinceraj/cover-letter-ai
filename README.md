@@ -20,8 +20,8 @@ CoverGenius AI is a sophisticated full-stack application that leverages Google's
 ### 🔐 Authentication & Access
 
 - **Dual Access Modes**:
-  - Registered users with email/password authentication
-  - Guest access with IP-based tracking
+    - Registered users with email/password authentication
+    - Guest access with IP-based tracking
 - **JWT Security**: Secure token-based authentication with 24-hour expiration
 - **Usage Limits**: Built-in credit system to manage access
 - **Email Verification**: Optional email verification for registered users
@@ -134,52 +134,52 @@ cover-letter-ai/
 
 1. **Clone the repository**
 
-   ```bash
-   git clone <repository-url>
-   cd cover-letter-ai
-   ```
+    ```bash
+    git clone <repository-url>
+    cd cover-letter-ai
+    ```
 
 2. **Install dependencies**
 
-   ```bash
-   bun install
-   ```
+    ```bash
+    bun install
+    ```
 
 3. **Environment Configuration**
 
-   Create a `.env` file in the root directory:
+    Create a `.env` file in the root directory:
 
-   ```env
-   # Database
-   DB_URI=mongodb://localhost:27017/cover-letter-ai
-   # or use MongoDB Atlas: mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
+    ```env
+    # Database
+    DB_URI=mongodb://localhost:27017/cover-letter-ai
+    # or use MongoDB Atlas: mongodb+srv://user:pass@cluster.mongodb.net/cover-letter-ai
 
-   # Authentication
-   JWT_SECRET=your-super-secret-jwt-key-here
+    # Authentication
+    JWT_SECRET=your-super-secret-jwt-key-here
 
-   # Google Gemini AI
-   GEMINI_API_KEY=your-gemini-api-key
+    # Google Gemini AI
+    GEMINI_API_KEY=your-gemini-api-key
 
-   # Cloudinary (for file uploads) // Future Plans
-   CLOUDINARY_CLOUD_NAME=your-cloud-name
-   CLOUDINARY_API_KEY=your-api-key
-   CLOUDINARY_API_SECRET=your-api-secret
+    # Cloudinary (for file uploads) // Future Plans
+    CLOUDINARY_CLOUD_NAME=your-cloud-name
+    CLOUDINARY_API_KEY=your-api-key
+    CLOUDINARY_API_SECRET=your-api-secret
 
-   # Razorpay (for payments)
-   RAZORPAY_KEY_ID=your-razorpay-key-id
-   RAZORPAY_KEY_SECRET=your-razorpay-secret
+    # Razorpay (for payments)
+    RAZORPAY_KEY_ID=your-razorpay-key-id
+    RAZORPAY_KEY_SECRET=your-razorpay-secret
 
-   # Brevo SMTP (for email notifications)
-   BREVO_SMTP_HOST=smtp-relay.brevo.com
-   BREVO_SMTP_PORT=587
-   BREVO_SMTP_USER=your-brevo-username
-   BREVO_SMTP_KEY=your-brevo-api-key
+    # Brevo SMTP (for email notifications)
+    BREVO_SMTP_HOST=smtp-relay.brevo.com
+    BREVO_SMTP_PORT=587
+    BREVO_SMTP_USER=your-brevo-username
+    BREVO_SMTP_KEY=your-brevo-api-key
 
-   # URLs (adjust for production)
-   BACKEND_URL=http://localhost:3000
-   FRONTEND_URL=http://localhost:5173
-   VITE_API_URL=http://localhost:3000
-   ```
+    # URLs (adjust for production)
+    BACKEND_URL=http://localhost:3000
+    FRONTEND_URL=http://localhost:5173
+    VITE_API_URL=http://localhost:3000
+    ```
 
 ### 🏃‍♂️ Development
 
@@ -216,28 +216,25 @@ bun check-types             # Type checking
 ### For End Users
 
 1. **Choose Access Method**:
-
-   - **Guest Mode**: 3 free generations, no registration required
-   - **Registered User**: 10 free generations, account required
+    - **Guest Mode**: 3 free generations, no registration required
+    - **Registered User**: 10 free generations, account required
 
 2. **Prepare Your Materials**:
-
-   - Job description (copy/paste from job posting)
-   - Resume in PDF format
-   - Optional: Additional relevant information
+    - Job description (copy/paste from job posting)
+    - Resume in PDF format
+    - Optional: Additional relevant information
 
 3. **Generate Cover Letter**:
-
-   - Fill in the job description (max 4,499 characters)
-   - Upload your PDF resume
-   - Add any additional information (max 500 characters)
-   - Click "Generate Cover Letter"
+    - Fill in the job description (max 4,499 characters)
+    - Upload your PDF resume
+    - Add any additional information (max 500 characters)
+    - Click "Generate Cover Letter"
 
 4. **Review and Download**:
-   - Preview the generated cover letter
-   - Review AI suggestions for enhancement
-   - Download as text file
-   - Generate additional letters as needed
+    - Preview the generated cover letter
+    - Review AI suggestions for enhancement
+    - Download as text file
+    - Generate additional letters as needed
 
 ### Credit System
 
@@ -280,7 +277,7 @@ The frontend is configured for automatic deployment on Vercel:
 
 1. Connect your GitHub repository to Vercel
 2. Set environment variables in Vercel dashboard:
-   - `VITE_API_URL`: Your backend URL
+    - `VITE_API_URL`: Your backend URL
 3. Deploy automatically on push to main branch
 
 ### Backend (Render)

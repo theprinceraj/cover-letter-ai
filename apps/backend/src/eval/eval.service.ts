@@ -36,13 +36,15 @@ export class EvalService {
     if (!additionalInfo) textualPrompt = `Job Description: ${jobDescription}`;
     else textualPrompt = `Job Description: ${jobDescription}\nMy Relevant Information: ${additionalInfo}`;
 
-    const contentParts: any = [textualPrompt];
+    const contentParts: Parameters<typeof createUserContent>[0] = [textualPrompt];
     const resumeFileUri: string | null = null;
+    const currentUserId = String(currentUser.id);
     if (resume) {
-      const resumeFileLocalTempName = `${currentUser.id.substring(0, 5)}-${resume.originalname}.pdf`;
+      const resumeFileLocalTempName = `${currentUserId.substring(0, 5)}-${resume.originalname}.pdf`;
       writeFileSync(resumeFileLocalTempName, resume.buffer);
+      const fileBytes = Uint8Array.from(resume.buffer);
       const resumeFile = await this.ai.files.upload({
-        file: new Blob([resume.buffer], { type: resume.mimetype }),
+        file: new Blob([fileBytes], { type: resume.mimetype }),
       });
       contentParts.push(createPartFromUri(resumeFile.uri || '', resume.mimetype));
       unlinkSync(resumeFileLocalTempName);
@@ -71,20 +73,20 @@ export class EvalService {
           .map((line) =>
             line
               .trim()
-              .replace(/^[\*\-]\s*/, '')
+              .replace(/^[*-]\s*/, '')
               .trim(),
           )
           .filter(Boolean)
       : [];
 
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
-      await this.db.user.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
+      await this.db.user.updateOne({ id: currentUserId }, { $inc: { exhaustedUses: 1 } });
     } else {
-      await this.db.guest.updateOne({ id: currentUser.id }, { $inc: { exhaustedUses: 1 } });
+      await this.db.guest.updateOne({ id: currentUserId }, { $inc: { exhaustedUses: 1 } });
     }
 
     await this.db.use.create({
-      userId: currentUser.id,
+      userId: currentUserId,
       useCount: currentUser.exhaustedUses + 1,
       jobDescription,
       additionalInfo,
@@ -101,7 +103,7 @@ export class EvalService {
 
   private async verifyCaptchaToken(token: string, ip: string | null | undefined): Promise<boolean> {
     const formData = new FormData();
-    formData.append('secret', this.config.get('TURNSTILE_SECRET_KEY') as string);
+    formData.append('secret', this.config.getOrThrow<string>('TURNSTILE_SECRET_KEY'));
     formData.append('response', token);
     if (ip) formData.append('remoteip', ip);
 
@@ -112,7 +114,14 @@ export class EvalService {
       method: 'POST',
     });
 
-    const data = await response.json();
+    const rawData: unknown = await response.json();
+    const data =
+      typeof rawData === 'object' &&
+      rawData !== null &&
+      'success' in rawData &&
+      typeof (rawData as { success: unknown }).success === 'boolean'
+        ? (rawData as { success: boolean })
+        : { success: false };
     if (data.success) return true;
     else {
       console.error('Error verifying captcha token', data);

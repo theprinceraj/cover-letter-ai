@@ -11,19 +11,20 @@ import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup/local')
-  async signupLocal(@Body() dto: LocalDto, @Req() { socket: { remoteAddress: ip } }: ExpressRequest) {
-    return this.authService.signupLocal(dto, ip as string);
+  signupLocal(@Body() dto: LocalDto, @Req() { socket: { remoteAddress: ip } }: ExpressRequest) {
+    if (!ip) throw new UnauthorizedException('Unable to determine client IP address');
+    return this.authService.signupLocal(dto, ip);
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login/local')
-  async loginLocal(@Body() dto: LocalDto, @GetUser() user: UserDocument) {
+  loginLocal(@Body() dto: LocalDto, @GetUser() user: UserDocument) {
     // LocalDto is not used here, but it is required by the LocalAuthGuard
     return this.authService.loginLocal(user);
   }
 
   @Post('login/guest')
-  async loginGuest(@Req() req: ExpressRequest) {
+  loginGuest(@Req() req: ExpressRequest) {
     // Extract real client IP
     const ip =
       (req.headers['x-forwarded-for'] as string) || (req.headers['x-real-ip'] as string) || req.socket.remoteAddress || '127.0.0.1';
@@ -34,26 +35,26 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getMe(@GetUser() user: UserDocument | GuestDocument) {
+  getMe(@GetUser() user: UserDocument | GuestDocument) {
     return this.authService.getMe(user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('verify-email')
-  async verifyEmail(@Body() dto: VerifyEmailDto, @GetUser() user: UserDocument | GuestDocument) {
+  verifyEmail(@Body() dto: VerifyEmailDto, @GetUser() user: UserDocument | GuestDocument) {
     if (user.provider === AUTH_PROVIDERS.GUEST) throw new UnauthorizedException('Invalid token.');
     return this.authService.verifyEmail(dto, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('resend-verification')
-  async resendVerification(@GetUser() user: UserDocument | GuestDocument) {
+  resendVerification(@GetUser() user: UserDocument | GuestDocument) {
     if (user.provider === AUTH_PROVIDERS.GUEST) throw new UnauthorizedException('Invalid token.');
     return this.authService.resendVerification(user);
   }
 
   @Get('check-is-alive')
-  async checkIsAlive() {
+  checkIsAlive() {
     return {
       message: 'Server is alive',
     };

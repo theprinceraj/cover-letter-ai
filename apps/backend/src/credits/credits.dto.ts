@@ -4,8 +4,18 @@ import { IsRazorpayPaymentId } from './is-razorpay-pay-id.validator';
 import * as sanitizeHtml from 'sanitize-html';
 import { Transform } from 'class-transformer';
 
+const sanitizeInput = (value: unknown): string => {
+  const input = typeof value === 'string' ? value : '';
+  return sanitizeHtml(input, { allowedTags: [], allowedAttributes: {} });
+};
+
+const sanitizeTrimmedInput = (value: unknown): string => {
+  const input = typeof value === 'string' ? value : '';
+  return sanitizeHtml(input.trim(), { allowedTags: [], allowedAttributes: {} });
+};
+
 export class CreateOrderDto {
-  @Transform(({ value }) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }))
+  @Transform(({ value }: { value: unknown }) => sanitizeInput(value))
   @IsNotEmpty()
   @IsString()
   @IsIn(Object.values(CREDIT_PACKAGES_ID), {
@@ -13,7 +23,7 @@ export class CreateOrderDto {
   })
   packageId!: CREDIT_PACKAGES_ID;
 
-  @Transform(({ value }) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }))
+  @Transform(({ value }: { value: unknown }) => sanitizeInput(value))
   @IsNotEmpty()
   @IsString()
   @Length(3, 3, {
@@ -24,7 +34,7 @@ export class CreateOrderDto {
   })
   currencyCodeInISOFormat!: string;
 
-  @Transform(({ value }) => sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} }))
+  @Transform(({ value }: { value: unknown }) => sanitizeInput(value))
   @IsNotEmpty()
   @IsString()
   @IsIn(Object.values(PAYMENT_GATEWAYS), {
@@ -36,7 +46,7 @@ export class CreateOrderDto {
 export class VerifyRazorpayCreditOrderPaymentDto {
   @IsNotEmpty()
   @IsString()
-  @Transform(({ value }) => sanitizeHtml(value.trim(), { allowedTags: [], allowedAttributes: {} }))
+  @Transform(({ value }: { value: unknown }) => sanitizeTrimmedInput(value))
   @IsRazorpayPaymentId()
   razorpay_payment_id!: string;
 

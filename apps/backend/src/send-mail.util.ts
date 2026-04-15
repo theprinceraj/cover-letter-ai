@@ -300,14 +300,16 @@ export async function sendMail(to: string, subject: string, otp: number, remaini
   if (!transporter) {
     throw new Error('Transporter not initialized');
   }
-  transporter
-    .sendMail({
+  try {
+    await transporter.sendMail({
       from: '"Cover Genius" <covergenius.web@gmail.com>',
       to,
       subject,
       html: OTP_HTML_TEMPLATE.replace('{{text}}', otp.toString())
         .replace('{{year}}', new Date().getFullYear().toString())
         .replace('{{remainingTimeInMinutes}}', remainingTimeInMinutes.toString()),
-    })
-    .catch(console.error);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 }

@@ -21,8 +21,8 @@ import {
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => ({
-        uri: config.get('DB_URI') as string,
+      useFactory: (config: ConfigService) => ({
+        uri: config.get('DB_URI'),
       }),
     }),
     MongooseModule.forFeature([

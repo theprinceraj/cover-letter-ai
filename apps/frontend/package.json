@@ -10,9 +10,9 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@cover-letter-ai/constants": "*",
-        "@cover-letter-ai/eslint-config": "*",
-        "@cover-letter-ai/ts-config": "*",
+        "@cover-letter-ai/constants": "workspace:*",
+        "@cover-letter-ai/eslint-config": "workspace:*",
+        "@cover-letter-ai/ts-config": "workspace:*",
         "@paypal/react-paypal-js": "^8.8.3",
         "@tailwindcss/vite": "^4.1.11",
         "@vercel/analytics": "^1.5.0",
@@ -20,7 +20,7 @@
         "lucide-react": "^0.539.0",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
-        "react-helmet-async": "^2.0.5",
+        "react-helmet-async": "^3.0.0",
         "react-razorpay": "^3.0.1",
         "react-router": "^7.8.0",
         "react-turnstile": "^1.1.4",
@@ -28,6 +28,7 @@
         "tailwindcss": "^4.1.11"
     },
     "devDependencies": {
+        "@swc/helpers": "^0.5.17",
         "@types/react": "^19.1.9",
         "@types/react-dom": "^19.1.7",
         "@vitejs/plugin-react-swc": "^3.11.0",

@@ -13,19 +13,27 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
 import * as sanitizeHtml from 'sanitize-html';
 
+const sanitizeAndNormalizeEmail = (value: unknown): string => {
+  const email = typeof value === 'string' ? value : '';
+  return sanitizeHtml(email.trim().toLowerCase(), {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+};
+
+const sanitizePassword = (value: unknown): string => {
+  const password = typeof value === 'string' ? value : '';
+  return password.trim().replace(/\s+/g, '').replace(/\r\n/g, '');
+};
+
 export class LocalDto {
-  @Transform(({ value }) =>
-    sanitizeHtml(value.trim().toLowerCase(), {
-      allowedTags: [],
-      allowedAttributes: {},
-    }),
-  )
+  @Transform(({ value }: { value: unknown }) => sanitizeAndNormalizeEmail(value))
   @IsNotEmpty()
   @IsEmail()
   @Length(EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH)
   email!: string;
 
-  @Transform(({ value }) => value.trim().replace(/\s+/g, '').replace(/\r\n/g, ''))
+  @Transform(({ value }: { value: unknown }) => sanitizePassword(value))
   @IsNotEmpty()
   @IsString()
   @Length(PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH)

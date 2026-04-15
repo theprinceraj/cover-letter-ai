@@ -6,6 +6,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { DbService } from 'src/db/db.service';
 import { UserDocument, GuestDocument } from 'src/db/schema';
 
+type JwtPayload = {
+  sub: string;
+  type?: AUTH_PROVIDERS;
+};
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
@@ -13,15 +18,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly db: DbService,
   ) {
     super({
-      secretOrKey: configService.get('JWT_SECRET') as string,
+      secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
     });
   }
 
-  async validate(payload: any): Promise<UserDocument | GuestDocument> {
-    // console.log('payload', payload);
-
+  async validate(payload: JwtPayload): Promise<UserDocument | GuestDocument> {
     // Check if this is a guest token
     if (payload.type === AUTH_PROVIDERS.GUEST) {
       const guest = await this.db.guest.findById(payload.sub);

@@ -1,4 +1,4 @@
-import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
+import { registerDecorator, ValidationOptions } from 'class-validator';
 
 export function IsRazorpayPaymentId(options?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -8,10 +8,10 @@ export function IsRazorpayPaymentId(options?: ValidationOptions) {
       propertyName: propertyName,
       options: options,
       validator: {
-        validate(value: any, validationArguments: ValidationArguments) {
+        validate(value: unknown) {
           return typeof value === 'string' && /^pay_[a-zA-Z0-9]{14,20}$/.test(value);
         },
-        defaultMessage(_args: ValidationArguments) {
+        defaultMessage() {
           return 'Invalid Razorpay payment ID format';
         },
       },

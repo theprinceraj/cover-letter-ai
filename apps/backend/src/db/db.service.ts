@@ -42,10 +42,11 @@ export class DbService {
    * @param user - The user document containing all fields
    * @returns User object with confidential fields (hash, ipAddress) removed
    */
-  public deleteConfidentialData(user: UserDocument): any {
-    if (!user.hash && !user.ipAddress) return user;
-    const { hash, ipAddress, ...userWithoutConfidentialData } = user.toObject();
-    return userWithoutConfidentialData;
+  public deleteConfidentialData(user: UserDocument): Record<string, unknown> {
+    const userObject = user.toObject() as Partial<UserDocument>;
+    delete userObject.hash;
+    delete userObject.ipAddress;
+    return userObject;
   }
 
   public isValidSnowflake(id: string): boolean {

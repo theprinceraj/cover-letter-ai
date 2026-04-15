@@ -1,4 +1,4 @@
-import Razorpay = require('razorpay');
+import Razorpay from 'razorpay';
 import { Orders } from 'razorpay/dist/types/orders';
 import {
   ACCEPTED_CURRENCY_CODES,
@@ -26,12 +26,14 @@ export class CreditsService {
     private readonly db: DbService,
   ) {
     this.razorpay = new Razorpay({
-      key_id: this.config.get('RAZORPAY_KEY_ID') as string,
-      key_secret: this.config.get('RAZORPAY_KEY_SECRET') as string,
+      key_id: this.config.getOrThrow<string>('RAZORPAY_KEY_ID'),
+      key_secret: this.config.getOrThrow<string>('RAZORPAY_KEY_SECRET'),
     });
   }
 
   async createOrderUsingRazorpay(user: UserDocument, dto: CreateOrderDto): Promise<CreditsService_OrderUsingRazorpay_Response> {
+    const userId = String(user.id);
+
     // Get package details
     const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
     if (!pkgDetails) {
@@ -42,41 +44,44 @@ export class CreditsService {
     const OrderCreateRequestBody: Orders.RazorpayOrderCreateRequestBody = {
       currency: dto.currencyCodeInISOFormat,
       amount: dto.currencyCodeInISOFormat === 'INR' ? pkgDetails.priceInINR * 100 : pkgDetails.priceInUSD_Cents,
-      receipt: `order_${user.id}_${new Date().toISOString().split('T')[0]}`,
+      receipt: `order_${userId}_${new Date().toISOString().split('T')[0]}`,
       notes: {
-        user_id: user.id as string,
+        user_id: userId,
         user_email: user.email,
         package_id: dto.packageId as string,
       },
     };
-    const order = await this.razorpay.orders.create(OrderCreateRequestBody);
+    const order: Orders.RazorpayOrder = await this.razorpay.orders.create(OrderCreateRequestBody);
 
     // Create order in database
-    const creditOrder = await this.db.creditOrder.create({
+    const orderCreatedAt = new Date(order.created_at * 1000);
+    await this.db.creditOrder.create({
       id: order.id,
-      userId: user.id,
+      userId,
       amountToBePaidInMinorUnits: order.amount_due,
       currency: order.currency,
       status: order.status,
       receipt: order.receipt,
       notes: order.notes,
-      orderCreatedAt: new Date(order.created_at * 1000),
+      orderCreatedAt,
       gateway: PAYMENT_GATEWAYS.RAZORPAY,
     });
 
     return {
       order: {
-        id: creditOrder.id,
-        amountToBePaidInMinorUnits: creditOrder.amountToBePaidInMinorUnits,
-        currency: creditOrder.currency,
-        status: creditOrder.status,
-        orderCreatedAt: creditOrder.orderCreatedAt,
+        id: order.id,
+        amountToBePaidInMinorUnits: order.amount_due,
+        currency: order.currency as ACCEPTED_CURRENCY_CODES,
+        status: order.status as CREDIT_ORDER_STATUS,
+        orderCreatedAt,
       },
       pkg: pkgDetails,
     };
   }
 
   async createOrderUsingPayPal(user: UserDocument, dto: CreateOrderDto): Promise<CreditsService_OrderUsingPayPal_Response> {
+    const userId = String(user.id);
+
     // Get package details
     const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
     if (!pkgDetails) {
@@ -108,28 +113,33 @@ export class CreditsService {
       if (!httpResponse.statusCode.toString().startsWith('20') || result.status !== OrderStatus.Created)
         throw new InternalServerErrorException('Failed to create order using Paypal');
 
-      const creditOrder = await this.db.creditOrder.create({
+      const orderCreatedAt = new Date();
+      await this.db.creditOrder.create({
         id: result.id,
-        userId: user.id,
+        userId,
         amountToBePaidInMinorUnits: pkgDetails.priceInUSD_Cents,
         currency: ACCEPTED_CURRENCY_CODES.USD,
         status: CREDIT_ORDER_STATUS.CREATED,
         notes: {
-          user_id: user.id as string,
+          user_id: userId,
           user_email: user.email,
           package_id: dto.packageId as string,
         },
-        orderCreatedAt: new Date(Date.now()),
+        orderCreatedAt,
         gateway: PAYMENT_GATEWAYS.PAYPAL,
       });
 
+      if (!result.id) {
+        throw new InternalServerErrorException('Failed to create order using Paypal');
+      }
+
       return {
         order: {
-          id: creditOrder.id,
+          id: result.id,
           amountToBePaidInMinorUnits: pkgDetails.priceInUSD_Cents,
           currency: ACCEPTED_CURRENCY_CODES.USD,
-          status: creditOrder.status,
-          orderCreatedAt: creditOrder.orderCreatedAt,
+          status: CREDIT_ORDER_STATUS.CREATED,
+          orderCreatedAt,
         },
         pkg: pkgDetails,
       };
@@ -149,7 +159,7 @@ export class CreditsService {
       throw new BadRequestException('Invalid order ID or order is not paid');
     }
     const generatedSignature = crypto
-      .createHmac('sha256', this.config.get('RAZORPAY_KEY_SECRET') as string)
+      .createHmac('sha256', this.config.getOrThrow<string>('RAZORPAY_KEY_SECRET'))
       .update(order.id + '|' + dto.razorpay_payment_id)
       .digest('hex');
     if (generatedSignature !== dto.razorpay_signature) {
@@ -181,8 +191,8 @@ export class CreditsService {
     }
 
     // Get package details to know how many credits to add
-    const pkgId = creditOrder.notes.package_id;
-    const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === pkgId);
+    const pkgId = String(creditOrder.notes.package_id);
+    const pkgDetails = CREDIT_PACKAGES.find((pkg) => String(pkg.id) === pkgId);
     if (!pkgDetails) throw new NotFoundException(`Package with ID ${pkgId} not found.`);
 
     // Update order status to paid and fill paymentId
