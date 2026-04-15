@@ -50,7 +50,7 @@ const TestimonialCard: React.FC<
 
     return (
         <div className={`${baseStyle} bg-white shadow-md shadow-dark`}>
-            <div className="rounded-full px-4 lg:">
+            <div className="rounded-full overflow-clip mx-6 lg:min-w-28">
                 <img src={img} alt="Testimonial Author Picture" />
             </div>
             <div className="flex flex-col items-center justify-center lg:items-start space-y-10 lg:min-w-2/3">
@@ -59,9 +59,7 @@ const TestimonialCard: React.FC<
                         What our <br className="md:hidden" />
                         customers thought?
                     </h3>
-                    <p className="text-sm md:text-lg lg:text-2xl px-2 italic min-h-[70px] lg:min-h-[120px]">
-                        {truncatedText}
-                    </p>
+                    <p className="text-sm md:text-lg lg:text-2xl px-2 italic min-h-17.5 lg:min-h-30">{truncatedText}</p>
                     <h4 className="text-xl font-extrabold">{author}</h4>
                 </div>
                 <div className="flex space-x-4">

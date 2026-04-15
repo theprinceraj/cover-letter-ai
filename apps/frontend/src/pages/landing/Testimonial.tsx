@@ -3,17 +3,17 @@ import { Layout } from "../../Layout";
 
 const emptyTestimonials = [
     {
-        img: "https://avatar.iran.liara.run/public",
+        img: "https://picsum.photos/200",
         text: "This space is waiting for your success story! Be the first to land your dream job with CoverGenius.",
         author: "Your Name Here",
     },
     {
-        img: "https://avatar.iran.liara.run/public",
+        img: "https://picsum.photos/201",
         text: "We're saving this spot for you! Share how CoverGenius helped you get that interview.",
         author: "Future Success Story",
     },
     {
-        img: "https://avatar.iran.liara.run/public",
+        img: "https://picsum.photos/202",
         text: "Your testimonial could be right here! Use CoverGenius and tell us about your experience.",
         author: "Next Happy Customer",
     },
