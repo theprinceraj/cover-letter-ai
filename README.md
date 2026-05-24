@@ -377,3 +377,7 @@ For support, <a href="mailto:profile.princeraj@gmail.com">click here</a> to emai
 ---
 
 **Built with ❤️ using modern technologies and AI**
+
+
+- shresth is great
+- vardhan is best
