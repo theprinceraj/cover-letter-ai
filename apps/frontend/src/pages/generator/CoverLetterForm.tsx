@@ -38,7 +38,7 @@ const TurnstileWidget: React.FC<{
     useTurnstile();
     return (
         <Turnstile
-            sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "unknown-site-key"}
             execution="render"
             onVerify={(token) => {
                 setCaptchaToken(token);
@@ -99,7 +99,7 @@ export const CoverLetterForm: React.FC = () => {
                 setFormErrors((prev) => ({ ...prev, [name]: undefined }));
             }
         },
-        [formErrors]
+        [formErrors],
     );
 
     const handleFileChange = useCallback(
@@ -110,7 +110,7 @@ export const CoverLetterForm: React.FC = () => {
                 setFormErrors((prev) => ({ ...prev, resume: undefined }));
             }
         },
-        [formErrors]
+        [formErrors],
     );
 
     const handleSubmit = useCallback(
@@ -144,11 +144,11 @@ export const CoverLetterForm: React.FC = () => {
                     const formData = new FormData();
                     formData.append(
                         "jobDescription",
-                        formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH)
+                        formValues.jobDescription.substring(0, MAX_JOB_DESCRIPTION_LENGTH),
                     );
                     formData.append(
                         "additionalInfo",
-                        formValues.additionalInfo.substring(0, MAX_OTHER_RELEVANT_INFORMATION_LENGTH)
+                        formValues.additionalInfo.substring(0, MAX_OTHER_RELEVANT_INFORMATION_LENGTH),
                     );
                     formData.append("captchaToken", captchaToken);
                     formData.append("resume", formValues.resume as Blob);
@@ -176,7 +176,7 @@ export const CoverLetterForm: React.FC = () => {
                 }
             }
         },
-        [fetchWithAuth, captchaToken, formValues, user, guest, incrementExhaustedUses, isAuthenticated]
+        [fetchWithAuth, captchaToken, formValues, user, guest, incrementExhaustedUses, isAuthenticated],
     );
 
     // Show loading state while checking authentication

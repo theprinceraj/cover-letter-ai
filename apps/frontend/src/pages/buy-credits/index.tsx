@@ -43,11 +43,11 @@ export const BuyCredits: React.FC = memo(() => {
     const [selectedPlan, setSelectedPlan] = useState<CreditPlan | null>(null);
     const envVars = useMemo(
         () => ({
-            razorpayKeyId: import.meta.env.VITE_RAZORPAY_KEY_ID,
-            paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
-            environment: import.meta.env.VITE_ENVIRONMENT,
+            razorpayKeyId: import.meta.env.VITE_RAZORPAY_KEY_ID || "unknown-razorpay-key-id",
+            paypalClientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || "unknown-paypal-client-id",
+            environment: import.meta.env.VITE_ENVIRONMENT || "sandbox",
         }),
-        []
+        [],
     );
 
     const purchaseInfo = useMemo(
@@ -57,7 +57,7 @@ export const BuyCredits: React.FC = memo(() => {
             isEmailVerified,
             canBuy: isAuthenticated && !isGuest && isEmailVerified,
         }),
-        [isAuthenticated, isGuest, isEmailVerified]
+        [isAuthenticated, isGuest, isEmailVerified],
     );
 
     const handleRazorpayPaymentSuccess = useCallback(
@@ -88,7 +88,7 @@ export const BuyCredits: React.FC = memo(() => {
                 setIsPaymentStatusModalOpen(true);
             }
         },
-        [fetchWithAuth]
+        [fetchWithAuth],
     );
 
     const handlePaymentFailure = useCallback(() => {
@@ -112,7 +112,7 @@ export const BuyCredits: React.FC = memo(() => {
             const razorpayInstance = new Razorpay(options);
             razorpayInstance.open();
         },
-        [envVars.razorpayKeyId, handlePaymentFailure, handleRazorpayPaymentSuccess, Razorpay]
+        [envVars.razorpayKeyId, handlePaymentFailure, handleRazorpayPaymentSuccess, Razorpay],
     );
 
     const handleRazorpayPurchase = useCallback(
@@ -145,7 +145,7 @@ export const BuyCredits: React.FC = memo(() => {
                 toast.error("Failed to create order. Please try again later.");
             }
         },
-        [fetchWithAuth, initiateRazorpayDialog]
+        [fetchWithAuth, initiateRazorpayDialog],
     );
 
     const handleBuyBtnClick = useCallback(
@@ -161,7 +161,7 @@ export const BuyCredits: React.FC = memo(() => {
                 setIsPaypalBtnsVisible(true);
             }
         },
-        [handleRazorpayPurchase, openOnboardModal, purchaseInfo]
+        [handleRazorpayPurchase, openOnboardModal, purchaseInfo],
     );
 
     const handlePaypalCreateOrder: CreateOrderFn = useCallback(async () => {
@@ -213,7 +213,7 @@ export const BuyCredits: React.FC = memo(() => {
                 setIsPaymentStatusModalOpen(true);
             }
         },
-        [fetchWithAuth]
+        [fetchWithAuth],
     );
 
     const handleClosePaypalModal = () => {
@@ -242,7 +242,7 @@ export const BuyCredits: React.FC = memo(() => {
             setPaymentCurrency,
             handleBuyBtnClick,
         }),
-        [creditPlans, paymentCurrency, setPaymentCurrency, handleBuyBtnClick]
+        [creditPlans, paymentCurrency, setPaymentCurrency, handleBuyBtnClick],
     );
 
     return (
