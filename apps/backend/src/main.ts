@@ -8,12 +8,12 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      transform: true,
+      transform: true,  
       forbidNonWhitelisted: true,
     }),
   );
   app.enableCors({
-    origin: [FRONTEND_URL, 'https://covergenius.is-a.software', 'https://cv.theprinceraj.tech'],
+    origin: [FRONTEND_URL, 'https://cv.theprinceraj.in'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
