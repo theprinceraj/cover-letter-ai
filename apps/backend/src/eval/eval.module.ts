@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { EvalController } from './eval.controller';
 import { EvalService } from './eval.service.js';
 import { GeminiService } from '../gemini.service';
-import { JwtStrategy } from '../auth/strategies';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
+  imports: [AuthModule],
   controllers: [EvalController],
-  providers: [EvalService, GeminiService, JwtStrategy],
+  providers: [EvalService, GeminiService],
 })
 export class EvalModule {}

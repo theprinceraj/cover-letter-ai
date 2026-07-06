@@ -38,12 +38,12 @@ export class DbService {
   }
 
   /**
-   * Removes sensitive information from a user document
-   * @param user - The user document containing all fields
+   * Removes sensitive information from a user document or object
+   * @param user - The user document or object containing all fields
    * @returns User object with confidential fields (hash, ipAddress) removed
    */
-  public deleteConfidentialData(user: UserDocument): Record<string, unknown> {
-    const userObject = user.toObject() as Partial<UserDocument>;
+  public deleteConfidentialData(user: any): Record<string, unknown> {
+    const userObject = user && typeof user.toObject === 'function' ? user.toObject() : { ...user };
     delete userObject.hash;
     delete userObject.ipAddress;
     return userObject;

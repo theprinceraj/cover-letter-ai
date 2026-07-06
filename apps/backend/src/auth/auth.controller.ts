@@ -11,9 +11,12 @@ import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('signup/local')
-  signupLocal(@Body() dto: LocalDto, @Req() { socket: { remoteAddress: ip } }: ExpressRequest) {
+  signupLocal(@Req() req: ExpressRequest, @Body() dto: LocalDto) {
+    const ip =
+      (req.headers['x-forwarded-for'] as string) || (req.headers['x-real-ip'] as string) || req.socket.remoteAddress;
     if (!ip) throw new UnauthorizedException('Unable to determine client IP address');
-    return this.authService.signupLocal(dto, ip);
+    const clientIp = ip === '::1' ? '127.0.0.1' : ip.split(',')[0].trim();
+    return this.authService.signupLocal(dto, clientIp);
   }
 
   @UseGuards(LocalAuthGuard)

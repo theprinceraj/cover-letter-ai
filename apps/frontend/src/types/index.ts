@@ -7,7 +7,11 @@ export interface GeneratorFormValues {
     jobDescription: string;
     resume: File | null;
     additionalInfo: string;
+    tone?: string;
+    length?: string;
+    experienceLevel?: string;
 }
+
 
 export interface GeneratorFormErrors {
     jobDescription?: string;

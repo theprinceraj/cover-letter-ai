@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { FileTextIcon, UploadIcon, X } from "lucide-react";
+import { getSupportedResumeAcceptString, SUPPORTED_RESUME_EXTENSIONS } from "@cover-letter-ai/constants";
 
 interface FileUploadProps {
     onFileChange: (file: File | null) => void;
@@ -14,7 +15,7 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = ({
     onFileChange,
     error,
-    acceptedTypes = ".pdf,application/pdf",
+    acceptedTypes = getSupportedResumeAcceptString(),
     label = "Upload Resume",
     currentFile,
     disabled = false,
@@ -36,7 +37,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
-
+ 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             onFileChange(e.dataTransfer.files[0]);
         }
@@ -93,7 +94,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 {currentFile ? (
                     <div className="flex items-center space-x-2 px-4 py-2 bg-slate-200/40 rounded-md shadow-md border border-secondary-300">
                         <FileTextIcon size={18} className="text-primary" />
-                        <span className="text-sm text-secondary-900 truncate max-w-[200px]">{currentFile.name}</span>
+                        <span className="text-sm text-secondary-900 truncate max-w-50">{currentFile.name}</span>
                         <button
                             type="button"
                             onClick={handleRemoveFile}
@@ -106,7 +107,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     <>
                         <UploadIcon size={24} className="text-white mb-2" />
                         <p className="text-sm text-secondary-500 mb-1">Drag and drop your resume here</p>
-                        <p className="text-xs text-secondary-500">Supported formats: PDF</p>
+                        <p className="text-xs text-secondary-500">
+                            Supported formats: {SUPPORTED_RESUME_EXTENSIONS.map((ext) => ext.toUpperCase()).join(", ")}
+                        </p>
                     </>
                 )}
             </div>

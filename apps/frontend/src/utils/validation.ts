@@ -1,9 +1,9 @@
 import {
     MAX_JOB_DESCRIPTION_LENGTH,
     MIN_JOB_DESCRIPTION_LENGTH,
-    PASSWORD_MAX_LENGTH,
-    PASSWORD_MIN_LENGTH,
-    PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX,
+    isSupportedResumeFile,
+    getEmailErrors,
+    getPasswordErrors,
 } from "@cover-letter-ai/constants";
 import type { GeneratorFormErrors, GeneratorFormValues, SignInFormErrors } from "../types";
 import { toast } from "sonner";
@@ -12,38 +12,11 @@ export const validateSignInForm = (email: string | null, password: string | null
     const errors: SignInFormErrors["errors"] = { email: [], password: [] };
 
     if (email) {
-        // Email validation goes here
+        errors.email = getEmailErrors(email);
     }
 
     if (password) {
-        if (password.length < PASSWORD_MIN_LENGTH) {
-            errors.password.push(`Password must be at least ${PASSWORD_MIN_LENGTH} characters long`);
-        }
-
-        if (password.length > PASSWORD_MAX_LENGTH) {
-            errors.password.push(`Password must be at most ${PASSWORD_MAX_LENGTH} characters long`);
-        }
-
-        if (!/[A-Z]/.test(password)) {
-            errors.password.push("Password must contain at least one uppercase letter");
-        }
-
-        if (!/[a-z]/.test(password)) {
-            errors.password.push("Password must contain at least one lowercase letter");
-        }
-
-        if (!/\d/.test(password)) {
-            errors.password.push("Password must contain at least one digit");
-        }
-
-        if (!PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX.test(password)) {
-            errors.password.push(
-                `Password must contain at least one special character from: ${PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX.source.substring(
-                    1,
-                    PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX.source.length - 1
-                )}`
-            );
-        }
+        errors.password = getPasswordErrors(password);
     }
 
     return {
@@ -69,11 +42,8 @@ export const validateGeneratorForm = (values: GeneratorFormValues): GeneratorFor
 
     // Resume validation
     if (values.resume) {
-        const fileType = values.resume.type;
-        const validTypes = ["application/pdf"];
-
-        if (!validTypes.includes(fileType)) {
-            errors.resume = "Please upload a PDF file";
+        if (!isSupportedResumeFile(values.resume.name, values.resume.type)) {
+            errors.resume = "Please upload a PDF, DOCX, or TXT file";
         }
     }
 

@@ -19,6 +19,34 @@ export interface CreditPlan {
     features: string[];
 }
 
+const PLAN_METADATA: Record<CREDIT_PACKAGES_ID, { icon: LucideIcon; popular?: boolean; features: string[] }> = {
+    [CREDIT_PACKAGES_ID.BASIC]: {
+        icon: Star,
+        features: [
+            "10 AI-generated cover letters",
+            "Industry-specific customization",
+            "Mobile & desktop access",
+        ],
+    },
+    [CREDIT_PACKAGES_ID.STANDARD]: {
+        icon: Zap,
+        popular: true,
+        features: [
+            "30 AI-generated cover letters",
+            "Industry-specific customization",
+            "Mobile & desktop access",
+        ],
+    },
+    [CREDIT_PACKAGES_ID.PREMIUM]: {
+        icon: Crown,
+        features: [
+            "50 AI-generated cover letters",
+            "Industry-specific customization",
+            "Mobile & desktop access",
+        ],
+    },
+};
+
 export const useCreditPlans = () => {
     const [creditPlans, setCreditPlans] = useState<CreditPlan[]>([]);
 
@@ -30,60 +58,11 @@ export const useCreditPlans = () => {
                 return;
             }
             const data = response.data;
-            setCreditPlans([
-                {
-                    id: CREDIT_PACKAGES_ID.BASIC,
-                    name: "Basic",
-                    credits: data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.BASIC)?.credits ?? 0,
-                    priceInINR:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.BASIC)?.priceInINR ?? 0,
-                    priceInUSD_Cents:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.BASIC)
-                            ?.priceInUSD_Cents ?? 0,
-                    icon: Star,
-                    features: [
-                        "10 AI-generated cover letters",
-                        "Industry-specific customization",
-                        "Mobile & desktop access",
-                    ],
-                },
-                {
-                    id: CREDIT_PACKAGES_ID.STANDARD,
-                    name: "Standard",
-                    credits:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.STANDARD)?.credits ?? 0,
-                    priceInINR:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.STANDARD)?.priceInINR ??
-                        0,
-                    priceInUSD_Cents:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.STANDARD)
-                            ?.priceInUSD_Cents ?? 0,
-                    icon: Zap,
-                    popular: true,
-                    features: [
-                        "30 AI-generated cover letters",
-                        "Industry-specific customization",
-                        "Mobile & desktop access",
-                    ],
-                },
-                {
-                    id: CREDIT_PACKAGES_ID.PREMIUM,
-                    name: "Premium",
-                    credits:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.PREMIUM)?.credits ?? 0,
-                    priceInINR:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.PREMIUM)?.priceInINR ?? 0,
-                    priceInUSD_Cents:
-                        data.find((pkg: CREDIT_PACKAGE_TYPE) => pkg.id === CREDIT_PACKAGES_ID.PREMIUM)
-                            ?.priceInUSD_Cents ?? 0,
-                    icon: Crown,
-                    features: [
-                        "50 AI-generated cover letters",
-                        "Industry-specific customization",
-                        "Mobile & desktop access",
-                    ],
-                },
-            ]);
+            const mapped = data.map((pkg: CREDIT_PACKAGE_TYPE) => ({
+                ...pkg,
+                ...(PLAN_METADATA[pkg.id] || { icon: Star, features: [] }),
+            }));
+            setCreditPlans(mapped);
         };
         fetchCreditPlans();
     }, []);

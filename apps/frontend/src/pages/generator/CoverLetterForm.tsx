@@ -10,6 +10,12 @@ import {
     DEFAULT_USE_LIMIT_FOR_GUEST,
     MAX_JOB_DESCRIPTION_LENGTH,
     MAX_OTHER_RELEVANT_INFORMATION_LENGTH,
+    COVER_LETTER_TONES,
+    COVER_LETTER_LENGTHS,
+    COVER_LETTER_EXPERIENCE_LEVELS,
+    COVER_LETTER_TONE_LABELS,
+    COVER_LETTER_LENGTH_LABELS,
+    COVER_LETTER_EXPERIENCE_LEVEL_LABELS,
     type EvalService_Eval_Response,
 } from "@cover-letter-ai/constants";
 import { AuthContext, GlobalContext } from "../../Contexts";
@@ -77,6 +83,9 @@ export const CoverLetterForm: React.FC = () => {
         jobDescription: "",
         resume: null,
         additionalInfo: "",
+        tone: COVER_LETTER_TONES.PROFESSIONAL,
+        length: COVER_LETTER_LENGTHS.STANDARD,
+        experienceLevel: COVER_LETTER_EXPERIENCE_LEVELS.STUDENT,
     });
     const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const [formErrors, setFormErrors] = useState<GeneratorFormErrors>({});
@@ -95,11 +104,20 @@ export const CoverLetterForm: React.FC = () => {
             const { name, value } = e.target;
             setFormValues((prev) => ({ ...prev, [name]: value }));
             // Clear error when user starts typing
-            if (formErrors[name as keyof GeneratorFormValues]) {
-                setFormErrors((prev) => ({ ...prev, [name]: undefined }));
+            const errKey = name as keyof GeneratorFormErrors;
+            if (formErrors[errKey]) {
+                setFormErrors((prev) => ({ ...prev, [errKey]: undefined }));
             }
         },
         [formErrors],
+    );
+
+    const handleSelectChange = useCallback(
+        (e: React.ChangeEvent<HTMLSelectElement>) => {
+            const { name, value } = e.target;
+            setFormValues((prev) => ({ ...prev, [name]: value }));
+        },
+        [],
     );
 
     const handleFileChange = useCallback(
@@ -152,6 +170,9 @@ export const CoverLetterForm: React.FC = () => {
                     );
                     formData.append("captchaToken", captchaToken);
                     formData.append("resume", formValues.resume as Blob);
+                    formData.append("tone", formValues.tone || COVER_LETTER_TONES.PROFESSIONAL);
+                    formData.append("length", formValues.length || COVER_LETTER_LENGTHS.STANDARD);
+                    formData.append("experienceLevel", formValues.experienceLevel || COVER_LETTER_EXPERIENCE_LEVELS.STUDENT);
 
                     const response = await fetchWithAuth<EvalService_Eval_Response | { error: true; message: string }>({
                         url: "/eval/cl",
@@ -262,8 +283,11 @@ export const CoverLetterForm: React.FC = () => {
                         {/* Inline Cover Letter Preview */}
                         <CoverLetterPreview
                             coverLetter={apiResponse.coverLetter}
+                            setCoverLetter={(val) => setApiResponse(prev => ({ ...prev, coverLetter: val }))}
                             suggestions={apiResponse.suggestions}
+                            setSuggestions={(val) => setApiResponse(prev => ({ ...prev, suggestions: val }))}
                             onDownload={() => handleDownload(cleanMarkdownText(apiResponse.coverLetter))}
+                            fetchWithAuth={fetchWithAuth}
                         />
 
                         {/* Action Buttons */}
@@ -283,6 +307,9 @@ export const CoverLetterForm: React.FC = () => {
                                         jobDescription: "",
                                         resume: null,
                                         additionalInfo: "",
+                                        tone: COVER_LETTER_TONES.PROFESSIONAL,
+                                        length: COVER_LETTER_LENGTHS.STANDARD,
+                                        experienceLevel: COVER_LETTER_EXPERIENCE_LEVELS.STUDENT,
                                     });
                                     setFormErrors({});
                                     setApiResponse({ coverLetter: "", suggestions: [] });
@@ -336,6 +363,51 @@ export const CoverLetterForm: React.FC = () => {
                                         currentCount={formValues.additionalInfo.length}
                                         disabled={currentStep !== 0}
                                     />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6 mb-6">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Tone of Voice</label>
+                                    <select
+                                        name="tone"
+                                        value={formValues.tone || COVER_LETTER_TONES.PROFESSIONAL}
+                                        onChange={handleSelectChange}
+                                        disabled={currentStep !== 0}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                                    >
+                                        {Object.entries(COVER_LETTER_TONE_LABELS).map(([value, label]) => (
+                                            <option key={value} value={value}>{label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Length</label>
+                                    <select
+                                        name="length"
+                                        value={formValues.length || COVER_LETTER_LENGTHS.STANDARD}
+                                        onChange={handleSelectChange}
+                                        disabled={currentStep !== 0}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                                    >
+                                        {Object.entries(COVER_LETTER_LENGTH_LABELS).map(([value, label]) => (
+                                            <option key={value} value={value}>{label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-300 mb-2">Experience Level</label>
+                                    <select
+                                        name="experienceLevel"
+                                        value={formValues.experienceLevel || COVER_LETTER_EXPERIENCE_LEVELS.STUDENT}
+                                        onChange={handleSelectChange}
+                                        disabled={currentStep !== 0}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                                    >
+                                        {Object.entries(COVER_LETTER_EXPERIENCE_LEVEL_LABELS).map(([value, label]) => (
+                                            <option key={value} value={value}>{label}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <TurnstileWidget setCaptchaToken={setCaptchaToken} setError={setError} />

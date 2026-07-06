@@ -292,8 +292,7 @@ try {
     },
   });
 } catch (e) {
-  console.log(process.env.BREVO_SMTP_HOST, process.env.BREVO_SMTP_PORT, process.env.BREVO_SMTP_USER, process.env.BREVO_SMTP_KEY);
-  console.error(e);
+  console.error('Failed to initialize nodemailer transporter:', e);
 }
 
 export async function sendMail(to: string, subject: string, otp: number, remainingTimeInMinutes: number): Promise<void> {

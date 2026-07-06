@@ -4,8 +4,9 @@ import { EvalModule } from './eval/eval.module';
 import { DbModule } from './db/db.module';
 import { AuthModule } from './auth/auth.module';
 import { join } from 'path';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { CreditsModule } from './credits/credits.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import { CreditsModule } from './credits/credits.module';
     AuthModule,
     EvalModule,
     CreditsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

@@ -1,14 +1,14 @@
-import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai';
-import { AUTH_PROVIDERS, GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
+import { GoogleGenAI } from '@google/genai';
+import { AUTH_PROVIDERS, MIN_JOB_DESCRIPTION_LENGTH, SUPPORTED_RESUME_EXTENSIONS } from '@cover-letter-ai/constants';
 import type { EvalService_Eval_Response } from '@cover-letter-ai/constants';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { GuestDocument } from '../db/schema/guest.schema.js';
-import { UserDocument } from '../db/schema/user.schema.js';
+import { GuestDocument, UserDocument } from '../db/schema/index.js';
 import { GeminiService } from '../gemini.service.js';
-import { SYSTEM_INSTRUCTION } from './constants.js';
+import { getSystemInstruction } from './constants.js';
 import { ConfigService } from '@nestjs/config';
-import { EvalClDto } from './eval-cl.dto.js';
+import { EvalClDto, RefineClDto } from './eval-cl.dto.js';
 import { DbService } from '../db/db.service';
+import { parseResume } from './resume-parser.js';
 
 @Injectable()
 export class EvalService {
@@ -23,7 +23,7 @@ export class EvalService {
   }
 
   async eval(
-    { jobDescription, additionalInfo, captchaToken }: EvalClDto,
+    { jobDescription, additionalInfo, captchaToken, tone, length, experienceLevel }: EvalClDto,
     resume: Express.Multer.File,
     currentUser: UserDocument | GuestDocument,
   ) {
@@ -31,49 +31,53 @@ export class EvalService {
 
     if (currentUser.exhaustedUses >= currentUser.useLimit) throw new BadRequestException('You have exhausted your use limit');
 
-    let textualPrompt: string;
-    if (!additionalInfo) textualPrompt = `Job Description: ${jobDescription}`;
-    else textualPrompt = `Job Description: ${jobDescription}\nMy Relevant Information: ${additionalInfo}`;
-
-    const contentParts: Parameters<typeof createUserContent>[0] = [textualPrompt];
-    const resumeFileUri: string | null = null;
-    const currentUserId = String(currentUser.id);
+    let resumeText = '';
     if (resume) {
-      const fileBytes = Uint8Array.from(resume.buffer);
-      const resumeFile = await this.ai.files.upload({
-        file: new Blob([fileBytes], { type: resume.mimetype }),
-      });
-      contentParts.push(createPartFromUri(resumeFile.uri || '', resume.mimetype));
+      try {
+        resumeText = await parseResume(resume.buffer, resume.mimetype);
+      } catch (err) {
+        console.error('Error parsing resume file:', err);
+        const allowedStr = SUPPORTED_RESUME_EXTENSIONS.map(ext => ext.toUpperCase()).join(', ');
+        throw new BadRequestException(`Could not parse your resume file. Please ensure it is a valid ${allowedStr} file.`);
+      }
     }
 
+    let textualPrompt = `Job Description:\n${jobDescription}\n\n`;
+    if (resumeText) {
+      textualPrompt += `Candidate's Resume:\n${resumeText}\n\n`;
+    }
+    if (additionalInfo) {
+      textualPrompt += `Additional Context/Requests:\n${additionalInfo}\n\n`;
+    }
+
+    const currentUserId = String(currentUser.id);
+    const systemInstruction = getSystemInstruction(tone, length, experienceLevel);
+
     const response = await this.ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: createUserContent(contentParts),
-      config: { systemInstruction: SYSTEM_INSTRUCTION },
+      model: 'gemini-3.1-flash-lite',
+      contents: textualPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            coverLetter: { type: 'STRING' },
+            suggestions: {
+              type: 'ARRAY',
+              items: { type: 'STRING' },
+            },
+          },
+          required: ['coverLetter', 'suggestions'],
+        },
+      },
     });
 
     if (!response.text) {
       throw new BadRequestException('Failed to generate response from Gemini');
     }
 
-    const splitResponse = response.text?.split(GEMINI_RESPONSE_DELIMITER);
-    let coverLetter = splitResponse?.[0]?.trim();
-    if (coverLetter) {
-      coverLetter = coverLetter.replace(/(\s*---)?\s*\**\s*$/, '').trim();
-    }
-
-    const suggestionsText = splitResponse?.[1]?.trim();
-    const suggestions = suggestionsText
-      ? suggestionsText
-        .split('\n')
-        .map((line) =>
-          line
-            .trim()
-            .replace(/^[*-]\s*/, '')
-            .trim(),
-        )
-        .filter(Boolean)
-      : [];
+    const data = JSON.parse(response.text) as { coverLetter: string; suggestions: string[] };
 
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
       await this.db.user.updateOne({ id: currentUserId }, { $inc: { exhaustedUses: 1 } });
@@ -85,17 +89,95 @@ export class EvalService {
       userId: currentUserId,
       useCount: currentUser.exhaustedUses + 1,
       jobDescription,
-      additionalInfo,
-      documentUrl: resumeFileUri || '',
-      documentType: resume.mimetype,
-      documentName: resume.originalname,
-      suggestions,
-      coverLetter,
+      additionalInfo: additionalInfo || '',
+      documentUrl: '',
+      documentType: resume?.mimetype || 'text/plain',
+      documentName: resume?.originalname || 'resume.txt',
+      suggestions: data.suggestions,
+      coverLetter: data.coverLetter,
       type: currentUser.provider === AUTH_PROVIDERS.GUEST ? 'GUEST' : 'USER',
     });
 
-    return { coverLetter, suggestions } as EvalService_Eval_Response;
+    return data as EvalService_Eval_Response;
   }
+
+  async refine(
+    { coverLetter, instruction, captchaToken }: RefineClDto,
+    currentUser: UserDocument | GuestDocument,
+  ) {
+    if (!(await this.verifyCaptchaToken(captchaToken, currentUser.ipAddress))) throw new BadRequestException('Invalid captcha token');
+
+    if (currentUser.exhaustedUses >= currentUser.useLimit) throw new BadRequestException('You have exhausted your use limit');
+
+    const prompt = `
+You are an expert career advisor and editor. You are asked to refine a cover letter based on a specific user instruction.
+
+Original Cover Letter:
+"""
+${coverLetter}
+"""
+
+User Refinement Instruction:
+"${instruction}"
+
+Your Task:
+1. Rewrite/modify the cover letter according to the user instruction. Keep the changes minimal and targeted, but ensure you satisfy their request.
+2. Provide constructive feedback/suggestions for further improvement based on the new content.
+
+Remember:
+- Do NOT use markdown formatting in the cover letter.
+- Do NOT include bracketed placeholders.
+`;
+
+    const currentUserId = String(currentUser.id);
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            coverLetter: { type: 'STRING' },
+            suggestions: {
+              type: 'ARRAY',
+              items: { type: 'STRING' },
+            },
+          },
+          required: ['coverLetter', 'suggestions'],
+        },
+      },
+    });
+
+    if (!response.text) {
+      throw new BadRequestException('Failed to generate response from Gemini');
+    }
+
+    const data = JSON.parse(response.text) as { coverLetter: string; suggestions: string[] };
+
+    if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
+      await this.db.user.updateOne({ id: currentUserId }, { $inc: { exhaustedUses: 1 } });
+    } else {
+      await this.db.guest.updateOne({ id: currentUserId }, { $inc: { exhaustedUses: 1 } });
+    }
+
+    await this.db.use.create({
+      userId: currentUserId,
+      useCount: currentUser.exhaustedUses + 1,
+      jobDescription: `Refine: ${instruction.substring(0, 100)}`.padEnd(MIN_JOB_DESCRIPTION_LENGTH + 1, '.'),
+      additionalInfo: '',
+      documentUrl: '',
+      documentType: 'text/plain',
+      documentName: 'refined_letter.txt',
+      suggestions: data.suggestions,
+      coverLetter: data.coverLetter,
+      type: currentUser.provider === AUTH_PROVIDERS.GUEST ? 'GUEST' : 'USER',
+    });
+
+    return data as EvalService_Eval_Response;
+  }
+
 
   private async verifyCaptchaToken(token: string, ip: string | null | undefined): Promise<boolean> {
     const formData = new FormData();

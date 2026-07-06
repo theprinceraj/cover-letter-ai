@@ -16,7 +16,7 @@ export const Layout: React.FC<PropsWithChildren<LayoutProps>> = ({
     hasHeader = false,
     hasFooter = false,
 }) => {
-    const containerClasses = `min-h-[95vh] flex flex-col items-center px-4 md:px-16 lg:px-32 py-4 lg:py-24 ${containerClassName}`;
+    const containerClasses = `min-h-[95vh] flex flex-col items-center px-4 md:px-16 py-4 lg:py-24 ${containerClassName}`;
     return (
         <div className={`text-black ${className}`}>
             {hasHeader && <Header />}

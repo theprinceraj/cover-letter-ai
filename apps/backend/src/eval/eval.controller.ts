@@ -2,11 +2,11 @@ import { BadRequestException, Body, Controller, Post, UploadedFile, UseGuards, U
 import { EvalService } from './eval.service.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards';
-import { EvalClDto } from './eval-cl.dto';
-import { GuestDocument, UserDocument } from '../db/schema';
-import { GetUser } from '../auth/decorators/get-user.decorator';
+import { EvalClDto, RefineClDto } from './eval-cl.dto.js';
+import { GuestDocument, UserDocument } from '../db/schema/index.js';
+import { GetUser } from '../auth/decorators/get-user.decorator.js';
 import { memoryStorage } from 'multer';
-import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
+import { AUTH_PROVIDERS, isSupportedResumeFile, SUPPORTED_RESUME_EXTENSIONS } from '@cover-letter-ai/constants';
 
 @Controller('eval')
 export class EvalController {
@@ -18,8 +18,9 @@ export class EvalController {
     FileInterceptor('resume', {
       storage: memoryStorage(),
       fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(pdf)$/)) {
-          return callback(new Error('Only PDF files are allowed!'), false);
+        if (!isSupportedResumeFile(file.originalname, file.mimetype)) {
+          const allowedStr = SUPPORTED_RESUME_EXTENSIONS.map((ext) => ext.toUpperCase()).join(', ');
+          return callback(new Error(`Only ${allowedStr} files are allowed!`), false);
         }
         callback(null, true);
       },
@@ -31,4 +32,13 @@ export class EvalController {
       throw new BadRequestException('Please verify your email to use the service');
     return this.evalService.eval(body, resume, user);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('refine')
+  async refine(@Body() body: RefineClDto, @GetUser() user: UserDocument | GuestDocument) {
+    if (user.provider !== AUTH_PROVIDERS.GUEST && !user.emailVerified)
+      throw new BadRequestException('Please verify your email to use the service');
+    return this.evalService.refine(body, user);
+  }
 }
+

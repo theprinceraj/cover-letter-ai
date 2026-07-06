@@ -21,8 +21,6 @@ interface PricingCardProps {
     plan: CreditPlan;
     isINR: boolean;
     buttonText: string;
-    isPaymentMethodsVisible: boolean;
-    setIsPaymentMethodsVisible: React.Dispatch<React.SetStateAction<boolean>>;
     onRazorpayClick?: () => void;
     onPaypalClick?: () => void;
 }
@@ -33,12 +31,11 @@ const PricingCard = memo(
         plan,
         isINR,
         buttonText,
-        isPaymentMethodsVisible,
-        setIsPaymentMethodsVisible,
         onRazorpayClick,
         onPaypalClick,
     }: PricingCardProps) => {
         const [loading, setLoading] = useState(false);
+        const [isPaymentMethodsVisible, setIsPaymentMethodsVisible] = useState(false);
 
         const handleBuyBtnClick = (provider: "razorpay" | "paypal") => {
             setLoading(true);
@@ -52,9 +49,8 @@ const PricingCard = memo(
         const handleCtaClick = () => setIsPaymentMethodsVisible((prev) => !prev);
 
         const formattedPrice = formatPrice({ priceINR: plan.priceInINR, priceUSD: plan.priceInUSD_Cents }, isINR);
-        const cardClasses = `bg-dark text-white relative rounded-2xl border-2 hover:scale-105 transition-all duration-200 ${
-            plan.popular ? "border-primary scale-105 hover:scale-110" : "border-neutral-200 hover:border-purple-300"
-        }`;
+        const cardClasses = `bg-dark text-white relative rounded-2xl border-2 hover:scale-105 transition-all duration-200 ${plan.popular ? "border-primary scale-105 hover:scale-110" : "border-neutral-200 hover:border-purple-300"
+            }`;
 
         return (
             <div className={cardClasses}>
@@ -81,7 +77,7 @@ const PricingCard = memo(
                     <ul className="space-y-4 mb-8">
                         {plan.features.map((feature, index) => (
                             <li key={index} className="flex items-start space-x-3">
-                                <div className="size-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <div className="size-5 rounded-full bg-primary flex items-center justify-center shrink-0 mt-0.5">
                                     <Check className="size-3 text-dark" />
                                 </div>
                                 <span className="text-sm">{feature}</span>
@@ -135,7 +131,6 @@ export const PricingCardsList = ({
     handleBuyBtnClick,
 }: PricingCardListProps) => {
     const location = useLocation();
-    const [isPaymentMethodsVisible, setIsPaymentMethodsVisible] = useState(false);
     const isINR = useMemo(() => paymentCurrency === ACCEPTED_CURRENCY_CODES.INR, [paymentCurrency]);
     const buttonText = useMemo(
         () => (location.pathname === FRONTEND_ENDPOINTS.CREDITS_SHOP ? "Buy Now" : "Get Started"),
@@ -146,9 +141,8 @@ export const PricingCardsList = ({
     }, [isINR, setPaymentCurrency]);
 
     const toggleClasses = `relative w-12 h-6 rounded-full transition-colors ${isINR ? "bg-dark" : "bg-neutral-400"}`;
-    const toggleButtonClasses = `absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-        isINR ? "translate-x-1" : "translate-x-7"
-    }`;
+    const toggleButtonClasses = `absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${isINR ? "translate-x-1" : "translate-x-7"
+        }`;
     const createHandlers = useCallback(
         (plan: CreditPlan) => ({
             onRazorpayClick: () => handleBuyBtnClick?.("razorpay", plan),
@@ -179,9 +173,7 @@ export const PricingCardsList = ({
                             key={plan.id}
                             plan={plan}
                             isINR={isINR}
-                            isPaymentMethodsVisible={isPaymentMethodsVisible}
                             buttonText={buttonText}
-                            setIsPaymentMethodsVisible={setIsPaymentMethodsVisible}
                             onRazorpayClick={handlers.onRazorpayClick}
                             onPaypalClick={handlers.onPaypalClick}
                         />

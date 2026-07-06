@@ -24,10 +24,31 @@ export const PASSWORD_MIN_SPECIAL_CHARACTERS = 1;
 export const PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX = /[!@#$%^&*]/;
 export const PASSWORD_TEST_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,20}$/;
 
+export enum COVER_LETTER_TONES {
+    PROFESSIONAL = "professional",
+    ENTHUSIASTIC = "enthusiastic",
+    FORMAL = "formal",
+    CONFIDENT = "confident",
+    CREATIVE = "creative",
+}
+
+export enum COVER_LETTER_LENGTHS {
+    SHORT = "short",
+    STANDARD = "standard",
+    DETAILED = "detailed",
+}
+
+export enum COVER_LETTER_EXPERIENCE_LEVELS {
+    STUDENT = "student",
+    MID_LEVEL = "mid-level",
+    SENIOR = "senior",
+}
+
 export interface EvalService_Eval_Response {
     coverLetter: string;
     suggestions: string[];
 }
+
 
 export interface AuthService_LoginLocal_Response {
     access_token: string;
@@ -141,6 +162,88 @@ export enum CREDIT_ORDER_STATUS {
 
 export type CREDIT_PACKAGE_TYPE = (typeof CREDIT_PACKAGES)[number];
 
+export const SUPPORTED_RESUME_EXTENSIONS = ["pdf", "docx", "doc", "txt"];
+export const SUPPORTED_RESUME_MIME_TYPES = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "text/plain",
+];
+
+export const isSupportedResumeFile = (fileName: string, mimeType?: string): boolean => {
+    const ext = fileName.split(".").pop()?.toLowerCase();
+    const hasValidExt = ext ? SUPPORTED_RESUME_EXTENSIONS.includes(ext) : false;
+    const hasValidMime = mimeType ? SUPPORTED_RESUME_MIME_TYPES.includes(mimeType) : true;
+    return hasValidExt && hasValidMime;
+};
+
+export const getSupportedResumeAcceptString = (): string => {
+    return [...SUPPORTED_RESUME_EXTENSIONS.map(ext => `.${ext}`), ...SUPPORTED_RESUME_MIME_TYPES].join(",");
+};
+
+export const EMAIL_TEST_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const getEmailErrors = (email: string): string[] => {
+    const errors: string[] = [];
+    if (email.length < EMAIL_MIN_LENGTH) {
+        errors.push(`Email must be at least ${EMAIL_MIN_LENGTH} characters long`);
+    }
+    if (email.length > EMAIL_MAX_LENGTH) {
+        errors.push(`Email must be at most ${EMAIL_MAX_LENGTH} characters long`);
+    }
+    if (!EMAIL_TEST_REGEX.test(email)) {
+        errors.push("Please enter a valid email address");
+    }
+    return errors;
+};
+
+export const getPasswordErrors = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < PASSWORD_MIN_LENGTH) {
+        errors.push(`Password must be at least ${PASSWORD_MIN_LENGTH} characters long`);
+    }
+    if (password.length > PASSWORD_MAX_LENGTH) {
+        errors.push(`Password must be at most ${PASSWORD_MAX_LENGTH} characters long`);
+    }
+    if (!/[A-Z]/.test(password)) {
+        errors.push("Password must contain at least one uppercase letter");
+    }
+    if (!/[a-z]/.test(password)) {
+        errors.push("Password must contain at least one lowercase letter");
+    }
+    if (!/\d/.test(password)) {
+        errors.push("Password must contain at least one digit");
+    }
+    if (!PASSWORD_SPECIAL_CHARACTERS_TEST_REGEX.test(password)) {
+        errors.push(`Password must contain at least one special character from: !@#$%^&*`);
+    }
+    return errors;
+};
+
+export const getCreditPackageById = (id: string) => {
+    return CREDIT_PACKAGES.find((pkg) => pkg.id === id);
+};
+
+export const COVER_LETTER_TONE_LABELS: Record<COVER_LETTER_TONES, string> = {
+    [COVER_LETTER_TONES.PROFESSIONAL]: "Professional",
+    [COVER_LETTER_TONES.ENTHUSIASTIC]: "Enthusiastic",
+    [COVER_LETTER_TONES.FORMAL]: "Formal",
+    [COVER_LETTER_TONES.CONFIDENT]: "Confident",
+    [COVER_LETTER_TONES.CREATIVE]: "Creative",
+};
+
+export const COVER_LETTER_LENGTH_LABELS: Record<COVER_LETTER_LENGTHS, string> = {
+    [COVER_LETTER_LENGTHS.SHORT]: "Short (1-2 paragraphs)",
+    [COVER_LETTER_LENGTHS.STANDARD]: "Standard (3-4 paragraphs)",
+    [COVER_LETTER_LENGTHS.DETAILED]: "Detailed (4+ paragraphs)",
+};
+
+export const COVER_LETTER_EXPERIENCE_LEVEL_LABELS: Record<COVER_LETTER_EXPERIENCE_LEVELS, string> = {
+    [COVER_LETTER_EXPERIENCE_LEVELS.STUDENT]: "Student / Entry-level",
+    [COVER_LETTER_EXPERIENCE_LEVELS.MID_LEVEL]: "Mid-level Professional",
+    [COVER_LETTER_EXPERIENCE_LEVELS.SENIOR]: "Senior / Executive",
+};
+
 export default {
     BACKEND_URL,
     FRONTEND_URL,
@@ -167,4 +270,20 @@ export default {
 
     ACCEPTED_CURRENCY_CODES,
     PAYMENT_GATEWAYS,
+
+    COVER_LETTER_TONES,
+    COVER_LETTER_LENGTHS,
+    COVER_LETTER_EXPERIENCE_LEVELS,
+
+    SUPPORTED_RESUME_EXTENSIONS,
+    SUPPORTED_RESUME_MIME_TYPES,
+    isSupportedResumeFile,
+    getSupportedResumeAcceptString,
+    EMAIL_TEST_REGEX,
+    getEmailErrors,
+    getPasswordErrors,
+    getCreditPackageById,
+    COVER_LETTER_TONE_LABELS,
+    COVER_LETTER_LENGTH_LABELS,
+    COVER_LETTER_EXPERIENCE_LEVEL_LABELS,
 };

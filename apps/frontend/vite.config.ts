@@ -5,6 +5,7 @@ import vitePluginSvgr from "vite-plugin-svgr";
 
 // https://vite.dev/config/
 export default defineConfig({
+  envDir: "../../",
   plugins: [react(), tailwindcss(), vitePluginSvgr()],
   resolve: {
     dedupe: ["react", "react-dom"],

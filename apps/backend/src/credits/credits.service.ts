@@ -7,6 +7,7 @@ import {
   CreditsService_OrderUsingRazorpay_Response,
   CreditsService_OrderVerification_Response,
   PAYMENT_GATEWAYS,
+  getCreditPackageById,
 } from '@cover-letter-ai/constants';
 import * as crypto from 'crypto';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
@@ -35,7 +36,7 @@ export class CreditsService {
     const userId = String(user.id);
 
     // Get package details
-    const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
+    const pkgDetails = getCreditPackageById(dto.packageId);
     if (!pkgDetails) {
       throw new NotFoundException(`Package with ID '${dto.packageId}' not found`);
     }
@@ -83,7 +84,7 @@ export class CreditsService {
     const userId = String(user.id);
 
     // Get package details
-    const pkgDetails = CREDIT_PACKAGES.find((pkg) => pkg.id === dto.packageId);
+    const pkgDetails = getCreditPackageById(dto.packageId);
     if (!pkgDetails) {
       throw new NotFoundException(`Package with ID '${dto.packageId}' not found`);
     }
@@ -172,12 +173,22 @@ export class CreditsService {
   }
 
   async verifyPayPalCreditOrderPayment(orderId: string): Promise<CreditsService_OrderVerification_Response> {
-    const res = await ordersController.captureOrder({ id: orderId });
-    if (res.result.status !== OrderStatus.Completed) throw new BadRequestException('Payment failed');
+    try {
+      const res = await ordersController.captureOrder({ id: orderId });
+      if (res.result.status !== OrderStatus.Completed) {
+        throw new BadRequestException('Payment failed or not completed');
+      }
 
-    const creditsAdded = await this.processOrderByID(orderId);
+      const creditsAdded = await this.processOrderByID(orderId);
 
-    return { success: true, creditsAdded: creditsAdded };
+      return { success: true, creditsAdded: creditsAdded };
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('PayPal capture error:', error);
+      throw new InternalServerErrorException('Failed to capture PayPal order');
+    }
   }
 
   private async processOrderByID(orderId: string, razorpay_payment_id?: string): Promise<number> {
@@ -186,24 +197,25 @@ export class CreditsService {
     if (!creditOrder) {
       throw new NotFoundException('Order not found');
     }
-    if (creditOrder.status === CREDIT_ORDER_STATUS.PAID) {
-      throw new BadRequestException('Order has already been processed');
-    }
 
-    // Get package details to know how many credits to add
-    const pkgId = String(creditOrder.notes.package_id);
-    const pkgDetails = CREDIT_PACKAGES.find((pkg) => String(pkg.id) === pkgId);
-    if (!pkgDetails) throw new NotFoundException(`Package with ID ${pkgId} not found.`);
-
-    // Update order status to paid and fill paymentId
-    await this.db.creditOrder.updateOne(
-      { id: orderId },
+    // Atomically transition status from non-PAID to PAID
+    const updateResult = await this.db.creditOrder.updateOne(
+      { id: orderId, status: { $ne: CREDIT_ORDER_STATUS.PAID } },
       {
         status: CREDIT_ORDER_STATUS.PAID,
         paymentId: razorpay_payment_id || null,
         paymentVerifiedAt: new Date(),
       },
     );
+
+    if (updateResult.modifiedCount === 0) {
+      throw new BadRequestException('Order has already been processed');
+    }
+
+    // Get package details to know how many credits to add
+    const pkgId = String(creditOrder.notes.package_id);
+    const pkgDetails = getCreditPackageById(pkgId);
+    if (!pkgDetails) throw new NotFoundException(`Package with ID ${pkgId} not found.`);
 
     // Add credits to user
     await this.db.user.updateOne(
