@@ -4,7 +4,7 @@ import { LocalDto, VerifyEmailDto } from './dto';
 import { Request as ExpressRequest } from 'express';
 import { GetUser } from './decorators/get-user.decorator';
 import { JwtAuthGuard, LocalAuthGuard } from './guards';
-import { GuestDocument, UserDocument } from 'src/db/schema';
+import { GuestDocument, UserDocument } from '../db/schema';
 import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 
 @Controller('auth')

@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
-import { DbService } from 'src/db/db.service';
+import { DbService } from '../db/db.service';
 import { LocalDto, VerifyEmailDto } from './dto';
 import {
   AUTH_PROVIDERS,
@@ -14,8 +14,8 @@ import {
 } from '@cover-letter-ai/constants';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { GuestDocument, UserDocument } from 'src/db/schema';
-import { sendMail } from 'src/send-mail.util';
+import { GuestDocument, UserDocument } from '../db/schema';
+import { sendMail } from '../send-mail.util';
 
 type GuestMeResponse = {
   id: string;

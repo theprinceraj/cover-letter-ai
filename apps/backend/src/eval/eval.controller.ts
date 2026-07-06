@@ -1,10 +1,10 @@
 import { BadRequestException, Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { EvalService } from './eval.service.js';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from 'src/auth/guards';
+import { JwtAuthGuard } from '../auth/guards';
 import { EvalClDto } from './eval-cl.dto';
-import { GuestDocument, UserDocument } from 'src/db/schema';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
+import { GuestDocument, UserDocument } from '../db/schema';
+import { GetUser } from '../auth/decorators/get-user.decorator';
 import { memoryStorage } from 'multer';
 import { AUTH_PROVIDERS } from '@cover-letter-ai/constants';
 

@@ -1,5 +1,5 @@
 import { createParamDecorator } from '@nestjs/common';
-import { UserDocument } from 'src/db/schema';
+import { UserDocument } from '../../db/schema';
 
 type RequestUser = Record<string, unknown>;
 

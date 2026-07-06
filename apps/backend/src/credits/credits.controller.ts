@@ -1,9 +1,9 @@
 import { CREDIT_PACKAGES, CreditsService_GetPackagesList_Response, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
 import { BadRequestException, Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { CreditsService } from './credits.service';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { GetUser } from 'src/auth/decorators/get-user.decorator';
-import { UserDocument } from 'src/db/schema';
+import { JwtAuthGuard } from '../auth/guards';
+import { GetUser } from '../auth/decorators/get-user.decorator';
+import { UserDocument } from '../db/schema';
 import { CreateOrderDto, VerifyRazorpayCreditOrderPaymentDto } from './credits.dto';
 
 @Controller('credits')

@@ -4,12 +4,12 @@ import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai
 import { SYSTEM_INSTRUCTION } from './constants.js';
 import { AUTH_PROVIDERS, GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
 import type { EvalService_Eval_Response } from '@cover-letter-ai/constants';
-import { DbService } from 'src/db/db.service';
+import { DbService } from '../db/db.service';
 import { EvalClDto } from './eval-cl.dto.js';
-import { UserDocument } from 'src/db/schema/user.schema.js';
+import { UserDocument } from '../db/schema/user.schema.js';
 import { ConfigService } from '@nestjs/config';
 import { unlinkSync, writeFileSync } from 'fs';
-import { GuestDocument } from 'src/db/schema/guest.schema.js';
+import { GuestDocument } from '../db/schema/guest.schema.js';
 
 @Injectable()
 export class EvalService {

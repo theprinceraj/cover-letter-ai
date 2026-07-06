@@ -10,13 +10,13 @@ import {
 } from '@cover-letter-ai/constants';
 import * as crypto from 'crypto';
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { UserDocument } from 'src/db/schema';
+import { UserDocument } from '../db/schema';
 import { CreateOrderDto, VerifyRazorpayCreditOrderPaymentDto } from './credits.dto';
 import { ConfigService } from '@nestjs/config';
-import { DbService } from 'src/db/db.service';
+import { DbService } from '../db/db.service';
 import { CREDIT_ORDER_STATUS } from '@cover-letter-ai/constants';
 import { CheckoutPaymentIntent, OrderRequest, OrderStatus } from '@paypal/paypal-server-sdk';
-import { ordersController } from 'src/paypal.util';
+import { ordersController } from '../paypal.util';
 
 @Injectable()
 export class CreditsService {
