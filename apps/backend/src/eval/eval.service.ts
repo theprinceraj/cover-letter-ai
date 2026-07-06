@@ -1,15 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { GeminiService } from '../gemini.service.js';
 import { createPartFromUri, createUserContent, GoogleGenAI } from '@google/genai';
-import { SYSTEM_INSTRUCTION } from './constants.js';
 import { AUTH_PROVIDERS, GEMINI_RESPONSE_DELIMITER } from '@cover-letter-ai/constants';
 import type { EvalService_Eval_Response } from '@cover-letter-ai/constants';
-import { DbService } from '../db/db.service';
-import { EvalClDto } from './eval-cl.dto.js';
-import { UserDocument } from '../db/schema/user.schema.js';
-import { ConfigService } from '@nestjs/config';
-import { unlinkSync, writeFileSync } from 'fs';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { GuestDocument } from '../db/schema/guest.schema.js';
+import { UserDocument } from '../db/schema/user.schema.js';
+import { GeminiService } from '../gemini.service.js';
+import { SYSTEM_INSTRUCTION } from './constants.js';
+import { ConfigService } from '@nestjs/config';
+import { EvalClDto } from './eval-cl.dto.js';
+import { DbService } from '../db/db.service';
 
 @Injectable()
 export class EvalService {
@@ -40,14 +39,11 @@ export class EvalService {
     const resumeFileUri: string | null = null;
     const currentUserId = String(currentUser.id);
     if (resume) {
-      const resumeFileLocalTempName = `${currentUserId.substring(0, 5)}-${resume.originalname}.pdf`;
-      writeFileSync(resumeFileLocalTempName, resume.buffer);
       const fileBytes = Uint8Array.from(resume.buffer);
       const resumeFile = await this.ai.files.upload({
         file: new Blob([fileBytes], { type: resume.mimetype }),
       });
       contentParts.push(createPartFromUri(resumeFile.uri || '', resume.mimetype));
-      unlinkSync(resumeFileLocalTempName);
     }
 
     const response = await this.ai.models.generateContent({
@@ -69,14 +65,14 @@ export class EvalService {
     const suggestionsText = splitResponse?.[1]?.trim();
     const suggestions = suggestionsText
       ? suggestionsText
-          .split('\n')
-          .map((line) =>
-            line
-              .trim()
-              .replace(/^[*-]\s*/, '')
-              .trim(),
-          )
-          .filter(Boolean)
+        .split('\n')
+        .map((line) =>
+          line
+            .trim()
+            .replace(/^[*-]\s*/, '')
+            .trim(),
+        )
+        .filter(Boolean)
       : [];
 
     if (currentUser.provider !== AUTH_PROVIDERS.GUEST) {
@@ -117,9 +113,9 @@ export class EvalService {
     const rawData: unknown = await response.json();
     const data =
       typeof rawData === 'object' &&
-      rawData !== null &&
-      'success' in rawData &&
-      typeof (rawData as { success: unknown }).success === 'boolean'
+        rawData !== null &&
+        'success' in rawData &&
+        typeof (rawData as { success: unknown }).success === 'boolean'
         ? (rawData as { success: boolean })
         : { success: false };
     if (data.success) return true;
