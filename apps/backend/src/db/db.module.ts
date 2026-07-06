@@ -36,4 +36,4 @@ import {
   providers: [DbService],
   exports: [DbService],
 })
-export class DbModule {}
+export class DbModule { }

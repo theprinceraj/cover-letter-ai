@@ -1,7 +1,7 @@
 import { MAX_JOB_DESCRIPTION_LENGTH, MAX_OTHER_RELEVANT_INFORMATION_LENGTH, MIN_JOB_DESCRIPTION_LENGTH } from '@cover-letter-ai/constants';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-import * as sanitizeHtml from 'sanitize-html';
+import sanitizeHtml from 'sanitize-html';
 
 const sanitizeMultilineText = (value: unknown): string => {
   const text = typeof value === 'string' ? value : '';

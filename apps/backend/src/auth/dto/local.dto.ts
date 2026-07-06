@@ -9,9 +9,9 @@ import {
   PASSWORD_MIN_UPPER_CASE_LETTERS,
   PASSWORD_TEST_REGEX,
 } from '@cover-letter-ai/constants';
+import sanitizeHtml from 'sanitize-html';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
-import * as sanitizeHtml from 'sanitize-html';
 
 const sanitizeAndNormalizeEmail = (value: unknown): string => {
   const email = typeof value === 'string' ? value : '';

@@ -2,6 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { FRONTEND_URL } from '@cover-letter-ai/constants';
 import { ValidationPipe } from '@nestjs/common';
+import * as dns from 'dns';
+
+dns.setServers(['1.1.1.1', '8.8.8.8']);
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

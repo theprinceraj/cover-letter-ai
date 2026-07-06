@@ -1,7 +1,7 @@
 import { ACCEPTED_CURRENCY_CODES, CREDIT_PACKAGES_ID, PAYMENT_GATEWAYS } from '@cover-letter-ai/constants';
 import { IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
 import { IsRazorpayPaymentId } from './is-razorpay-pay-id.validator';
-import * as sanitizeHtml from 'sanitize-html';
+import sanitizeHtml from 'sanitize-html';
 import { Transform } from 'class-transformer';
 
 const sanitizeInput = (value: unknown): string => {
